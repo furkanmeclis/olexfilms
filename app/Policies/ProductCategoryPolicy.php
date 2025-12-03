@@ -13,8 +13,11 @@ class ProductCategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Herkes görebilir (admin, merkez, bayi)
-        return true;
+        // Herkes görebilir (admin, merkez)
+        return $user->hasAnyRole([
+            UserRoleEnum::SUPER_ADMIN->value,
+            UserRoleEnum::CENTER_STAFF->value,
+        ]);
     }
 
     /**
@@ -22,8 +25,11 @@ class ProductCategoryPolicy
      */
     public function view(User $user, ProductCategory $productCategory): bool
     {
-        // Herkes görebilir
-        return true;
+        // Herkes görebilir (admin, merkez)
+        return $user->hasAnyRole([
+            UserRoleEnum::SUPER_ADMIN->value,
+            UserRoleEnum::CENTER_STAFF->value,
+        ]);
     }
 
     /**

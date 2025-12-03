@@ -30,9 +30,16 @@ class CarModelResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $recordTitleAttribute = 'name';
+
     public static function canViewAny(): bool
     {
         return auth()->user()?->hasRole('super_admin') ?? false;
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'external_id', 'brand.name'];
     }
 
     public static function form(Schema $schema): Schema

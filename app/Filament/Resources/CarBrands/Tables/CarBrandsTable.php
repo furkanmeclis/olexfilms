@@ -17,13 +17,13 @@ class CarBrandsTable
     {
         return $table
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('logo')
+                    ->label('Logo')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/placeholder.png')),
+
                 \Filament\Tables\Columns\TextColumn::make('name')
                     ->label('Marka Adı')
-                    ->searchable()
-                    ->sortable(),
-
-                \Filament\Tables\Columns\TextColumn::make('external_id')
-                    ->label('Dış ID')
                     ->searchable()
                     ->sortable(),
 

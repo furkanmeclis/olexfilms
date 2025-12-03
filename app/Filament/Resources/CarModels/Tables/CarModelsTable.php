@@ -17,6 +17,11 @@ class CarModelsTable
     {
         return $table
             ->columns([
+                \Filament\Tables\Columns\ImageColumn::make('brand.logo')
+                    ->label('Marka Logo')
+                    ->circular()
+                    ->defaultImageUrl(url('/images/placeholder.png')),
+
                 \Filament\Tables\Columns\TextColumn::make('brand.name')
                     ->label('Marka')
                     ->searchable()
@@ -24,11 +29,6 @@ class CarModelsTable
 
                 \Filament\Tables\Columns\TextColumn::make('name')
                     ->label('Model Adı')
-                    ->searchable()
-                    ->sortable(),
-
-                \Filament\Tables\Columns\TextColumn::make('external_id')
-                    ->label('Dış ID')
                     ->searchable()
                     ->sortable(),
 
