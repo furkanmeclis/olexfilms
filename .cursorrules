@@ -1,0 +1,125 @@
+# Glorian v2.3 - Cursor Rules
+
+## Genel Kurallar
+
+- Her zaman Türkçe yanıt ver
+- Context7 MCP'yi her aşamada kullan, özellikle Filament ve Laravel dokümantasyonu için
+- pnpm kullan (npm değil)
+- Kod yazarken Laravel 12 ve Filament 4 best practices'lerini takip et
+
+## Filament 4 Önemli Notlar
+
+### Namespace Kuralları
+
+**KRİTİK:** Filament 4'te Section component'i için doğru namespace:
+- ✅ `Filament\Schemas\Components\Section` (hem form hem infolist için)
+- ❌ `Filament\Infolists\Components\Section` (BÖYLE BİR SINIF YOK!)
+
+**Infolist Component'leri:**
+- `Filament\Infolists\Components\TextEntry`
+- `Filament\Infolists\Components\ImageEntry`
+- `Filament\Infolists\Components\Section` → YANLIŞ!
+- `Filament\Schemas\Components\Section` → DOĞRU!
+
+**Form Component'leri:**
+- `Filament\Forms\Components\TextInput`
+- `Filament\Forms\Components\Select`
+- `Filament\Schemas\Components\Section` → DOĞRU!
+
+### Form ve Infolist Yapısı
+
+- Form'larda mutlaka Section kullan (Card görünümü için)
+- Infolist'lerde de Section kullan (düzenli görünüm için)
+- Her Section'a anlamlı Türkçe başlık ver
+- Section'larda `columns()` metodunu kullan (2 kolon genelde iyi)
+
+### ViewPage Kullanımı
+
+- Her resource için ViewPage oluştur
+- ViewPage'lerde infolist kullan (form değil)
+- Infolist'lerde Section için `Filament\Schemas\Components\Section` kullan
+
+## Laravel 12 Best Practices
+
+### Migrations
+- `foreignId()` kullan, `unsignedBigInteger()` yerine
+- `constrained()` ile foreign key tanımla
+- `nullable()` modifier'ı foreign key'den önce kullan
+
+### Models
+- Scope'lar için `#[Scope]` attribute kullan
+- Relationship metodlarında tip hinting kullan
+- `HasRoles` trait'i Spatie Permission için
+
+### Enums
+- PHP 8.1+ native enum kullan (string backed)
+- Enum değerlerini `->value` ile al
+
+## Spatie Laravel Permission
+
+- Roller: `super_admin`, `center_staff`, `dealer_owner`, `dealer_staff`
+- User model'de `HasRoles` trait kullan
+- Policy'lerde `hasRole()`, `hasAnyRole()` metodlarını kullan
+- Seeder'larda cache temizle: `app()[PermissionRegistrar::class]->forgetCachedPermissions()`
+
+## Proje Özel Kurallar
+
+### Bayi (Dealer) Mimarisi
+- Admin ve Merkez çalışanlarında `dealer_id` NULL olur
+- Bayi sahibi ve çalışanında `dealer_id` dolu olmak zorundadır
+- Bayi pasifse, personel aktif olsa bile giremez (CheckDealerActive middleware)
+- Bayi Sahibi sadece kendi `dealer_id`'sine sahip kullanıcıları görür
+
+### Filament Resource Kuralları
+- Her resource için ViewPage oluştur
+- Create ve Edit sayfalarında form'ları Section ile sarmala
+- Tablolarda ViewAction ekle
+- Tüm label'lar Türkçe olmalı
+- Navigation label'ları Türkçe tanımla
+
+### Form Yapısı
+- Form'ları Section'lara böl (Kişisel Bilgiler, Yetkilendirme, Güvenlik, Durum gibi)
+- Her Section'a anlamlı Türkçe başlık ver
+- Section'larda `columns(2)` kullan (genelde)
+- Full width alanlar için `columnSpanFull()` kullan
+
+### Wizard Kullanımı
+- Wizard step'lerinde de Section kullan
+- Her step'te ilgili Section'ları grupla
+- Wizard'da `HasWizard` trait kullan
+
+## Context7 MCP Kullanımı
+
+- Her yeni özellik eklerken Context7'den dokümantasyon al
+- Özellikle Filament 4 için güncel dokümantasyon kullan
+- Laravel 12 için migration ve model best practices'lerini kontrol et
+- Spatie Permission için doğru kullanımı Context7'den doğrula
+
+## Paket Yönetimi
+
+- pnpm kullan (npm değil)
+- Composer için `composer require` kullan
+- Migration'ları her zaman çalıştır
+- Seeder'ları test et
+
+## Hata Önleme
+
+- Infolist'lerde Section kullanırken namespace'i kontrol et
+- Form ve Infolist'te aynı Section namespace'i kullanılır
+- ViewPage'lerde mutlaka infolist tanımla
+- Policy'lerde rol kontrolü yaparken enum value kullan
+
+## Kod Kalitesi
+
+- Her zaman linter hatalarını kontrol et
+- Type hinting kullan
+- Return type'ları belirt
+- Docblock'ları ekle (gerekirse)
+
+## Test ve Doğrulama
+
+- Migration'ları çalıştır
+- Seeder'ları test et
+- Filament panelinde manuel test yap
+- Cache'leri temizle (route, config, view)
+
