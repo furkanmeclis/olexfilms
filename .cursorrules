@@ -21,6 +21,16 @@
 - `Filament\Infolists\Components\Section` → YANLIŞ!
 - `Filament\Schemas\Components\Section` → DOĞRU!
 
+**Infolist TextEntry Metodları:**
+- ✅ `TextEntry::badge()` - Badge görünümü için
+- ✅ `TextEntry::listWithLineBreaks()` - Relationship'lerden liste göstermek için (her satırda bir değer)
+- ✅ `TextEntry::bulleted()` - Liste için bullet points
+- ✅ `TextEntry::separator()` - Virgül veya başka separator ile ayırmak için
+- ❌ `TextEntry::list()` - BÖYLE BİR METOD YOK!
+- ❌ `TextEntry::badgeList()` - BÖYLE BİR METOD YOK!
+- ✅ Nested liste için: `RepeatableEntry::make('items')->schema([TextEntry::make('field')])` kullan
+- ✅ Relationship'ten tek alan liste: `TextEntry::make('relation.field')->listWithLineBreaks()->badge()`
+
 **Form Component'leri:**
 - `Filament\Forms\Components\TextInput`
 - `Filament\Forms\Components\Select`
@@ -108,6 +118,12 @@
 - Form ve Infolist'te aynı Section namespace'i kullanılır
 - ViewPage'lerde mutlaka infolist tanımla
 - Policy'lerde rol kontrolü yaparken enum value kullan
+- **KRİTİK:** Filament 4'te `TextEntry::list()` ve `TextEntry::badgeList()` metodları YOK!
+  - ❌ YANLIŞ: `TextEntry::make('items')->list(...)` veya `->badgeList(...)`
+  - ❌ YANLIŞ: `formatStateUsing()` içinde array döndürüp `separator()` kullanmak (htmlspecialchars hatası)
+  - ✅ DOĞRU (Nested liste): `RepeatableEntry::make('items')->schema([TextEntry::make('field')])`
+  - ✅ DOĞRU (Relationship liste): `TextEntry::make('items.barcode')->listWithLineBreaks()->badge()`
+  - ✅ DOĞRU (String döndürme): `formatStateUsing(fn($state) => $state->pluck('field')->join(', '))` (string döndürmeli)
 
 ## Kod Kalitesi
 

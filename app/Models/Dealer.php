@@ -34,6 +34,30 @@ class Dealer extends Model
     }
 
     /**
+     * Get all orders for this dealer.
+     */
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get all stock items for this dealer.
+     */
+    public function stockItems(): HasMany
+    {
+        return $this->hasMany(StockItem::class);
+    }
+
+    /**
+     * Get all services for this dealer.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class);
+    }
+
+    /**
      * Scope a query to only include active dealers.
      */
     #[Scope]

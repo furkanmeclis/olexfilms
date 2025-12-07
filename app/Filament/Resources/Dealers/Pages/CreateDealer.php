@@ -40,7 +40,7 @@ class CreateDealer extends CreateRecord
                                 ->label('E-posta')
                                 ->email()
                                 ->required()
-                                ->unique(ignoreRecord: true)
+                                ->unique()
                                 ->maxLength(255),
 
                             TextInput::make('phone')
@@ -118,7 +118,7 @@ class CreateDealer extends CreateRecord
                                 ->label('E-posta')
                                 ->email()
                                 ->required(fn ($get) => $get('owner_type') === 'new')
-                                ->unique(User::class, 'email', ignoreRecord: true)
+                                ->unique(User::class, 'email')
                                 ->maxLength(255)
                                 ->visible(fn ($get) => $get('owner_type') === 'new'),
 

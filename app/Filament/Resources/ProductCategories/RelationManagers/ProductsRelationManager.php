@@ -40,7 +40,7 @@ class ProductsRelationManager extends RelationManager
         // Form component'lerini modify et - category_id Select'ini Hidden yap
         $components = collect($form->getComponents())->map(function ($component) {
             if ($component instanceof \Filament\Schemas\Components\Section) {
-                $sectionComponents = collect($component->getSchema())->map(function ($field) {
+                $sectionComponents = collect($component->getComponents(withActions: false, withHidden: false))->map(function ($field) {
                     if ($field->getName() === 'category_id') {
                         return Hidden::make('category_id')
                             ->default(fn () => $this->ownerRecord->id);

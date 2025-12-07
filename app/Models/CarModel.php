@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CarModel extends Model
@@ -35,6 +36,14 @@ class CarModel extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(CarBrand::class, 'brand_id');
+    }
+
+    /**
+     * Get all services for this model.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class, 'car_model_id');
     }
 
     /**

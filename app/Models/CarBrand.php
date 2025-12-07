@@ -38,6 +38,14 @@ class CarBrand extends Model
     }
 
     /**
+     * Get all services for this brand.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class, 'car_brand_id');
+    }
+
+    /**
      * Scope a query to only include active brands.
      */
     #[Scope]

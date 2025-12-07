@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -61,6 +62,22 @@ class User extends Authenticatable
     public function dealer(): BelongsTo
     {
         return $this->belongsTo(Dealer::class);
+    }
+
+    /**
+     * Get all customers created by this user.
+     */
+    public function createdCustomers(): HasMany
+    {
+        return $this->hasMany(Customer::class, 'created_by');
+    }
+
+    /**
+     * Get all services created by this user.
+     */
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class, 'user_id');
     }
 
     /**
