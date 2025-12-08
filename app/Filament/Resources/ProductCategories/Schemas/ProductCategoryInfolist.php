@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ProductCategories\Schemas;
 
-use App\Enums\CarPartEnum;
+use App\Filament\Infolists\Components\CarPartView;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -18,17 +18,8 @@ class ProductCategoryInfolist
                         TextEntry::make('name')
                             ->label('Kategori Adı'),
 
-                        TextEntry::make('available_parts')
+                        CarPartView::make('available_parts')
                             ->label('Uygulanabilir Parçalar')
-                            ->badge()
-                            ->formatStateUsing(function ($state) {
-                                if (! is_array($state) || empty($state)) {
-                                    return 'Belirtilmemiş';
-                                }
-                                $labels = CarPartEnum::getLabels();
-                                $formatted = array_map(fn ($part) => $labels[$part] ?? $part, $state);
-                                return implode(', ', $formatted);
-                            })
                             ->columnSpanFull(),
 
                         TextEntry::make('is_active')

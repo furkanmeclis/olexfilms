@@ -1,0 +1,102 @@
+/* Car Part Picker Styles */
+
+.car-part-picker {
+    width: 100%;
+}
+
+.car-part-picker .car-svg-container {
+    max-width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.car-part-picker .car-svg-container svg {
+    max-width: 100%;
+    height: auto;
+    width: 100%;
+}
+
+.car-part-picker .car-svg-container svg path[id] {
+    transition: fill 0.2s ease-in-out;
+}
+
+/* Tree View Sidebar */
+.car-part-picker .border {
+    border-color: rgb(229 231 235);
+}
+
+.dark .car-part-picker .border {
+    border-color: rgb(55 65 81);
+}
+
+.car-part-picker label {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.car-part-picker label:hover {
+    background-color: rgb(229 231 235);
+}
+
+.dark .car-part-picker label:hover {
+    background-color: rgb(31 41 55);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .car-part-picker .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .car-part-picker .col-span-2 {
+        grid-column: span 1;
+    }
+}
+
+/* SVG path hover effects */
+.car-part-picker svg path[data-part-id] {
+    transition: fill 0.15s ease-in-out;
+}
+
+.car-part-picker svg path[data-part-id]:hover {
+    filter: brightness(1.1);
+}
+
+/* Checkbox styling */
+.car-part-picker input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+}
+
+/* Scrollbar styling for sidebar */
+.car-part-picker .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+}
+
+.car-part-picker .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+    border-radius: 3px;
+}
+
+.dark .car-part-picker .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgb(31 41 55);
+}
+
+.car-part-picker .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgb(209 213 219);
+    border-radius: 3px;
+}
+
+.dark .car-part-picker .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgb(75 85 99);
+}
+
+.car-part-picker .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgb(156 163 175);
+}
+
+.dark .car-part-picker .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgb(107 114 128);
+}

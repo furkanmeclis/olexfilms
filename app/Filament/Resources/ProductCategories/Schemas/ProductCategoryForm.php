@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources\ProductCategories\Schemas;
 
-use App\Enums\CarPartEnum;
-use Filament\Forms\Components\CheckboxList;
+use App\Filament\Forms\Components\CarPartPicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -22,10 +21,8 @@ class ProductCategoryForm
                             ->required()
                             ->maxLength(255),
 
-                        CheckboxList::make('available_parts')
+                        CarPartPicker::make('available_parts')
                             ->label('Uygulanabilir Parçalar')
-                            ->options(CarPartEnum::getLabels())
-                            ->columns(2)
                             ->required(),
 
                         Toggle::make('is_active')
