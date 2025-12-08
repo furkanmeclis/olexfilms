@@ -8,11 +8,15 @@
 @import '../../vendor/filament/tables/resources/css/index.css';
 @import '../../vendor/filament/widgets/resources/css/index.css';
 
+@source '../views/filament/forms/components/*.blade.php';
+@source '../views/filament/**/*.blade.php';
+@source '../views/components/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
 @source '../**/*.vue';
+
 
 @theme {
     --font-sans:
