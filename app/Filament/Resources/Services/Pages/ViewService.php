@@ -91,6 +91,13 @@ class ViewService extends ViewRecord
                 ->url(fn () => ServiceResource::getUrl('edit', ['record' => $record]));
         }
 
+        // Galeri yönetimi
+        $actions[] = Actions\Action::make('manageImages')
+            ->label('Galeri Yönetimi')
+            ->icon('heroicon-o-photo')
+            ->color('success')
+            ->url(fn () => ServiceResource::getUrl('manage-images', ['record' => $record]));
+
         return $actions;
     }
 }

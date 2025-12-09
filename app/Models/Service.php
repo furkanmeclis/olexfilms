@@ -94,4 +94,12 @@ class Service extends Model
     {
         return $this->hasMany(Warranty::class);
     }
+
+    /**
+     * Get the images for this service.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ServiceImage::class)->orderBy('order');
+    }
 }

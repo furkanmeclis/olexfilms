@@ -8,14 +8,20 @@ use App\Enums\ServiceItemUsageTypeEnum;
 use App\Enums\ServiceStatusEnum;
 use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
+use App\Filament\Forms\Components\CarPartPicker;
+use App\Filament\Forms\Components\ServiceNumberInput;
+use App\Filament\Forms\Components\StockItemPicker;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\Facades\Auth;
@@ -54,25 +60,90 @@ class ServiceForm
         return [$cityData, $cityDistrictMap];
     }
 
-    public static function getCustomerAndCarStep(): array
+    public static function getCustomerAndCarStep(?ServiceStatusEnum $currentStatus = null): array
     {
         $user = Auth::user();
         $isAdmin = $user && ($user->hasRole(UserRoleEnum::SUPER_ADMIN->value) || $user->hasRole(UserRoleEnum::CENTER_STAFF->value));
         $currentYear = (int) date('Y');
         $years = range($currentYear, 1975);
+        $isLocked = $currentStatus === ServiceStatusEnum::COMPLETED 
+            || $currentStatus === ServiceStatusEnum::CANCELLED;
 
         [$cityData, $cityDistrictMap] = self::getCityData();
 
         return [
             Section::make('Müşteri Seçimi')
                 ->schema([
-                    Select::make('customer_id')
-                        ->label('Müşteri')
-                        ->relationship('customer', 'name')
+                    // Admin için önce bayi seçimi
+                    Select::make('dealer_id')
+                        ->label('Bayi')
+                        ->relationship('dealer', 'name')
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->disabled($isLocked)
+                        ->live()
+                        ->columnSpanFull()
+                        ->afterStateUpdated(fn ($state, callable $set) => $set('customer_id', null))
+                        ->visible(fn () => $isAdmin),
+
+                    // Bayi çalışanları için hidden dealer_id
+                    Hidden::make('dealer_id')
+                        ->default(fn () => $user->dealer_id ?? null)
+                        ->visible(fn () => !$isAdmin),
+
+                    // Müşteri seçimi - admin için bayi bazlı filtreleme
+                    Select::make('customer_id')
+                        ->label('Müşteri')
+                        ->relationship(
+                            'customer',
+                            'name',
+                            function ($query, $get) use ($isAdmin, $user) {
+                                $dealerId = $isAdmin ? $get('dealer_id') : ($user?->dealer_id);
+                                
+                                if ($dealerId) {
+                                    $query->where('dealer_id', $dealerId);
+                                } else {
+                                    // Eğer dealer_id yoksa hiçbir şey gösterme
+                                    $query->whereRaw('1 = 0');
+                                }
+                                
+                                return $query;
+                            }
+                        )
+                        ->getSearchResultsUsing(function (string $search, $get) use ($isAdmin, $user) {
+                            $dealerId = $isAdmin ? $get('dealer_id') : ($user?->dealer_id);
+                            
+                            if (!$dealerId) {
+                                return [];
+                            }
+                            
+                            return \App\Models\Customer::query()
+                                ->where('dealer_id', $dealerId)
+                                ->where('name', 'like', "%{$search}%")
+                                ->limit(50)
+                                ->get()
+                                ->mapWithKeys(fn ($customer) => [$customer->getKey() => $customer->name]);
+                        })
+                        ->getOptionLabelUsing(fn ($value): ?string => \App\Models\Customer::find($value)?->name)
+                        ->searchable()
+                        ->preload(fn () => !$isAdmin) // Admin için preload kullanma, çünkü dealer_id seçilene kadar boş olacak
+                        ->required()
+                        ->disabled(fn ($get) => ($isAdmin && !$get('dealer_id')) || $isLocked)
+                        ->reactive()
+                        ->live()
                         ->createOptionForm([
+                            // Bayi ID - herkes için hidden, default olarak seçilen bayi gelir
+                            Hidden::make('dealer_id')
+                                ->default(function () use ($isAdmin, $user) {
+                                    // Bayi çalışanları için kullanıcının dealer_id'sini al
+                                    if (!$isAdmin) {
+                                        return $user->dealer_id ?? null;
+                                    }
+                                    // Admin için createOptionUsing callback'inde set edilecek
+                                    return null;
+                                }),
+
                             Select::make('type')
                                 ->label('Tip')
                                 ->options(CustomerTypeEnum::getLabels())
@@ -150,25 +221,25 @@ class ServiceForm
                                 ])
                                 ->columns(2),
 
-                            Hidden::make('dealer_id')
-                                ->default(fn () => $user->dealer_id ?? null),
-
                             Hidden::make('created_by')
                                 ->default(fn () => Auth::id()),
                         ])
+                        ->createOptionUsing(function (array $data, $livewire) use ($isAdmin) {
+                            // Admin ise parent form state'inden dealer_id'yi al ve set et
+                            if ($isAdmin) {
+                                $formData = $livewire->form->getState();
+                                $parentDealerId = $formData['dealer_id'] ?? null;
+                                if ($parentDealerId) {
+                                    $data['dealer_id'] = $parentDealerId;
+                                }
+                            }
+                            
+                            $customer = \App\Models\Customer::create($data);
+                            
+                            // Yeni oluşturulan müşteriyi döndür
+                            return $customer->getKey();
+                        })
                         ->columnSpanFull(),
-
-                    Hidden::make('dealer_id')
-                        ->default(fn () => $user->dealer_id ?? null)
-                        ->visible(fn () => !$isAdmin),
-
-                    Select::make('dealer_id')
-                        ->label('Bayi')
-                        ->relationship('dealer', 'name')
-                        ->searchable()
-                        ->preload()
-                        ->required()
-                        ->visible(fn () => $isAdmin),
 
                     Hidden::make('user_id')
                         ->default(fn () => Auth::id()),
@@ -183,6 +254,7 @@ class ServiceForm
                         ->searchable()
                         ->preload()
                         ->required()
+                        ->disabled($isLocked)
                         ->live()
                         ->afterStateUpdated(fn ($state, callable $set) => $set('car_model_id', null)),
 
@@ -192,40 +264,48 @@ class ServiceForm
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->disabled(fn ($get) => !$get('car_brand_id'))
+                        ->disabled(fn ($get) => !$get('car_brand_id') || $isLocked)
                         ->reactive(),
 
                     Select::make('year')
                         ->label('Yıl')
                         ->options(array_combine($years, $years))
                         ->required()
+                        ->disabled($isLocked)
                         ->default($currentYear),
 
                     TextInput::make('vin')
                         ->label('Şasi No')
+                        ->disabled($isLocked)
                         ->maxLength(255),
 
                     TextInput::make('plate')
                         ->label('Plaka')
+                        ->required()
+                        ->disabled($isLocked)
                         ->maxLength(255),
 
                     TextInput::make('km')
                         ->label('Kilometre')
                         ->numeric()
-                        ->required()
+                        ->disabled($isLocked)
                         ->minValue(0),
 
                     TextInput::make('package')
                         ->label('Paket')
-                        ->maxLength(255)
-                        ->required(),
+                        ->disabled($isLocked)
+                        ->maxLength(255),
                 ])
                 ->columns(2),
         ];
     }
 
-    public static function getStockStep(): array
+    public static function getStockStep(?ServiceStatusEnum $currentStatus = null): array
     {
+        $isLocked = $currentStatus === ServiceStatusEnum::COMPLETED 
+            || $currentStatus === ServiceStatusEnum::CANCELLED
+            || $currentStatus === ServiceStatusEnum::READY;
+        
         return [
             Section::make('Stok/Malzeme Seçimi')
                 ->schema([
@@ -237,20 +317,85 @@ class ServiceForm
                     Repeater::make('service_items')
                         ->relationship('items')
                         ->label('Stok Ürünleri')
+                        ->disabled($isLocked)
+                        ->addable(!$isLocked)
+                        ->deletable(!$isLocked)
+                        ->live()
                         ->schema([
-                            Select::make('stock_item_id')
+                            StockItemPicker::make('stock_item_id')
                                 ->label('Stok Ürünü')
-                                ->relationship(
-                                    'stockItem',
-                                    'barcode',
-                                    fn ($query) => $query
-                                        ->where('status', StockStatusEnum::AVAILABLE->value)
-                                        ->where('dealer_id', Auth::user()?->dealer_id)
-                                )
-                                ->searchable()
-                                ->preload()
                                 ->required()
-                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->barcode} - {$record->product->name}")
+                                ->disabled($isLocked)
+                                ->live()
+                                ->key(function (Get $get): string {
+                                    // applied_parts değiştiğinde component'i yeniden render et
+                                    $appliedParts = $get('../../applied_parts') 
+                                        ?? $get('../../../applied_parts') 
+                                        ?? $get('applied_parts') 
+                                        ?? [];
+                                    
+                                    if (is_string($appliedParts)) {
+                                        $appliedParts = json_decode($appliedParts, true) ?? [];
+                                    }
+                                    
+                                    $partsKey = is_array($appliedParts) ? implode(',', $appliedParts) : '';
+                                    $dealerId = $get('../../dealer_id') 
+                                        ?? $get('../../../dealer_id') 
+                                        ?? $get('dealer_id') 
+                                        ?? 'none';
+                                    
+                                    return 'stock-picker-' . $dealerId . '-' . md5($partsKey);
+                                })
+                                ->appliedParts(function (Get $get): array {
+                                    // Component içinde otomatik path çözümleme yapılıyor
+                                    // Burada sadece Get instance'ı geçiyoruz, component kendi içinde çözümleyecek
+                                    // Ancak direkt erişim de deneyebiliriz
+                                    try {
+                                        $appliedParts = $get('applied_parts') 
+                                            ?? $get('../applied_parts') 
+                                            ?? $get('../../applied_parts') 
+                                            ?? $get('../../../applied_parts') 
+                                            ?? [];
+                                        
+                                        if (is_string($appliedParts)) {
+                                            $appliedParts = json_decode($appliedParts, true) ?? [];
+                                        }
+                                        
+                                        return is_array($appliedParts) ? $appliedParts : [];
+                                    } catch (\Exception $e) {
+                                        return [];
+                                    }
+                                })
+                                ->dealerId(function (Get $get) {
+                                    $user = Auth::user();
+                                    if($user && $user->hasAnyRole([UserRoleEnum::SUPER_ADMIN->value, UserRoleEnum::CENTER_STAFF->value])) {
+                                        // Admin için wizard'dan dealer_id al - KRİTİK: Doğru dealer_id'yi almalı
+                                        try {
+                                            // Wizard root'tan dealer_id'yi al
+                                            $dealerId = $get('../../../dealer_id') 
+                                                ?? $get('../../dealer_id') 
+                                                ?? $get('../dealer_id') 
+                                                ?? $get('dealer_id');
+                                            
+                                            // Eğer hala null ise, form state'inden al
+                                            if (!$dealerId) {
+                                                // Livewire form state'ine erişmeyi dene
+                                                $livewire = app('livewire')->current();
+                                                if ($livewire && method_exists($livewire, 'get')) {
+                                                    $formData = $livewire->form->getState();
+                                                    $dealerId = $formData['dealer_id'] ?? null;
+                                                }
+                                            }
+                                            
+                                            return $dealerId ? (int) $dealerId : null;
+                                        } catch (\Exception $e) {
+                                            return null;
+                                        }
+                                    } else {
+                                        // Bayi çalışanı için kullanıcının dealer_id'sini kullan
+                                        return $user?->dealer?->id;
+                                    }
+                                })
                                 ->columnSpanFull(),
 
                             Hidden::make('usage_type')
@@ -259,6 +404,7 @@ class ServiceForm
                             TextInput::make('notes')
                                 ->label('Notlar')
                                 ->maxLength(255)
+                                ->disabled($isLocked)
                                 ->columnSpanFull(),
                         ])
                         ->defaultItems(1)
@@ -268,74 +414,119 @@ class ServiceForm
         ];
     }
 
-    public static function getAppliedPartsStep(): array
+    public static function getAppliedPartsStep(?ServiceStatusEnum $currentStatus = null): array
     {
+        $isLocked = $currentStatus === ServiceStatusEnum::COMPLETED 
+            || $currentStatus === ServiceStatusEnum::CANCELLED
+            || $currentStatus === ServiceStatusEnum::READY;
+        
         return [
             Section::make('Kaplama Alanları')
                 ->schema([
-                    CheckboxList::make('applied_parts')
+                    CarPartPicker::make('applied_parts')
                         ->label('Uygulanan Parçalar')
-                        ->options(CarPartEnum::getLabels())
-                        ->columns(2)
-                        ->descriptions(function ($get) {
-                            // Seçilen stok ürünlerinin kategorilerindeki available_parts'ı topla
-                            $serviceItems = $get('service_items') ?? [];
-                            $availableParts = [];
-
-                            foreach ($serviceItems as $item) {
-                                if (isset($item['stock_item_id'])) {
-                                    $stockItem = \App\Models\StockItem::find($item['stock_item_id']);
-                                    if ($stockItem && $stockItem->product && $stockItem->product->category) {
-                                        $categoryParts = $stockItem->product->category->available_parts ?? [];
-                                        $availableParts = array_merge($availableParts, $categoryParts);
-                                    }
-                                }
-                            }
-
-                            return array_unique($availableParts);
-                        })
-                        ->columnSpanFull(),
+                        ->required()
+                        ->disabled($isLocked)
+                        ->live()
+                        ->helperText($isLocked ? 'Tamamlanan, iptal edilen veya hazır durumundaki hizmetlerde kaplama alanları değiştirilemez.' : 'Araç parçalarını görsel olarak seçin'),
                 ]),
         ];
     }
 
-    public static function getStatusAndNotesStep(): array
+    public static function getStatusAndNotesStep(?ServiceStatusEnum $currentStatus = null): array
     {
+        $isLocked = $currentStatus === ServiceStatusEnum::COMPLETED 
+            || $currentStatus === ServiceStatusEnum::CANCELLED;
+        $options = [
+            ServiceStatusEnum::DRAFT->value => ServiceStatusEnum::DRAFT->getLabel(),
+            ServiceStatusEnum::PENDING->value => ServiceStatusEnum::PENDING->getLabel(),
+            ServiceStatusEnum::PROCESSING->value => ServiceStatusEnum::PROCESSING->getLabel(),
+        ];
+        if ($isLocked) {
+            $options[ServiceStatusEnum::READY->value] = ServiceStatusEnum::READY->getLabel();
+            $options[ServiceStatusEnum::COMPLETED->value] = ServiceStatusEnum::COMPLETED->getLabel();
+            $options[ServiceStatusEnum::CANCELLED->value] = ServiceStatusEnum::CANCELLED->getLabel();
+        }
         return [
             Section::make('Durum ve Notlar')
+            ->columns(1)
                 ->schema([
-                    TextInput::make('service_no')
+                    ServiceNumberInput::make('service_no')
                         ->label('Hizmet Numarası')
                         ->required()
-                        ->unique(ignoreRecord: true)
-                        ->maxLength(255)
-                        ->helperText('Örn: SRV-2024-001'),
+                        ->disabled($isLocked)
+                        ->helperText($isLocked ? 'Tamamlanan veya iptal edilen hizmetlerde hizmet numarası değiştirilemez.' : 'Hizmet numarasını girin veya QR kod okutun'),
 
-                    Select::make('status')
-                        ->label('Durum')
-                        ->options(ServiceStatusEnum::getLabels())
+                    Radio::make('status')
+                        ->label('Durum') 
+                        ->options($options)
+                        ->default($currentStatus?->value ?? ServiceStatusEnum::PROCESSING->value)
+                        ->inline()
                         ->required()
-                        ->default(ServiceStatusEnum::DRAFT->value),
+                        ->disabled($isLocked)
+                        ->helperText($isLocked ? 'Tamamlanan veya iptal edilen hizmetlerde durum değiştirilemez.' : null),
 
                     Textarea::make('notes')
                         ->label('Notlar')
                         ->rows(3)
                         ->maxLength(65535)
                         ->columnSpanFull(),
-                ])
-                ->columns(2),
+                ]),
+        ];
+    }
+
+    public static function getGalleryStep(?ServiceStatusEnum $currentStatus = null): array
+    {
+        $isLocked = $currentStatus === ServiceStatusEnum::COMPLETED 
+            || $currentStatus === ServiceStatusEnum::CANCELLED;
+        
+        return [
+            Section::make('Galeri')
+                ->schema([
+                    Repeater::make('images')
+                        ->relationship('images')
+                        ->label('Galeri Görselleri')
+                        ->disabled($isLocked)
+                        ->addable(!$isLocked)
+                        ->deletable(!$isLocked)
+                        ->reorderable(!$isLocked)
+                        ->orderColumn('order')
+                        ->schema([
+                            FileUpload::make('image_path')
+                                ->label('Görsel')
+                                ->image()
+                                ->directory('services/gallery')
+                                ->imageEditor()
+                                ->maxSize(2048)
+                                ->required()
+                                ->columnSpanFull(),
+
+                            TextInput::make('title')
+                                ->label('Başlık')
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+                        ])
+                        ->defaultItems(0)
+                        ->addActionLabel('Görsel Ekle')
+                        ->columns(2),
+                ]),
         ];
     }
 
     public static function configure(Schema $schema): Schema
     {
+        // Mevcut kaydın durumunu al (edit sayfasında)
+        $record = $schema->getRecord();
+        $currentStatus = $record?->status ?? null;
+        
         // Normal form için tüm step'leri birleştir (Edit sayfası için)
+        // Mevcut durumu her step metoduna geç
         return $schema
             ->components([
-                ...self::getCustomerAndCarStep(),
-                ...self::getStockStep(),
-                ...self::getAppliedPartsStep(),
-                ...self::getStatusAndNotesStep(),
+                ...self::getCustomerAndCarStep($currentStatus),
+                ...self::getAppliedPartsStep($currentStatus),
+                ...self::getStockStep($currentStatus),
+                ...self::getStatusAndNotesStep($currentStatus),
             ]);
     }
 }
