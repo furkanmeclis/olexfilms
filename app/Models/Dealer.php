@@ -7,18 +7,49 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Dealer extends Model
 {
     use HasFactory;
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (Dealer $dealer) {
+            if (empty($dealer->dealer_code)) {
+                do {
+                    $code = strtoupper(Str::random(8));
+                } while (static::where('dealer_code', $code)->exists());
+
+                $dealer->dealer_code = $code;
+            }
+        });
+
+        static::updating(function (Dealer $dealer) {
+            // dealer_code değiştirilemez
+            if ($dealer->isDirty('dealer_code') && $dealer->getOriginal('dealer_code')) {
+                $dealer->dealer_code = $dealer->getOriginal('dealer_code');
+            }
+        });
+    }
+
     protected $fillable = [
+        'dealer_code',
         'name',
         'email',
         'phone',
         'address',
         'logo_path',
         'is_active',
+        'facebook_url',
+        'instagram_url',
+        'twitter_url',
+        'linkedin_url',
+        'website_url',
+        'city',
+        'district',
     ];
 
     protected $casts = [

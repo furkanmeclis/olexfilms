@@ -2,14 +2,19 @@
 
 namespace App\Filament\Resources\Dealers\Tables;
 
+use App\Filament\Exports\DealerExporter;
+use App\Models\Dealer;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class DealersTable
@@ -22,6 +27,12 @@ class DealersTable
                     ->label('Logo')
                     ->circular()
                     ->defaultImageUrl(url('/images/placeholder.png')),
+
+                TextColumn::make('dealer_code')
+                    ->label('Bayi Kodu')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('name')
                     ->label('Bayi Adı')
@@ -36,6 +47,18 @@ class DealersTable
                 TextColumn::make('phone')
                     ->label('Telefon')
                     ->searchable(),
+
+                TextColumn::make('city')
+                    ->label('İl')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                TextColumn::make('district')
+                    ->label('İlçe')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
 
                 TextColumn::make('address')
                     ->label('Adres')
@@ -66,6 +89,30 @@ class DealersTable
                 Filter::make('is_inactive')
                     ->label('Pasif Bayiler')
                     ->query(fn ($query) => $query->where('is_active', false)),
+
+                SelectFilter::make('city')
+                    ->label('İl')
+                    ->options(function () {
+                        // Veritabanından mevcut illeri al
+                        return Dealer::whereNotNull('city')
+                            ->distinct()
+                            ->pluck('city', 'city')
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->preload(),
+
+                SelectFilter::make('district')
+                    ->label('İlçe')
+                    ->options(function () {
+                        // Veritabanından mevcut ilçeleri al
+                        return Dealer::whereNotNull('district')
+                            ->distinct()
+                            ->pluck('district', 'district')
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 ViewAction::make()
@@ -73,8 +120,16 @@ class DealersTable
                 EditAction::make()
                     ->label('Düzenle'),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(DealerExporter::class)
+                    ->label('Dışa Aktar'),
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->exporter(DealerExporter::class)
+                        ->label('Seçilenleri Dışa Aktar'),
                     DeleteBulkAction::make()
                         ->label('Sil'),
                 ]),

@@ -6,6 +6,7 @@ use App\Filament\Resources\Dealers\Pages\CreateDealer;
 use App\Filament\Resources\Dealers\Pages\EditDealer;
 use App\Filament\Resources\Dealers\Pages\ListDealers;
 use App\Filament\Resources\Dealers\Pages\ViewDealer;
+use App\Filament\Resources\Dealers\RelationManagers;
 use App\Filament\Resources\Dealers\Schemas\DealerForm;
 use App\Filament\Resources\Dealers\Tables\DealersTable;
 use App\Models\Dealer;
@@ -58,6 +59,11 @@ class DealerResource extends Resource
                             ->defaultImageUrl(url('/images/placeholder.png'))
                             ->columnSpanFull(),
 
+                        Infolists\Components\TextEntry::make('dealer_code')
+                            ->label('Bayi Kodu')
+                            ->badge()
+                            ->color('primary'),
+
                         Infolists\Components\TextEntry::make('name')
                             ->label('Bayi Adı'),
 
@@ -74,6 +80,54 @@ class DealerResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
+
+                Section::make('Konum Bilgileri')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('city')
+                            ->label('İl')
+                            ->icon('heroicon-m-map-pin'),
+
+                        Infolists\Components\TextEntry::make('district')
+                            ->label('İlçe')
+                            ->icon('heroicon-m-map-pin'),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => $record->city || $record->district),
+
+                Section::make('Sosyal Medya')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('website_url')
+                            ->label('Web Sitesi')
+                            ->url(fn ($state) => $state)
+                            ->icon('heroicon-m-globe-alt')
+                            ->openUrlInNewTab(),
+
+                        Infolists\Components\TextEntry::make('facebook_url')
+                            ->label('Facebook')
+                            ->url(fn ($state) => $state)
+                            ->icon('heroicon-m-facebook')
+                            ->openUrlInNewTab(),
+
+                        Infolists\Components\TextEntry::make('instagram_url')
+                            ->label('Instagram')
+                            ->url(fn ($state) => $state)
+                            ->icon('heroicon-m-instagram')
+                            ->openUrlInNewTab(),
+
+                        Infolists\Components\TextEntry::make('twitter_url')
+                            ->label('Twitter/X')
+                            ->url(fn ($state) => $state)
+                            ->icon('heroicon-m-x-mark')
+                            ->openUrlInNewTab(),
+
+                        Infolists\Components\TextEntry::make('linkedin_url')
+                            ->label('LinkedIn')
+                            ->url(fn ($state) => $state)
+                            ->icon('heroicon-m-linkedin')
+                            ->openUrlInNewTab(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn ($record) => $record->website_url || $record->facebook_url || $record->instagram_url || $record->twitter_url || $record->linkedin_url),
 
                 Section::make('Durum')
                     ->schema([
@@ -102,7 +156,7 @@ class DealerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\UsersRelationManager::class,
         ];
     }
 
