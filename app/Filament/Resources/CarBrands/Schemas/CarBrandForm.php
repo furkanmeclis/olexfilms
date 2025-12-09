@@ -31,7 +31,6 @@ class CarBrandForm
                             ->label('Logo')
                             ->image()
                             ->directory('car-brands/logos')
-                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048)
                             ->nullable()

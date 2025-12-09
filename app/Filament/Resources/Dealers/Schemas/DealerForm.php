@@ -152,7 +152,6 @@ class DealerForm
                             ->label('Logo')
                             ->image()
                             ->directory('dealers/logos')
-                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048)
                             ->nullable()
