@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -81,6 +82,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all SMS logs for this user.
+     */
+    public function smsLogs(): MorphMany
+    {
+        return $this->morphMany(SmsLog::class, 'notifiable');
+    }
+
+    /**
      * Scope a query to only include active users.
      */
     #[Scope]
@@ -105,4 +114,5 @@ class User extends Authenticatable
 
         return true;
     }
+    
 }
