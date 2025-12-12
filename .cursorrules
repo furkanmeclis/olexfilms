@@ -112,6 +112,15 @@
 - Migration'ları her zaman çalıştır
 - Seeder'ları test et
 
+## Telefon Numarası Input'ları
+
+- **KRİTİK:** Tüm telefon numarası input'ları için `Ysfkaya\FilamentPhoneInput\Forms\PhoneInput` kullanılmalıdır
+- ❌ `TextInput::make('phone')->tel()` kullanılmamalıdır
+- ✅ `PhoneInput::make('phone')->defaultCountry('TR')->validateFor('TR')->locale('tr')` kullanılmalıdır
+- Türkiye için default country 'TR' olarak ayarlanmalıdır
+- Validation için `validateFor('TR')` kullanılmalıdır
+- Locale için `locale('tr')` kullanılmalıdır
+
 ## Hata Önleme
 
 - Infolist'lerde Section kullanırken namespace'i kontrol et
