@@ -26,6 +26,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class ServiceForm
 {
@@ -157,11 +158,12 @@ class ServiceForm
                                 ->required()
                                 ->maxLength(255),
 
-                            TextInput::make('phone')
+                            PhoneInput::make('phone')
                                 ->label('Telefon')
                                 ->required()
-                                ->tel()
-                                ->maxLength(255),
+                                ->defaultCountry('TR')
+                                ->validateFor('TR')
+                                ->locale('tr'),
 
                             TextInput::make('email')
                                 ->label('E-posta')
@@ -455,7 +457,7 @@ class ServiceForm
                         ->label('Hizmet Numarası')
                         ->required()
                         ->disabled($isLocked)
-                        ->helperText($isLocked ? 'Tamamlanan veya iptal edilen hizmetlerde hizmet numarası değiştirilemez.' : 'Hizmet numarasını girin veya QR kod okutun'),
+                        ->helperText($isLocked ? 'Tamamlanan veya iptal edilen hizmetlerde hizmet numarası değiştirilemez.' : 'Hizmet numarasını girin veya QR kod okutun (backend\'de unique kontrolü yapılacak)'),
 
                     Radio::make('status')
                         ->label('Durum') 

@@ -45,6 +45,22 @@ class CreateService extends CreateRecord
         ];
     }
 
+    protected function mutateFormDataBeforeValidate(array $data): array
+    {
+        // Backend validation: Hizmet numarası unique olmalı
+        if (isset($data['service_no']) && !empty($data['service_no'])) {
+            $serviceExists = Service::where('service_no', $data['service_no'])->exists();
+
+            if ($serviceExists) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'service_no' => 'Bu hizmet numarası zaten kullanılıyor.',
+                ]);
+            }
+        }
+
+        return $data;
+    }
+
     public function validateServiceNumber(string $serviceNo): array
     {
         if (empty($serviceNo)) {
