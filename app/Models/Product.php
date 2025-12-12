@@ -21,6 +21,7 @@ class Product extends Model
         'sku',
         'description',
         'warranty_duration',
+        'micron_thickness',
         'price',
         'image_path',
         'is_active',
@@ -39,6 +40,7 @@ class Product extends Model
     {
         return [
             'warranty_duration' => 'integer',
+            'micron_thickness' => 'integer',
             'price' => 'decimal:2',
             'is_active' => 'boolean',
         ];

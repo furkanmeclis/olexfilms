@@ -37,6 +37,11 @@ class ProductResource extends Resource
         return ['name', 'sku', 'category.name'];
     }
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return ProductForm::configure($schema);

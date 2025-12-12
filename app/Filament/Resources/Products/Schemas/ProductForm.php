@@ -64,6 +64,14 @@ class ProductForm
                             ->minValue(0)
                             ->nullable(),
 
+                        TextInput::make('micron_thickness')
+                            ->label('Mikron Kalınlığı')
+                            ->numeric()
+                            ->suffix('μm')
+                            ->minValue(0)
+                            ->nullable()
+                            ->helperText('Mikrometre cinsinden kalınlık değeri'),
+
                         TextInput::make('price')
                             ->label('Fiyat (USD)')
                             ->numeric()
@@ -79,7 +87,6 @@ class ProductForm
                             ->label('Ürün Görseli')
                             ->image()
                             ->directory('products/images')
-                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048)
                             ->nullable()

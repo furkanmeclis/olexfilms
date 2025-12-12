@@ -57,6 +57,10 @@ class ProductInfolist
                             ->label('Garanti Süresi')
                             ->formatStateUsing(fn ($state) => $state ? "{$state} Ay" : 'Belirtilmemiş'),
 
+                        TextEntry::make('micron_thickness')
+                            ->label('Mikron Kalınlığı')
+                            ->formatStateUsing(fn ($state) => $state ? "{$state} μm" : 'Belirtilmemiş'),
+
                         TextEntry::make('price')
                             ->label('Fiyat')
                             ->money('USD')
