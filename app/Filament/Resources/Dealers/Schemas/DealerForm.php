@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\File;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class DealerForm
 {
@@ -65,11 +66,12 @@ class DealerForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                        TextInput::make('phone')
+                        PhoneInput::make('phone')
                             ->label('Telefon')
                             ->required()
-                            ->tel()
-                            ->maxLength(255),
+                            ->defaultCountry('TR')
+                            ->validateFor('TR')
+                            ->locale('tr'),
 
                         Textarea::make('address')
                             ->label('Adres')

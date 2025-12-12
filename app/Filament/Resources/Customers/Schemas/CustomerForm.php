@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CustomerForm
 {
@@ -64,11 +65,12 @@ class CustomerForm
                             ->required()
                             ->maxLength(255),
 
-                        TextInput::make('phone')
+                        PhoneInput::make('phone')
                             ->label('Telefon')
                             ->required()
-                            ->tel()
-                            ->maxLength(255),
+                            ->defaultCountry('TR')
+                            ->validateFor('TR')
+                            ->locale('tr'),
 
                         TextInput::make('email')
                             ->label('E-posta')

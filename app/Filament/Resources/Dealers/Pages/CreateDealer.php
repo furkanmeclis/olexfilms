@@ -17,6 +17,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Wizard\Step;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CreateDealer extends CreateRecord
 {
@@ -71,11 +72,12 @@ class CreateDealer extends CreateRecord
                                 ->unique()
                                 ->maxLength(255),
 
-                            TextInput::make('phone')
+                            PhoneInput::make('phone')
                                 ->label('Telefon')
                                 ->required()
-                                ->tel()
-                                ->maxLength(255),
+                                ->defaultCountry('TR')
+                                ->validateFor('TR')
+                                ->locale('tr'),
 
                             Textarea::make('address')
                                 ->label('Adres')
@@ -158,7 +160,6 @@ class CreateDealer extends CreateRecord
                                 ->label('Logo')
                                 ->image()
                                 ->directory('dealers/logos')
-                                ->visibility('public')
                                 ->imageEditor()
                                 ->maxSize(2048)
                                 ->nullable()
@@ -216,11 +217,12 @@ class CreateDealer extends CreateRecord
                                 ->maxLength(255)
                                 ->visible(fn ($get) => $get('owner_type') === 'new'),
 
-                            TextInput::make('owner_phone')
+                            PhoneInput::make('owner_phone')
                                 ->label('Telefon')
                                 ->required(fn ($get) => $get('owner_type') === 'new')
-                                ->tel()
-                                ->maxLength(255)
+                                ->defaultCountry('TR')
+                                ->validateFor('TR')
+                                ->locale('tr')
                                 ->visible(fn ($get) => $get('owner_type') === 'new'),
 
                             TextInput::make('owner_password')
