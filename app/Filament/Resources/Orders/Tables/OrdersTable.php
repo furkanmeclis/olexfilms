@@ -3,11 +3,22 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\OrderStatusEnum;
+use App\Enums\StockLocationEnum;
+use App\Enums\StockMovementActionEnum;
+use App\Enums\StockStatusEnum;
+use App\Enums\UserRoleEnum;
+use App\Models\Order;
+use App\Models\StockItem;
+use App\Models\StockMovement;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrdersTable
 {
@@ -44,12 +55,6 @@ class OrdersTable
                     ->sum('items', 'quantity')
                     ->sortable(),
 
-                TextColumn::make('total_amount')
-                    ->label('Toplam Tutar')
-                    ->money('USD')
-                    ->sortable()
-                    ->visible(fn () => auth()->user()?->hasRole('super_admin') ?? false),
-
                 TextColumn::make('created_at')
                     ->label('Oluşturulma Tarihi')
                     ->dateTime('d.m.Y H:i')
@@ -74,6 +79,61 @@ class OrdersTable
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
+                Action::make('deliverOrder')
+                    ->label('Teslim Et')
+                    ->icon('heroicon-o-check-badge')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Sipariş Teslim Ediliyor')
+                    ->modalDescription(function ($record) {
+                        return "Siparişi {$record->dealer->name} bayisine teslim etmek istediğinizden emin misiniz?";
+                    })
+                    ->visible(function ($record) {
+                        $user = Auth::user();
+                        return $user && $user->hasAnyRole([
+                            UserRoleEnum::SUPER_ADMIN->value,
+                            UserRoleEnum::CENTER_STAFF->value,
+                        ]) && $record->status->value === 'shipped';
+                    })
+                    ->action(function ($record) {
+                        $user = Auth::user();
+                        
+                        DB::transaction(function () use ($record, $user) {
+                            // Siparişe bağlı tüm stock_items'ı bul
+                            $stockItems = StockItem::whereHas('orderItems', function ($query) use ($record) {
+                                $query->whereHas('order', function ($q) use ($record) {
+                                    $q->where('id', $record->id);
+                                });
+                            })->get();
+
+                            foreach ($stockItems as $stockItem) {
+                                // StockItem'ı güncelle
+                                $stockItem->update([
+                                    'dealer_id' => $record->dealer_id,
+                                    'location' => StockLocationEnum::DEALER->value,
+                                    'status' => StockStatusEnum::AVAILABLE->value,
+                                ]);
+
+                                // Hareket logu oluştur
+                                StockMovement::create([
+                                    'stock_item_id' => $stockItem->id,
+                                    'user_id' => $user->id,
+                                    'action' => StockMovementActionEnum::RECEIVED->value,
+                                    'description' => "Sipariş #{$record->id} {$record->dealer->name} bayisine teslim edildi",
+                                    'created_at' => now(),
+                                ]);
+                            }
+
+                            // Sipariş statüsünü delivered yap
+                            $record->update(['status' => OrderStatusEnum::DELIVERED->value]);
+                        });
+
+                        Notification::make()
+                            ->title('Başarılı')
+                            ->body("Sipariş {$record->dealer->name} bayisine teslim edildi ve stoklar envanterine eklendi.")
+                            ->success()
+                            ->send();
+                    }),
             ]);
     }
 }

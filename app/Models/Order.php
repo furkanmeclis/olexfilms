@@ -21,14 +21,12 @@ class Order extends Model
         'cargo_company',
         'tracking_number',
         'notes',
-        'total_amount',
     ];
 
     protected function casts(): array
     {
         return [
             'status' => OrderStatusEnum::class,
-            'total_amount' => 'decimal:2',
         ];
     }
 

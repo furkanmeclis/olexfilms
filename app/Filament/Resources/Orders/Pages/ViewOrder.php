@@ -144,6 +144,57 @@ class ViewOrder extends ViewRecord
                 });
         }
 
+        // Teslim Et (Admin/Center Staff, shipped için)
+        if ($user && $user->hasAnyRole([
+            UserRoleEnum::SUPER_ADMIN->value,
+            UserRoleEnum::CENTER_STAFF->value,
+        ]) && $order->status->value === 'shipped') {
+            $actions[] = Action::make('deliverOrder')
+                ->label('Teslim Et')
+                ->icon('heroicon-o-check-badge')
+                ->color('success')
+                ->requiresConfirmation()
+                ->modalHeading('Sipariş Teslim Ediliyor')
+                ->modalDescription("Siparişi {$order->dealer->name} bayisine teslim etmek istediğinizden emin misiniz?")
+                ->action(function () use ($order, $user) {
+                    DB::transaction(function () use ($order, $user) {
+                        // Siparişe bağlı tüm stock_items'ı bul
+                        $stockItems = StockItem::whereHas('orderItems', function ($query) use ($order) {
+                            $query->whereHas('order', function ($q) use ($order) {
+                                $q->where('id', $order->id);
+                            });
+                        })->get();
+
+                        foreach ($stockItems as $stockItem) {
+                            // StockItem'ı güncelle
+                            $stockItem->update([
+                                'dealer_id' => $order->dealer_id,
+                                'location' => StockLocationEnum::DEALER->value,
+                                'status' => StockStatusEnum::AVAILABLE->value,
+                            ]);
+
+                            // Hareket logu oluştur
+                            StockMovement::create([
+                                'stock_item_id' => $stockItem->id,
+                                'user_id' => $user->id,
+                                'action' => StockMovementActionEnum::RECEIVED->value,
+                                'description' => "Sipariş #{$order->id} {$order->dealer->name} bayisine teslim edildi",
+                                'created_at' => now(),
+                            ]);
+                        }
+
+                        // Sipariş statüsünü delivered yap
+                        $order->update(['status' => OrderStatusEnum::DELIVERED->value]);
+                    });
+
+                    \Filament\Notifications\Notification::make()
+                        ->title('Başarılı')
+                        ->body("Sipariş {$order->dealer->name} bayisine teslim edildi ve stoklar envanterine eklendi.")
+                        ->success()
+                        ->send();
+                });
+        }
+
         // Teslim Al (sadece Bayi, shipped için)
         if ($user && $user->dealer_id && !$user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,

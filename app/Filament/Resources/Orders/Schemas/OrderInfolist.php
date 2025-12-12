@@ -37,11 +37,6 @@ class OrderInfolist
                                 default => 'gray',
                             }),
 
-                        TextEntry::make('total_amount')
-                            ->label('Toplam Tutar')
-                            ->money('USD')
-                            ->visible(fn () => $isSuperAdmin),
-
                         TextEntry::make('created_at')
                             ->label('Oluşturulma Tarihi')
                             ->dateTime('d.m.Y H:i'),
@@ -60,10 +55,6 @@ class OrderInfolist
                                     ->label('Ürün'),
                                 TextEntry::make('quantity')
                                     ->label('Adet'),
-                                TextEntry::make('unit_price')
-                                    ->label('Birim Fiyat')
-                                    ->money('USD')
-                                    ->visible(fn () => $isSuperAdmin),
                                 TextEntry::make('stockItems.barcode')
                                     ->label('Atanan Stoklar')
                                     ->badge()
