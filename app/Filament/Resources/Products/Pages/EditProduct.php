@@ -20,6 +20,17 @@ class EditProduct extends EditRecord
         return ProductForm::configure($schema);
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        // Model'de $hidden = ['price'] olduğu için price görünmüyor
+        // Form'a yüklerken price'ı görünür yap
+        if ($this->record && $this->record->price !== null) {
+            $data['price'] = $this->record->price;
+        }
+
+        return $data;
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -77,7 +77,7 @@ class ProductForm
                             ->numeric()
                             ->prefix('$')
                             ->required()
-                            ->visible(fn () => $isSuperAdmin),
+                            ->visible(fn () => Auth::user()?->hasRole(UserRoleEnum::SUPER_ADMIN->value) ?? false),
                     ])
                     ->columns(2),
 
