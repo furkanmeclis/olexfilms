@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
+use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class UserForm
 {
@@ -38,11 +39,12 @@ class UserForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                        TextInput::make('phone')
+                        PhoneInput::make('phone')
                             ->label('Telefon')
                             ->required()
-                            ->tel()
-                            ->maxLength(255),
+                            ->defaultCountry('TR')
+                            ->validateFor('TR')
+                            ->locale('tr'),
                     ])
                     ->columns(2),
 
