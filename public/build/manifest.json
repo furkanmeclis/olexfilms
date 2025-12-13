@@ -1,0 +1,41 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CIpJFLe_.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-BKSoTiH-.css",
+    "src": "resources/css/filament/admin/theme.css",
+    "isEntry": true,
+    "name": "theme",
+    "names": [
+      "theme.css"
+    ]
+  },
+  "resources/css/filament/car-part-picker.css": {
+    "file": "assets/car-part-picker-BEZAAjb1.css",
+    "src": "resources/css/filament/car-part-picker.css",
+    "isEntry": true,
+    "name": "car-part-picker",
+    "names": [
+      "car-part-picker.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-CAiCLEjY.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/filament/car-part-picker.js": {
+    "file": "assets/car-part-picker-B-CHdbId.js",
+    "name": "car-part-picker",
+    "src": "resources/js/filament/car-part-picker.js",
+    "isEntry": true
+  }
+}
