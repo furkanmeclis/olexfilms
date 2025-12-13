@@ -62,6 +62,12 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make('SMS')
                     ->label('SMS'),
+                NavigationGroup::make('NexPTG')
+                    ->label('NexPTG'),
+                NavigationGroup::make('Araç Bölümü')
+                    ->label('Araç Yönetimi'),
+                NavigationGroup::make('Sistem Yönetimi')
+                    ->label('Sistem Yönetimi'),
             ]);
     }
 }

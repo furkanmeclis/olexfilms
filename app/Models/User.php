@@ -90,6 +90,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the NexPTG API user for this user.
+     */
+    public function nexptgApiUser(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(NexptgApiUser::class);
+    }
+
+    /**
      * Scope a query to only include active users.
      */
     #[Scope]
