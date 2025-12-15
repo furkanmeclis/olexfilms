@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { PageProps } from '@/types';
+import { Button } from '@/components/ui/button';
 
 export default function Welcome({ auth }: PageProps) {
     return (
@@ -20,6 +21,7 @@ export default function Welcome({ auth }: PageProps) {
                                     <div>
                                         <h2 className="text-xl font-semibold text-gray-900">
                                             Inertia.js + React + TypeScript
+                                            <Button variant="destructive">Furkan</Button>
                                         </h2>
 
                                         <p className="mt-4 text-gray-500 text-sm leading-relaxed">
