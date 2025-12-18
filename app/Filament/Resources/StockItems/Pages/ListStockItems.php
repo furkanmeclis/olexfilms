@@ -7,9 +7,11 @@ use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Filament\Resources\StockItems\StockItemResource;
+use App\Imports\StockItemImport;
 use App\Models\Product;
 use App\Models\StockItem;
 use App\Models\StockMovement;
+use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -27,11 +29,46 @@ class ListStockItems extends ListRecords
 
         $actions = [];
 
-        // Sadece admin ve merkez çalışanları hızlı stok girişi yapabilir
+        // Sadece admin ve merkez çalışanları stok işlemleri yapabilir
         if ($user && $user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
         ])) {
+            // Excel Import Action
+            $actions[] = ExcelImportAction::make()
+                ->label('Excel\'den İçe Aktar')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary')
+                ->slideOver()
+                ->use(StockItemImport::class)
+                // Validation'ı kaldırdık, çünkü her satır için ayrı kontrol yapılıyor
+                // ÜRÜN KODU veya ÜRÜN (en az biri), BAYİ KODU veya BAYİ (en az biri) kontrolü model() metodunda yapılıyor
+                ->beforeUploadField([
+                    Select::make('default_dealer_id')
+                        ->label('Varsayılan Bayi')
+                        ->relationship('dealer', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Eğer Excel\'de bayi bulunamazsa bu bayi kullanılacak (opsiyonel)')
+                        ->nullable(),
+
+                    Select::make('default_product_id')
+                        ->label('Varsayılan Ürün')
+                        ->relationship('product', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Eğer Excel\'de ürün bulunamazsa bu ürün kullanılacak (opsiyonel)')
+                        ->nullable(),
+                ])
+                ->beforeImport(function (array $data, $livewire, $excelImportAction) {
+                    // Varsayılan değerleri customImportData'ya ekle
+                    $excelImportAction->customImportData([
+                        'default_dealer_id' => $data['default_dealer_id'] ?? null,
+                        'default_product_id' => $data['default_product_id'] ?? null,
+                    ]);
+                });
+
+            // Hızlı Stok Girişi Action
             $actions[] = Action::make('quickStockEntry')
                 ->label('Hızlı Stok Girişi')
                 ->icon('heroicon-o-plus-circle')
