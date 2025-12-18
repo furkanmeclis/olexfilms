@@ -102,10 +102,10 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
                 return null;
             })
             .filter((item): item is string => item !== null);
-        
+
         const sortedOldContact = [...oldContact].sort();
         const sortedContact = [...contact].sort();
-        
+
         if (JSON.stringify(sortedOldContact) !== JSON.stringify(sortedContact)) {
             setUnSaved(true);
         } else {
@@ -119,7 +119,7 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
                 ? { ...notification, value: !notification.value }
                 : notification
         ));
-        
+
         // Contact state'ini güncelle
         if (contact.includes(key)) {
             setContact(contact.filter(item => item !== key));
@@ -145,7 +145,7 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
         formData.append('settings', JSON.stringify(contact));
         formData.append('action', 'settings');
 
-        fetch(route('customer.notifyUpdate', hash), {
+        fetch(('customer.notifyUpdate', hash), {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrf_token
@@ -241,7 +241,7 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
                                 carPlate={service.car.plate}
                                 serviceDayMonth={("0" + new Date(service.created_at).getDate()).slice(-2) + "." + ("0" + (new Date(service.created_at).getMonth() + 1)).slice(-2)}
                                 serviceYear={new Date(service.created_at).getFullYear()}
-                                serviceUrl={route("warranty.index", service.service_no)}
+                                serviceUrl={("warranty.index", service.service_no)}
                                 brandLogo={service.car.brand_logo}
                             />
                         ))}

@@ -4,10 +4,7 @@ import { useState } from 'react';
 import { useToast } from '@/components/ui/toast';
 import { applyPhoneMask, removePhoneMask } from '@/lib/phoneMask';
 import OtpInput from 'react-otp-input';
-
-declare global {
-    function route(name: string, params?: any): string;
-}
+import { route } from 'ziggy';
 
 export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: string }) {
     const toast = useToast();
@@ -154,7 +151,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                             >
                                 {auth.user ? (
                                     <a
-                                        href={"/admin"}
+                                        href={route('filament.admin.pages.dashboard')}
                                         className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-500 transition-all duration-300"
                                     >
                                         <i className="pi pi-home mr-2" /> Yönetim Paneli
@@ -162,7 +159,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                                 ) : (
                                     <>
                                         <a
-                                            href={"/admin/login"}
+                                            href={route('filament.admin.auth.login')}
                                             className="relative inline-flex items-center justify-center px-6 py-2 text-base font-medium text-white transition-all duration-300 ease-in-out bg-gradient-to-r from-[#1a1a1a] to-[#333333] rounded-lg hover:from-[#333333] hover:to-[#1a1a1a] border border-[#E6B800]/30 hover:border-[#E6B800] shadow-lg hover:shadow-[#E6B800]/20 group"
                                         >
                                             <span className="relative flex items-center">
