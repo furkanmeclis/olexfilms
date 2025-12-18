@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Migrasyonu çalıştır.
      */
     public function up(): void
     {
@@ -15,15 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
             $table->foreignId('nexptg_report_id')->unique()->constrained('nexptg_reports')->onDelete('cascade');
-            $table->string('match_type'); // 'before' or 'after'
+            $table->string('match_type', 32); // 'before' or 'after' için uzunluk kısıtlandı
             $table->timestamps();
 
-            $table->index(['service_id', 'match_type']);
+            // Çok uzun string indexinden kaçınmak için string tipi ve uzunluk sınırını belirttik
+            $table->index(['service_id', 'match_type'], 'srv_nexptg_svcid_mt_idx');
         });
     }
 
     /**
-     * Reverse the migrations.
+     * Migrasyonu geri al.
      */
     public function down(): void
     {

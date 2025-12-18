@@ -20,8 +20,8 @@ return new class extends Migration
             $table->text('notes')->nullable();
             $table->timestamps();
             
-            $table->index(['service_id', 'created_at']);
-            $table->index('user_id');
+            $table->index(['service_id', 'created_at'], 'srv_status_logs_idx');
+            $table->index('user_id', 'user_id_idx');
         });
     }
 
