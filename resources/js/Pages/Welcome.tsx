@@ -80,7 +80,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
         let formData = new FormData();
         formData.append('customer_id', customerId);
         formData.append('otp', otp);
-        fetch(route('customer-otp-verify'), {
+        fetch(('customer-otp-verify'), {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': csrf_token,
