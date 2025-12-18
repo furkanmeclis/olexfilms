@@ -40,15 +40,18 @@ class ModelsRelationManager extends RelationManager
         // Form component'lerini modify et - brand_id Select'ini Hidden yap
         $components = collect($form->getComponents())->map(function ($component) {
             if ($component instanceof \Filament\Schemas\Components\Section) {
-                $sectionComponents = collect($component->getComponents(withActions: false, withHidden: false))->map(function ($field) {
-                    if ($field->getName() === 'brand_id') {
-                        return Hidden::make('brand_id')
-                            ->default(fn () => $this->ownerRecord->id);
-                    }
-                    return $field;
-                })->toArray();
+                $childSchema = $component->getChildSchema();
+                if ($childSchema) {
+                    $sectionComponents = collect($childSchema->getComponents())->map(function ($field) {
+                        if ($field->getName() === 'brand_id') {
+                            return Hidden::make('brand_id')
+                                ->default(fn () => $this->ownerRecord->id);
+                        }
+                        return $field;
+                    })->toArray();
 
-                return $component->schema($sectionComponents);
+                    return $component->schema($sectionComponents);
+                }
             }
             return $component;
         })->toArray();

@@ -35,15 +35,18 @@ class UsersRelationManager extends RelationManager
         // Form component'lerini modify et - dealer_id'yi Hidden yap
         $components = collect($form->getComponents())->map(function ($component) {
             if ($component instanceof \Filament\Schemas\Components\Section) {
-                $sectionComponents = collect($component->getComponents(withActions: false, withHidden: false))->map(function ($field) {
-                    if ($field->getName() === 'dealer_id') {
-                        return Hidden::make('dealer_id')
-                            ->default(fn () => $this->ownerRecord->id);
-                    }
-                    return $field;
-                })->toArray();
+                $childSchema = $component->getChildSchema();
+                if ($childSchema) {
+                    $sectionComponents = collect($childSchema->getComponents())->map(function ($field) {
+                        if ($field->getName() === 'dealer_id') {
+                            return Hidden::make('dealer_id')
+                                ->default(fn () => $this->ownerRecord->id);
+                        }
+                        return $field;
+                    })->toArray();
 
-                return $component->schema($sectionComponents);
+                    return $component->schema($sectionComponents);
+                }
             }
             return $component;
         })->toArray();
@@ -51,8 +54,11 @@ class UsersRelationManager extends RelationManager
         // Eğer dealer_id field'ı yoksa, ekle
         $hasDealerId = collect($components)->contains(function ($component) {
             if ($component instanceof \Filament\Schemas\Components\Section) {
-                return collect($component->getComponents(withActions: false, withHidden: false))
-                    ->contains(fn ($field) => $field->getName() === 'dealer_id');
+                $childSchema = $component->getChildSchema();
+                if ($childSchema) {
+                    return collect($childSchema->getComponents())
+                        ->contains(fn ($field) => $field->getName() === 'dealer_id');
+                }
             }
             return false;
         });
@@ -60,10 +66,13 @@ class UsersRelationManager extends RelationManager
         if (!$hasDealerId) {
             // İlk section'a dealer_id ekle
             if (isset($components[0]) && $components[0] instanceof \Filament\Schemas\Components\Section) {
-                $firstSectionComponents = $components[0]->getComponents(withActions: false, withHidden: false);
-                $firstSectionComponents[] = Hidden::make('dealer_id')
-                    ->default(fn () => $this->ownerRecord->id);
-                $components[0] = $components[0]->schema($firstSectionComponents);
+                $firstSectionChildSchema = $components[0]->getChildSchema();
+                if ($firstSectionChildSchema) {
+                    $firstSectionComponents = $firstSectionChildSchema->getComponents();
+                    $firstSectionComponents[] = Hidden::make('dealer_id')
+                        ->default(fn () => $this->ownerRecord->id);
+                    $components[0] = $components[0]->schema($firstSectionComponents);
+                }
             }
         }
 
