@@ -349,6 +349,20 @@ class ServiceForm
                                     return 'stock-picker-' . $dealerId . '-' . md5($partsKey);
                                 })
                                 ->appliedParts(function (Get $get): array {
+                                    // #region agent log
+                                    $logPath = base_path('.cursor/debug.log');
+                                    $logData = [
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run1',
+                                        'hypothesisId' => 'C',
+                                        'location' => 'ServiceForm::getStockStep::appliedParts',
+                                        'message' => 'appliedParts closure called',
+                                        'data' => [],
+                                        'timestamp' => (int)(microtime(true) * 1000),
+                                    ];
+                                    file_put_contents($logPath, json_encode($logData) . "\n", FILE_APPEND);
+                                    // #endregion
+                                    
                                     // Component içinde otomatik path çözümleme yapılıyor
                                     // Burada sadece Get instance'ı geçiyoruz, component kendi içinde çözümleyecek
                                     // Ancak direkt erişim de deneyebiliriz
@@ -359,16 +373,68 @@ class ServiceForm
                                             ?? $get('../../../applied_parts') 
                                             ?? [];
                                         
+                                        // #region agent log
+                                        $logData2 = [
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1',
+                                            'hypothesisId' => 'C',
+                                            'location' => 'ServiceForm::getStockStep::appliedParts',
+                                            'message' => 'appliedParts retrieved',
+                                            'data' => ['appliedParts' => $appliedParts, 'type' => gettype($appliedParts)],
+                                            'timestamp' => (int)(microtime(true) * 1000),
+                                        ];
+                                        file_put_contents($logPath, json_encode($logData2) . "\n", FILE_APPEND);
+                                        // #endregion
+                                        
                                         if (is_string($appliedParts)) {
                                             $appliedParts = json_decode($appliedParts, true) ?? [];
                                         }
                                         
+                                        // #region agent log
+                                        $logData3 = [
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1',
+                                            'hypothesisId' => 'C',
+                                            'location' => 'ServiceForm::getStockStep::appliedParts',
+                                            'message' => 'appliedParts final',
+                                            'data' => ['appliedParts' => $appliedParts, 'is_array' => is_array($appliedParts), 'count' => is_array($appliedParts) ? count($appliedParts) : 0],
+                                            'timestamp' => (int)(microtime(true) * 1000),
+                                        ];
+                                        file_put_contents($logPath, json_encode($logData3) . "\n", FILE_APPEND);
+                                        // #endregion
+                                        
                                         return is_array($appliedParts) ? $appliedParts : [];
                                     } catch (\Exception $e) {
+                                        // #region agent log
+                                        $logData4 = [
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1',
+                                            'hypothesisId' => 'C',
+                                            'location' => 'ServiceForm::getStockStep::appliedParts',
+                                            'message' => 'appliedParts exception',
+                                            'data' => ['error' => $e->getMessage()],
+                                            'timestamp' => (int)(microtime(true) * 1000),
+                                        ];
+                                        file_put_contents($logPath, json_encode($logData4) . "\n", FILE_APPEND);
+                                        // #endregion
                                         return [];
                                     }
                                 })
                                 ->dealerId(function (Get $get) {
+                                    // #region agent log
+                                    $logPath = base_path('.cursor/debug.log');
+                                    $logData = [
+                                        'sessionId' => 'debug-session',
+                                        'runId' => 'run1',
+                                        'hypothesisId' => 'D',
+                                        'location' => 'ServiceForm::getStockStep::dealerId',
+                                        'message' => 'dealerId closure called',
+                                        'data' => [],
+                                        'timestamp' => (int)(microtime(true) * 1000),
+                                    ];
+                                    file_put_contents($logPath, json_encode($logData) . "\n", FILE_APPEND);
+                                    // #endregion
+                                    
                                     $user = Auth::user();
                                     if($user && $user->hasAnyRole([UserRoleEnum::SUPER_ADMIN->value, UserRoleEnum::CENTER_STAFF->value])) {
                                         // Admin için wizard'dan dealer_id al - KRİTİK: Doğru dealer_id'yi almalı
@@ -379,6 +445,19 @@ class ServiceForm
                                                 ?? $get('../dealer_id') 
                                                 ?? $get('dealer_id');
                                             
+                                            // #region agent log
+                                            $logData2 = [
+                                                'sessionId' => 'debug-session',
+                                                'runId' => 'run1',
+                                                'hypothesisId' => 'D',
+                                                'location' => 'ServiceForm::getStockStep::dealerId',
+                                                'message' => 'dealerId from paths',
+                                                'data' => ['dealerId' => $dealerId, 'user_is_admin' => true],
+                                                'timestamp' => (int)(microtime(true) * 1000),
+                                            ];
+                                            file_put_contents($logPath, json_encode($logData2) . "\n", FILE_APPEND);
+                                            // #endregion
+                                            
                                             // Eğer hala null ise, form state'inden al
                                             if (!$dealerId) {
                                                 // Livewire form state'ine erişmeyi dene
@@ -386,16 +465,69 @@ class ServiceForm
                                                 if ($livewire && method_exists($livewire, 'get')) {
                                                     $formData = $livewire->form->getState();
                                                     $dealerId = $formData['dealer_id'] ?? null;
+                                                    
+                                                    // #region agent log
+                                                    $logData3 = [
+                                                        'sessionId' => 'debug-session',
+                                                        'runId' => 'run1',
+                                                        'hypothesisId' => 'D',
+                                                        'location' => 'ServiceForm::getStockStep::dealerId',
+                                                        'message' => 'dealerId from livewire state',
+                                                        'data' => ['dealerId' => $dealerId, 'formData_keys' => array_keys($formData ?? [])],
+                                                        'timestamp' => (int)(microtime(true) * 1000),
+                                                    ];
+                                                    file_put_contents($logPath, json_encode($logData3) . "\n", FILE_APPEND);
+                                                    // #endregion
                                                 }
                                             }
                                             
+                                            // #region agent log
+                                            $logData4 = [
+                                                'sessionId' => 'debug-session',
+                                                'runId' => 'run1',
+                                                'hypothesisId' => 'D',
+                                                'location' => 'ServiceForm::getStockStep::dealerId',
+                                                'message' => 'dealerId final (admin)',
+                                                'data' => ['dealerId' => $dealerId],
+                                                'timestamp' => (int)(microtime(true) * 1000),
+                                            ];
+                                            file_put_contents($logPath, json_encode($logData4) . "\n", FILE_APPEND);
+                                            // #endregion
+                                            
                                             return $dealerId ? (int) $dealerId : null;
                                         } catch (\Exception $e) {
+                                            // #region agent log
+                                            $logData5 = [
+                                                'sessionId' => 'debug-session',
+                                                'runId' => 'run1',
+                                                'hypothesisId' => 'D',
+                                                'location' => 'ServiceForm::getStockStep::dealerId',
+                                                'message' => 'dealerId exception (admin)',
+                                                'data' => ['error' => $e->getMessage()],
+                                                'timestamp' => (int)(microtime(true) * 1000),
+                                            ];
+                                            file_put_contents($logPath, json_encode($logData5) . "\n", FILE_APPEND);
+                                            // #endregion
                                             return null;
                                         }
                                     } else {
                                         // Bayi çalışanı için kullanıcının dealer_id'sini kullan
-                                        return $user?->dealer?->id;
+                                        $dealerId = $user?->dealer?->id;
+                                        
+                                        // #region agent log
+                                        $logData6 = [
+                                            'sessionId' => 'debug-session',
+                                            'runId' => 'run1',
+                                            'hypothesisId' => 'D',
+                                            'location' => 'ServiceForm::getStockStep::dealerId',
+                                            'message' => 'dealerId final (dealer staff)',
+                                            'data' => ['dealerId' => $dealerId, 'user_id' => $user?->id],
+                                            'timestamp' => (int)(microtime(true) * 1000),
+                                        ];
+                                        file_put_contents($logPath, json_encode($logData6) . "\n", FILE_APPEND);
+                                        // #endregion
+                                        
+                                        return $dealerId;
                                     }
                                 })
                                 ->columnSpanFull(),

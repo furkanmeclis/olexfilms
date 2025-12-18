@@ -154,7 +154,7 @@ class EditService extends EditRecord
                         ServiceItem::create([
                             'service_id' => $service->id,
                             'stock_item_id' => $stockItem->id,
-                            'usage_type' => \App\Enums\ServiceItemUsageTypeEnum::USED->value,
+                            'usage_type' => \App\Enums\ServiceItemUsageTypeEnum::FULL->value,
                         ]);
 
                         // Stok item'ın location'ını SERVICE yap ve status'unu USED yap

@@ -28,7 +28,11 @@ class ServiceObserver
     {
         // Eğer status değiştiyse
         if ($service->wasChanged('status')) {
-            $oldStatus = ServiceStatusEnum::from($service->getOriginal('status'));
+            // getOriginal() enum instance döndürebilir, bu durumda direkt kullan
+            $originalStatus = $service->getOriginal('status');
+            $oldStatus = $originalStatus instanceof ServiceStatusEnum 
+                ? $originalStatus 
+                : ServiceStatusEnum::from($originalStatus);
             $newStatus = $service->status;
 
             // Eğer status completed olduysa
