@@ -131,7 +131,7 @@
     
     // Stock items'ı map et ve available_parts_labels ekle
     $mappedStockItems = $stockItems->map(function($item) use ($partLabels, $fallbackImage) {
-        $availableParts = $item->product->category->available_parts ?? [];
+        $availableParts = $item->product?->category?->available_parts ?? [];
         
         // Eğer string ise (JSON), decode et
         if (is_string($availableParts)) {
@@ -149,12 +149,19 @@
             $availablePartsLabels[] = $partLabels[$part] ?? $part;
         }
         
+        $productImagePath = $item->product?->image_path;
+        $imagePath = $productImagePath 
+            ? (str_starts_with($productImagePath, 'storage/') 
+                ? asset($productImagePath) 
+                : asset('storage/' . $productImagePath)) 
+            : $fallbackImage;
+        
         return [
             'id' => $item->id,
             'barcode' => $item->barcode,
-            'product_name' => $item->product->name ?? '',
-            'category_name' => $item->product->category->name ?? '',
-            'image_path' => $item->product->image_path ? (str_starts_with($item->product->image_path, 'storage/') ? asset($item->product->image_path) : asset('storage/' . $item->product->image_path)) : $fallbackImage,
+            'product_name' => $item->product?->name ?? '',
+            'category_name' => $item->product?->category?->name ?? '',
+            'image_path' => $imagePath,
             'available_parts' => $availableParts,
             'available_parts_labels' => $availablePartsLabels
         ];
