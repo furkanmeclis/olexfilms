@@ -13,6 +13,7 @@ use App\Filament\Resources\Services\Schemas\ServiceForm;
 use App\Filament\Resources\Services\Tables\ServicesTable;
 use App\Models\Service;
 use BackedEnum;
+use UnitEnum;
 use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -25,7 +26,8 @@ class ServiceResource extends Resource
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationLabel = 'Hizmetler';
-
+    protected static UnitEnum|string|null $navigationGroup = 'Hizmet Yönetimi';
+ 
     protected static ?string $modelLabel = 'Hizmet';
 
     protected static ?string $pluralModelLabel = 'Hizmetler';
