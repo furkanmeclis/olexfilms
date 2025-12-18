@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome');
+
+// Customer routes
+Route::get('/customer/{hash}', [CustomerController::class, 'index'])->name('customer.notify');
+Route::post('/customer/{hash}/update', [CustomerController::class, 'update'])->name('customer.notifyUpdate');
+Route::post('/api/customer/otp-login', [CustomerController::class, 'customerOtpLogin'])->name('customer-otp-login');
+Route::post('/customer/otp-verify', [CustomerController::class, 'customerOtpVerify'])->name('customer-otp-verify');
