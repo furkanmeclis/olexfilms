@@ -25,15 +25,11 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Filament\Infolists\Concerns\InteractsWithInfolists;
-use Filament\Infolists\Contracts\HasInfolists;
-use Filament\Infolists\Infolist;
 
-class ServiceStatusManagement extends Page implements HasSchemas, HasTable, HasInfolists
+class ServiceStatusManagement extends Page implements HasSchemas, HasTable
 {
     use InteractsWithSchemas;
     use InteractsWithTable;
-    use InteractsWithInfolists;
 
     protected static ?string $navigationLabel = 'Servis Durum Yönetimi';
 
@@ -145,17 +141,7 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable, HasI
             return;
         }
 
-        // Dealer kontrolü - sadece kendi dealer_id'sine sahip servisleri görebilir
-        if ($user->dealer_id && $service->dealer_id !== $user->dealer_id) {
-            Notification::make()
-                ->warning()
-                ->title('Yetki Hatası')
-                ->body('Bu servise erişim yetkiniz bulunmamaktadır.')
-                ->send();
-            $this->service = null;
-            return;
-        }
-
+        // Bayi tüm hizmetleri arayabilir (servis durum yönetimi için)
         $this->service = $service;
 
         Notification::make()
@@ -205,14 +191,14 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable, HasI
         $this->resetTable();
     }
 
-    public function serviceStatusLogsTable(Table $table): Table
+    public function getServiceStatusLogsTableProperty(): Table
     {
-        return $table
-            ->query(
-                fn () => $this->service
-                    ? ServiceStatusLog::query()->where('service_id', $this->service->id)
-                    : ServiceStatusLog::query()->whereRaw('1 = 0')
-            )
+        $query = $this->service
+            ? ServiceStatusLog::query()->where('service_id', $this->service->id)
+            : ServiceStatusLog::query()->whereRaw('1 = 0');
+
+        return Table::make($this)
+            ->query($query)
             ->columns([
                 TextColumn::make('fromDealer.name')
                     ->label('Gelen Şube')
@@ -246,78 +232,18 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable, HasI
             ->emptyStateIcon('heroicon-o-document-text');
     }
 
-    public function serviceInfolist(Infolist $infolist): Infolist
+    public function getServiceInfolistProperty()
     {
-        return $infolist
-            ->record($this->service)
-            ->schema([
-                Section::make('Özet Bilgiler')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('service_no')
-                            ->label('Hizmet Numarası')
-                            ->size('lg')
-                            ->weight('bold')
-                            ->columnSpan(1),
+        if (!$this->service) {
+            return null;
+        }
 
-                        Infolists\Components\TextEntry::make('status')
-                            ->label('Durum')
-                            ->badge()
-                            ->size('lg')
-                            ->formatStateUsing(fn ($state) => $state->getLabel())
-                            ->color(fn ($state) => match ($state->value) {
-                                'draft' => 'gray',
-                                'pending' => 'warning',
-                                'processing' => 'info',
-                                'ready' => 'primary',
-                                'completed' => 'success',
-                                'cancelled' => 'danger',
-                                default => 'gray',
-                            })
-                            ->columnSpan(1),
-
-                        Infolists\Components\TextEntry::make('customer.name')
-                            ->label('Müşteri')
-                            ->size('lg')
-                            ->weight('bold')
-                            ->icon('heroicon-o-user')
-                            ->columnSpan(1),
-
-                        Infolists\Components\TextEntry::make('carBrand.name')
-                            ->label('Marka')
-                            ->icon('heroicon-o-tag')
-                            ->columnSpan(1),
-                    ])
-                    ->columns(2)
-                    ->icon('heroicon-o-information-circle'),
-
-                Section::make('Araç Bilgileri')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('carModel.name')
-                            ->label('Model')
-                            ->icon('heroicon-o-cog-6-tooth'),
-
-                        Infolists\Components\TextEntry::make('year')
-                            ->label('Yıl')
-                            ->badge()
-                            ->color('info')
-                            ->icon('heroicon-o-calendar'),
-
-                        Infolists\Components\TextEntry::make('plate')
-                            ->label('Plaka')
-                            ->badge()
-                            ->color('warning')
-                            ->icon('heroicon-o-identification')
-                            ->placeholder('Girilmemiş'),
-
-                        Infolists\Components\TextEntry::make('km')
-                            ->label('Kilometre')
-                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '.') . ' km' : 'Girilmemiş')
-                            ->icon('heroicon-o-map-pin'),
-                    ])
-                    ->columns(2)
-                    ->icon('heroicon-o-truck')
-                    ->collapsible(),
-            ]);
+        // ServiceResource'daki infolist'i kullan ve Livewire component'ine bağla
+        return \App\Filament\Resources\Services\ServiceResource::infolist(
+            Schema::make()
+                ->record($this->service)
+                ->livewire($this)
+        );
     }
 }
 

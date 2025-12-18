@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->validateCsrfTokens(except: [
             'api/nexptg/*',
+            'api/customer/otp-login',
+            'customer/otp-verify',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

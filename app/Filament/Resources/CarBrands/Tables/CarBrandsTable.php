@@ -15,6 +15,8 @@ class CarBrandsTable
 {
     public static function configure(Table $table): Table
     {
+        $canManageActiveStatus = auth()->user()?->hasAnyRole(['super_admin', 'center_staff']) ?? false;
+
         return $table
             ->columns([
                 \Filament\Tables\Columns\ImageColumn::make('logo')
@@ -29,7 +31,8 @@ class CarBrandsTable
 
                 \Filament\Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Aktif')
-                    ->sortable(),
+                    ->sortable()
+                    ->visible(fn () => $canManageActiveStatus),
 
                 \Filament\Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturulma')

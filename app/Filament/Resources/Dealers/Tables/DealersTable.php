@@ -21,6 +21,8 @@ class DealersTable
 {
     public static function configure(Table $table): Table
     {
+        $canManageActiveStatus = auth()->user()?->hasAnyRole(['super_admin', 'center_staff']) ?? false;
+
         return $table
             ->columns([
                 ImageColumn::make('logo_path')
@@ -67,7 +69,8 @@ class DealersTable
 
                 ToggleColumn::make('is_active')
                     ->label('Aktif')
-                    ->sortable(),
+                    ->sortable()
+                    ->visible(fn () => $canManageActiveStatus),
 
                 TextColumn::make('created_at')
                     ->label('Oluşturulma')

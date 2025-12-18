@@ -1,12 +1,11 @@
-import { Link, Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useToast } from '@/components/ui/toast';
-import { applyPhoneMask, removePhoneMask } from '@/lib/phoneMask';
 import OtpInput from 'react-otp-input';
-import { route } from 'ziggy';
+import { IMaskInput } from 'react-imask';
 
-export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: string }) {
+export default function Welcome({ auth }: { auth: any }) {
     const toast = useToast();
     const [phone, setPhone] = useState('');
     const [isOpen, setIsOpen] = useState(false);
@@ -32,12 +31,11 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
         setResend(false);
         setLoading(true);
         let formData = new FormData();
-        formData.append('phone', removePhoneMask(phone));
+        // Maskeyi kaldır - sadece rakamları al
+        const phoneNumber = phone.replace(/\D/g, '');
+        formData.append('phone', phoneNumber);
         fetch("/api/customer/otp-login", {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrf_token,
-            },
             body: formData,
         })
             .then((response) => response.json())
@@ -63,11 +61,11 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                     });
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 toast.show({
                     severity: 'error',
                     summary: 'Hata',
-                    detail: 'CSRF Token Hatası Lütfen Sayfayı Yenileyiniz..',
+                    detail: 'Bir hata oluştu. Lütfen tekrar deneyiniz.',
                 });
             })
             .finally(() => {
@@ -80,17 +78,14 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
         let formData = new FormData();
         formData.append('customer_id', customerId);
         formData.append('otp', otp);
-        fetch(('customer-otp-verify'), {
+        fetch('/customer/otp-verify', {
             method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrf_token,
-            },
             body: formData,
         })
             .then((response) => response.json())
             .then((data) => {
                 if (data.status) {
-                    router.visit(('customer.notify', data.hash));
+                    router.visit(`/customer/${data.hash}`);
                 } else {
                     toast.show({
                         severity: 'error',
@@ -100,11 +95,11 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                     });
                 }
             })
-            .catch((error) => {
+            .catch(() => {
                 toast.show({
                     severity: 'error',
                     summary: 'Hata',
-                    detail: 'CSRF Token Hatası Lütfen Sayfayı Yenileyiniz..',
+                    detail: 'Bir hata oluştu. Lütfen tekrar deneyiniz.',
                 });
             })
             .finally(() => {
@@ -112,10 +107,8 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
             });
     };
 
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        const masked = applyPhoneMask(value);
-        setPhone(masked);
+    const handlePhoneChange = (value: string) => {
+        setPhone(value);
     };
 
     return (
@@ -159,7 +152,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                                 ) : (
                                     <>
                                         <a
-                                            href={route('filament.admin.auth.login')}
+                                            href={"/admin/login"}
                                             className="relative inline-flex items-center justify-center px-6 py-2 text-base font-medium text-white transition-all duration-300 ease-in-out bg-gradient-to-r from-[#1a1a1a] to-[#333333] rounded-lg hover:from-[#333333] hover:to-[#1a1a1a] border border-[#E6B800]/30 hover:border-[#E6B800] shadow-lg hover:shadow-[#E6B800]/20 group"
                                         >
                                             <span className="relative flex items-center">
@@ -216,18 +209,19 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                             {!isSended ? (
                                 <div className="space-y-4">
                                     <div className="relative">
-                                        <input
-                                            type="tel"
+                                        <IMaskInput
+                                            mask="0(000) 000-0000"
                                             value={phone}
-                                            onChange={handlePhoneChange}
-                                            placeholder="Telefon Numarası"
+                                            onAccept={handlePhoneChange}
+                                            placeholder="0(5__) ___-____"
+                                            type="tel"
                                             className="w-full bg-[#002200] border border-green-900 text-white rounded-lg px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 placeholder-green-500/50"
                                         />
                                         <i className="pi pi-phone absolute right-4 top-1/2 -translate-y-1/2 text-green-500" />
                                     </div>
                                     <button
                                         onClick={(e) => otpLogin(e)}
-                                        disabled={loading || removePhoneMask(phone).length !== 11}
+                                        disabled={loading || phone.replace(/\D/g, '').length !== 11}
                                         className="w-full bg-green-600 text-white rounded-lg py-3 font-medium hover:bg-green-500 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-[#001100] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {loading ? (

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\UserRoleEnum;
 use App\Services\VatanSmsService;
 use App\Settings\VatanSmsSettings;
 use BackedEnum;
@@ -16,6 +17,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Auth;
 
 class ManageVatanSmsSettings extends Page implements HasSchemas
 {
@@ -32,6 +34,16 @@ class ManageVatanSmsSettings extends Page implements HasSchemas
     protected static string|UnitEnum|null $navigationGroup = 'SMS';
 
     protected static ?int $navigationSort = 3;
+
+    /**
+     * Sadece super_admin rolüne sahip kullanıcılar SMS ayarları sayfasına erişebilir
+     */
+    public static function canAccess(): bool
+    {
+        $user = Auth::user();
+        
+        return $user && $user->hasRole(UserRoleEnum::SUPER_ADMIN->value);
+    }
 
     public ?array $data = [];
 
