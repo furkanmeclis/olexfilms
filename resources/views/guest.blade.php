@@ -12,11 +12,12 @@
 
         <!-- Scripts -->
         @viteReactRefresh
-        @vite(['resources/js/guest.tsx', "resources/js/Pages/{$page['component']}.tsx"])
+        @vite('resources/js/guest.tsx')
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
         @inertia
     </body>
 </html>
+
 

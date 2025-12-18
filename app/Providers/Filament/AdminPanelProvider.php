@@ -32,8 +32,12 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Yellow,
             ])
+            ->brandLogo(asset('images/olex-logo-yatay-dark.svg'))
+            ->brandLogoHeight('3rem')
+            ->darkModeBrandLogo(asset('images/olex-logo-yatay.svg'))
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
