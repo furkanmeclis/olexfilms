@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\ServiceReportMatchTypeEnum;
 use App\Enums\ServiceStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Service extends Model
@@ -101,5 +103,45 @@ class Service extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ServiceImage::class)->orderBy('order');
+    }
+
+    /**
+     * Get all Nexptg reports for this service.
+     */
+    public function reports(): BelongsToMany
+    {
+        return $this->belongsToMany(NexptgReport::class, 'service_nexptg_report')
+            ->withPivot('match_type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get before service reports.
+     */
+    public function beforeReports(): BelongsToMany
+    {
+        return $this->belongsToMany(NexptgReport::class, 'service_nexptg_report')
+            ->wherePivot('match_type', ServiceReportMatchTypeEnum::BEFORE->value)
+            ->withPivot('match_type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get after service reports.
+     */
+    public function afterReports(): BelongsToMany
+    {
+        return $this->belongsToMany(NexptgReport::class, 'service_nexptg_report')
+            ->wherePivot('match_type', ServiceReportMatchTypeEnum::AFTER->value)
+            ->withPivot('match_type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get all status logs for this service.
+     */
+    public function statusLogs(): HasMany
+    {
+        return $this->hasMany(ServiceStatusLog::class)->orderBy('created_at', 'desc');
     }
 }

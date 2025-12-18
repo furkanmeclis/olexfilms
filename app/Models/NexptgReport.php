@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class NexptgReport extends Model
@@ -62,5 +63,23 @@ class NexptgReport extends Model
     public function tires(): HasMany
     {
         return $this->hasMany(NexptgReportTire::class, 'report_id');
+    }
+
+    /**
+     * Get all services that use this report.
+     */
+    public function services(): BelongsToMany
+    {
+        return $this->belongsToMany(Service::class, 'service_nexptg_report')
+            ->withPivot('match_type')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if this report is matched to any service.
+     */
+    public function isMatched(): bool
+    {
+        return $this->services()->exists();
     }
 }
