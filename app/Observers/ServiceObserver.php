@@ -26,37 +26,56 @@ class ServiceObserver
      */
     public function updated(Service $service): void
     {
-        // Eğer status completed olduysa
-        if ($service->wasChanged('status') && $service->status === ServiceStatusEnum::COMPLETED) {
-            // Tüm ServiceItem'ların StockItem'larını USED yap
-            $service->loadMissing('items.stockItem');
-            
-            foreach ($service->items as $serviceItem) {
-                $stockItem = $serviceItem->stockItem;
+        // Eğer status değiştiyse
+        if ($service->wasChanged('status')) {
+            $oldStatus = ServiceStatusEnum::from($service->getOriginal('status'));
+            $newStatus = $service->status;
 
-                // StockItem null ise atla
-                if (!$stockItem) {
-                    continue;
+            // Eğer status completed olduysa
+            if ($newStatus === ServiceStatusEnum::COMPLETED) {
+                // Tüm ServiceItem'ların StockItem'larını USED yap
+                $service->loadMissing('items.stockItem');
+                
+                foreach ($service->items as $serviceItem) {
+                    $stockItem = $serviceItem->stockItem;
+
+                    // StockItem null ise atla
+                    if (!$stockItem) {
+                        continue;
+                    }
+
+                    // StockItem'ı USED yap
+                    $stockItem->update([
+                        'status' => StockStatusEnum::USED->value,
+                    ]);
+
+                    // Stock movement logu oluştur
+                    StockMovement::create([
+                        'stock_item_id' => $stockItem->id,
+                        'user_id' => Auth::id() ?? $service->user_id,
+                        'action' => StockMovementActionEnum::USED_IN_SERVICE->value,
+                        'description' => "Hizmet #{$service->service_no} tamamlandı - kullanıldı",
+                        'created_at' => now(),
+                    ]);
                 }
 
-                // StockItem'ı USED yap
-                $stockItem->update([
-                    'status' => StockStatusEnum::USED->value,
-                ]);
-
-                // Stock movement logu oluştur
-                StockMovement::create([
-                    'stock_item_id' => $stockItem->id,
-                    'user_id' => Auth::id() ?? $service->user_id,
-                    'action' => StockMovementActionEnum::USED_IN_SERVICE->value,
-                    'description' => "Hizmet #{$service->service_no} tamamlandı - kullanıldı",
-                    'created_at' => now(),
-                ]);
+                // Garanti başlat
+                $listener = new ServiceStatusUpdatedListener();
+                $listener->handle($service);
+            } 
+            // Eğer status COMPLETED'dan başka bir duruma geri alınırsa
+            elseif ($oldStatus === ServiceStatusEnum::COMPLETED && $newStatus !== ServiceStatusEnum::COMPLETED) {
+                // İlgili garantileri pasifleştir (silme, sadece is_active = false)
+                $service->loadMissing('warranties');
+                
+                foreach ($service->warranties as $warranty) {
+                    if ($warranty->is_active) {
+                        $warranty->update([
+                            'is_active' => false,
+                        ]);
+                    }
+                }
             }
-
-            // Garanti başlat
-            $listener = new ServiceStatusUpdatedListener();
-            $listener->handle($service);
         }
     }
 

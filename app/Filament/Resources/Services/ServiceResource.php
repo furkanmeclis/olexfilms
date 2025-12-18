@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Services;
 
+use App\Enums\ServiceStatusEnum;
 use App\Filament\Infolists\Components\CarPartView;
 use App\Filament\Resources\Services\Pages\CreateService;
 use App\Filament\Resources\Services\Pages\EditService;
@@ -335,6 +336,93 @@ class ServiceResource extends Resource
                     ->collapsed(false)
                     ->icon('heroicon-o-photo'),
 
+                // Garanti Bilgileri
+                Section::make('Garanti Bilgileri')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('warranties_count')
+                            ->label('Toplam Garanti Sayısı')
+                            ->formatStateUsing(fn ($record) => $record->warranties()->count() . ' garanti')
+                            ->badge()
+                            ->color('info')
+                            ->icon('heroicon-o-shield-check')
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('active_warranties_count')
+                            ->label('Aktif Garanti Sayısı')
+                            ->formatStateUsing(fn ($record) => $record->warranties()->where('is_active', true)->count() . ' aktif')
+                            ->badge()
+                            ->color('success')
+                            ->icon('heroicon-o-check-circle')
+                            ->columnSpan(1),
+
+                        Infolists\Components\TextEntry::make('expired_warranties_count')
+                            ->label('Süresi Dolmuş Garanti Sayısı')
+                            ->formatStateUsing(fn ($record) => $record->warranties()
+                                ->where('is_active', true)
+                                ->where('end_date', '<', now()->startOfDay())
+                                ->count() . ' süresi dolmuş')
+                            ->badge()
+                            ->color('danger')
+                            ->icon('heroicon-o-clock')
+                            ->columnSpan(1),
+
+                        Infolists\Components\RepeatableEntry::make('warranties')
+                            ->label('Garanti Listesi')
+                            ->schema([
+                                Infolists\Components\TextEntry::make('stockItem.barcode')
+                                    ->label('Barkod')
+                                    ->badge()
+                                    ->color('info')
+                                    ->icon('heroicon-o-qr-code'),
+
+                                Infolists\Components\TextEntry::make('stockItem.product.name')
+                                    ->label('Ürün')
+                                    ->weight('bold')
+                                    ->icon('heroicon-o-cube'),
+
+                                Infolists\Components\TextEntry::make('end_date')
+                                    ->label('Bitiş Tarihi')
+                                    ->date('d.m.Y')
+                                    ->badge()
+                                    ->color(fn ($record) => $record->is_expired ? 'danger' : 'primary')
+                                    ->icon('heroicon-o-calendar'),
+
+                                Infolists\Components\TextEntry::make('days_remaining')
+                                    ->label('Kalan Gün')
+                                    ->formatStateUsing(fn ($state) => $state !== null 
+                                        ? ($state > 0 ? "{$state} gün" : 'Süresi dolmuş')
+                                        : 'Bilinmiyor')
+                                    ->badge()
+                                    ->color(fn ($state) => match (true) {
+                                        $state === null => 'gray',
+                                        $state <= 0 => 'danger',
+                                        $state <= 30 => 'warning',
+                                        default => 'success',
+                                    })
+                                    ->icon('heroicon-o-clock'),
+
+                                Infolists\Components\TextEntry::make('is_active')
+                                    ->label('Durum')
+                                    ->badge()
+                                    ->formatStateUsing(fn ($state, $record) => $state 
+                                        ? ($record->is_expired ? 'Süresi Dolmuş' : 'Aktif')
+                                        : 'Pasif')
+                                    ->color(fn ($state, $record) => match (true) {
+                                        !$state => 'gray',
+                                        $record->is_expired => 'danger',
+                                        default => 'success',
+                                    }),
+                            ])
+                            ->columns(2)
+                            ->grid(1)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(3)
+                    ->collapsible()
+                    ->collapsed(false)
+                    ->icon('heroicon-o-shield-check')
+                    ->visible(fn ($record) => $record->status->value === ServiceStatusEnum::COMPLETED->value),
+
                 // Notlar
                 Section::make('Notlar')
                     ->schema([
@@ -376,6 +464,7 @@ class ServiceResource extends Resource
     {
         return [
             \App\Filament\Resources\Services\RelationManagers\ServiceItemsRelationManager::class,
+            \App\Filament\Resources\Services\RelationManagers\WarrantiesRelationManager::class,
         ];
     }
 
