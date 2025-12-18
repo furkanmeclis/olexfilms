@@ -9,20 +9,20 @@ use App\Models\Warranty;
 class WarrantyPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Kullanıcı herhangi bir garanti kaydını listeleyebilir mi?
      */
     public function viewAny(User $user): bool
     {
-        // Herkes kendi yetkilerine göre garantileri görebilir
+        // Herkes kendi yetkisine göre listeleme yapabilir
         return true;
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Kullanıcı tekil bir garanti kaydını görüntüleyebilir mi?
      */
     public function view(User $user, Warranty $warranty): bool
     {
-        // Admin ve merkez çalışanları tüm garantileri görebilir
+        // Super admin ve merkez çalışanları tüm garantileri görebilir
         if ($user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -30,7 +30,7 @@ class WarrantyPolicy
             return true;
         }
 
-        // Bayi sadece kendi bayi hizmetlerinin garantilerini görebilir
+        // Bayi yalnızca kendi bayisine ait servislerin garantisini görebilir
         if ($user->dealer_id) {
             return $warranty->service && $warranty->service->dealer_id === $user->dealer_id;
         }
@@ -39,20 +39,20 @@ class WarrantyPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Kullanıcı garanti oluşturabilir mi?
      */
     public function create(User $user): bool
     {
-        // Garantiler otomatik oluşturulur, manuel oluşturma yok
+        // Garantiler manuel olarak oluşturulamaz
         return false;
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Kullanıcı garanti kaydını güncelleyebilir mi?
      */
     public function update(User $user, Warranty $warranty): bool
     {
-        // Sadece admin is_active alanını değiştirebilir
+        // Sadece super admin ve merkez çalışanı güncelleme yapabilir
         return $user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -60,16 +60,16 @@ class WarrantyPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Kullanıcı garanti kaydını silebilir mi?
      */
     public function delete(User $user, Warranty $warranty): bool
     {
-        // Garantiler silinemez (cascade delete zaten var, ama manuel silme yok)
+        // Garantiler manuel olarak silinemez
         return false;
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Kullanıcı garanti kaydını geri getirebilir mi?
      */
     public function restore(User $user, Warranty $warranty): bool
     {
@@ -77,11 +77,10 @@ class WarrantyPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Kullanıcı garanti kaydını kalıcı olarak silebilir mi?
      */
     public function forceDelete(User $user, Warranty $warranty): bool
     {
         return false;
     }
 }
-

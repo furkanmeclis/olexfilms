@@ -45,14 +45,27 @@ class WarrantyResource extends Resource
         $query = parent::getEloquentQuery();
 
         $user = auth()->user();
-        if ($user && $user->dealer_id && !$user->hasAnyRole([
+        if (!$user) {
+            return $query;
+        }
+
+        // Super admin ve merkez çalışanları tüm garantileri görebilir
+        if ($user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
         ])) {
-            // Bayi sadece kendi bayi hizmetlerinin garantilerini görür
+            return $query;
+        }
+
+        // Bayi sadece kendi bayi hizmetlerinin garantilerini görür
+        if ($user->dealer_id) {
             $query->whereHas('service', function ($q) use ($user) {
                 $q->where('dealer_id', $user->dealer_id);
             });
+        } else {
+            // Eğer kullanıcının dealer_id'si yoksa ve super admin/merkez çalışanı değilse,
+            // hiçbir garanti görmemeli (güvenlik için)
+            return $query->whereRaw('1 = 0');
         }
 
         return $query;
