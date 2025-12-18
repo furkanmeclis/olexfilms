@@ -3,13 +3,8 @@
 namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\OrderStatusEnum;
-use App\Enums\StockLocationEnum;
-use App\Enums\StockMovementActionEnum;
-use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Models\Order;
-use App\Models\StockItem;
-use App\Models\StockMovement;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
@@ -18,7 +13,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class OrdersTable
 {
@@ -96,37 +90,9 @@ class OrdersTable
                         ]) && $record->status->value === 'shipped';
                     })
                     ->action(function ($record) {
-                        $user = Auth::user();
-                        
-                        DB::transaction(function () use ($record, $user) {
-                            // Siparişe bağlı tüm stock_items'ı bul
-                            $stockItems = StockItem::whereHas('orderItems', function ($query) use ($record) {
-                                $query->whereHas('order', function ($q) use ($record) {
-                                    $q->where('id', $record->id);
-                                });
-                            })->get();
-
-                            foreach ($stockItems as $stockItem) {
-                                // StockItem'ı güncelle
-                                $stockItem->update([
-                                    'dealer_id' => $record->dealer_id,
-                                    'location' => StockLocationEnum::DEALER->value,
-                                    'status' => StockStatusEnum::AVAILABLE->value,
-                                ]);
-
-                                // Hareket logu oluştur
-                                StockMovement::create([
-                                    'stock_item_id' => $stockItem->id,
-                                    'user_id' => $user->id,
-                                    'action' => StockMovementActionEnum::RECEIVED->value,
-                                    'description' => "Sipariş #{$record->id} {$record->dealer->name} bayisine teslim edildi",
-                                    'created_at' => now(),
-                                ]);
-                            }
-
-                            // Sipariş statüsünü delivered yap
-                            $record->update(['status' => OrderStatusEnum::DELIVERED->value]);
-                        });
+                        // Sipariş statüsünü delivered yap
+                        // Observer stok durumunu ve movement loglarını güncelleyecek
+                        $record->update(['status' => OrderStatusEnum::DELIVERED->value]);
 
                         Notification::make()
                             ->title('Başarılı')

@@ -3,21 +3,15 @@
 namespace App\Filament\Resources\Orders\Pages;
 
 use App\Enums\OrderStatusEnum;
-use App\Enums\StockLocationEnum;
-use App\Enums\StockMovementActionEnum;
-use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Filament\Resources\Orders\OrderResource;
-use App\Models\OrderItem;
 use App\Models\StockItem;
-use App\Models\StockMovement;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class ViewOrder extends ViewRecord
 {
@@ -67,7 +61,7 @@ class ViewOrder extends ViewRecord
                     return $schema;
                 })
                 ->action(function (array $data) use ($order, $user) {
-                    DB::transaction(function () use ($data, $order, $user) {
+                    DB::transaction(function () use ($data, $order) {
                         foreach ($order->items as $item) {
                             $key = "order_item_{$item->id}";
                             if (!isset($data[$key]) || empty($data[$key])) {
@@ -77,26 +71,12 @@ class ViewOrder extends ViewRecord
                             $selectedStockIds = $data[$key];
 
                             // Seçilen stokları order_item_stock'a ekle
+                            // Observer stok durumunu güncelleyecek
                             $item->stockItems()->attach($selectedStockIds);
-
-                            // Stokların statüsünü reserved yap
-                            StockItem::whereIn('id', $selectedStockIds)->update([
-                                'status' => StockStatusEnum::RESERVED->value,
-                            ]);
-
-                            // Her stok için hareket logu oluştur
-                            foreach ($selectedStockIds as $stockId) {
-                                StockMovement::create([
-                                    'stock_item_id' => $stockId,
-                                    'user_id' => $user->id,
-                                    'action' => StockMovementActionEnum::TRANSFERRED_TO_DEALER->value,
-                                    'description' => "Sipariş #{$order->id} ile {$order->dealer->name} bayisine yollandı",
-                                    'created_at' => now(),
-                                ]);
-                            }
                         }
 
                         // Sipariş statüsünü processing yap
+                        // Observer stok durumunu ve movement loglarını güncelleyecek
                         $order->update(['status' => OrderStatusEnum::PROCESSING->value]);
                     });
 
@@ -156,36 +136,10 @@ class ViewOrder extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Sipariş Teslim Ediliyor')
                 ->modalDescription("Siparişi {$order->dealer->name} bayisine teslim etmek istediğinizden emin misiniz?")
-                ->action(function () use ($order, $user) {
-                    DB::transaction(function () use ($order, $user) {
-                        // Siparişe bağlı tüm stock_items'ı bul
-                        $stockItems = StockItem::whereHas('orderItems', function ($query) use ($order) {
-                            $query->whereHas('order', function ($q) use ($order) {
-                                $q->where('id', $order->id);
-                            });
-                        })->get();
-
-                        foreach ($stockItems as $stockItem) {
-                            // StockItem'ı güncelle
-                            $stockItem->update([
-                                'dealer_id' => $order->dealer_id,
-                                'location' => StockLocationEnum::DEALER->value,
-                                'status' => StockStatusEnum::AVAILABLE->value,
-                            ]);
-
-                            // Hareket logu oluştur
-                            StockMovement::create([
-                                'stock_item_id' => $stockItem->id,
-                                'user_id' => $user->id,
-                                'action' => StockMovementActionEnum::RECEIVED->value,
-                                'description' => "Sipariş #{$order->id} {$order->dealer->name} bayisine teslim edildi",
-                                'created_at' => now(),
-                            ]);
-                        }
-
-                        // Sipariş statüsünü delivered yap
-                        $order->update(['status' => OrderStatusEnum::DELIVERED->value]);
-                    });
+                ->action(function () use ($order) {
+                    // Sipariş statüsünü delivered yap
+                    // Observer stok durumunu ve movement loglarını güncelleyecek
+                    $order->update(['status' => OrderStatusEnum::DELIVERED->value]);
 
                     \Filament\Notifications\Notification::make()
                         ->title('Başarılı')
@@ -207,36 +161,10 @@ class ViewOrder extends ViewRecord
                 ->requiresConfirmation()
                 ->modalHeading('Sipariş Teslim Alınıyor')
                 ->modalDescription('Siparişi teslim almak istediğinizden emin misiniz?')
-                ->action(function () use ($order, $user) {
-                    DB::transaction(function () use ($order, $user) {
-                        // Siparişe bağlı tüm stock_items'ı bul
-                        $stockItems = StockItem::whereHas('orderItems', function ($query) use ($order) {
-                            $query->whereHas('order', function ($q) use ($order) {
-                                $q->where('id', $order->id);
-                            });
-                        })->get();
-
-                        foreach ($stockItems as $stockItem) {
-                            // StockItem'ı güncelle
-                            $stockItem->update([
-                                'dealer_id' => $order->dealer_id,
-                                'location' => StockLocationEnum::DEALER->value,
-                                'status' => StockStatusEnum::AVAILABLE->value,
-                            ]);
-
-                            // Hareket logu oluştur
-                            StockMovement::create([
-                                'stock_item_id' => $stockItem->id,
-                                'user_id' => $user->id,
-                                'action' => StockMovementActionEnum::RECEIVED->value,
-                                'description' => "Sipariş #{$order->id} teslim alındı",
-                                'created_at' => now(),
-                            ]);
-                        }
-
-                        // Sipariş statüsünü delivered yap
-                        $order->update(['status' => OrderStatusEnum::DELIVERED->value]);
-                    });
+                ->action(function () use ($order) {
+                    // Sipariş statüsünü delivered yap
+                    // Observer stok durumunu ve movement loglarını güncelleyecek
+                    $order->update(['status' => OrderStatusEnum::DELIVERED->value]);
 
                     \Filament\Notifications\Notification::make()
                         ->title('Başarılı')
