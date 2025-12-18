@@ -90,7 +90,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
             .then((response) => response.json())
             .then((data) => {
                 if (data.status) {
-                    router.visit(route('customer.notify', data.hash));
+                    router.visit(('customer.notify', data.hash));
                 } else {
                     toast.show({
                         severity: 'error',
@@ -151,7 +151,7 @@ export default function Welcome({ auth, csrf_token }: { auth: any; csrf_token: s
                             >
                                 {auth.user ? (
                                     <a
-                                        href={route('filament.admin.pages.dashboard')}
+                                        href={""}
                                         className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-500 transition-all duration-300"
                                     >
                                         <i className="pi pi-home mr-2" /> Yönetim Paneli
