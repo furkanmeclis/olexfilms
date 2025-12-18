@@ -113,25 +113,30 @@ class NexptgReportInfolist
 
                 Section::make('API Bilgileri')
                     ->schema([
-                        Infolists\Components\TextEntry::make('apiUser.username')
+                        Infolists\Components\TextEntry::make('api_username')
                             ->label('API Kullanıcı Adı')
                             ->placeholder('Belirtilmemiş')
-                            ->icon('heroicon-m-key'),
+                            ->icon('heroicon-m-key')
+                            ->state(fn ($record) => $record->apiUser?->username ?? null)
+                            ->formatStateUsing(fn ($state) => $state ?? 'Belirtilmemiş'),
 
-                        Infolists\Components\TextEntry::make('apiUser.user.name')
+                        Infolists\Components\TextEntry::make('api_user_name')
                             ->label('Bağlı Kullanıcı')
                             ->placeholder('Belirtilmemiş')
-                            ->icon('heroicon-m-user'),
+                            ->icon('heroicon-m-user')
+                            ->state(fn ($record) => $record->apiUser?->user?->name ?? null)
+                            ->formatStateUsing(fn ($state) => $state ?? 'Belirtilmemiş'),
 
-                        Infolists\Components\TextEntry::make('apiUser.is_active')
+                        Infolists\Components\TextEntry::make('api_user_status')
                             ->label('API Kullanıcı Durumu')
                             ->badge()
-                            ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Pasif')
-                            ->color(fn ($state) => $state ? 'success' : 'danger')
+                            ->state(fn ($record) => $record->apiUser?->is_active ?? null)
+                            ->formatStateUsing(fn ($state) => $state !== null ? ($state ? 'Aktif' : 'Pasif') : 'Belirtilmemiş')
+                            ->color(fn ($state) => $state !== null ? ($state ? 'success' : 'danger') : 'gray')
                             ->placeholder('Belirtilmemiş'),
                     ])
                     ->columns(3)
-                    ->visible(fn ($record) => $record->apiUser !== null)
+                    ->visible(fn ($record) => $record && $record->apiUser !== null)
                     ->collapsible(),
 
                 Section::make('Zaman Damgaları')
