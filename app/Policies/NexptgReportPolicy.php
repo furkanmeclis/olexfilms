@@ -44,6 +44,11 @@ class NexptgReportPolicy
      */
     public function update(User $user, NexptgReport $nexptgReport): bool
     {
+        // Eğer rapor bir hizmete eşleşmişse düzenlenemez
+        if ($nexptgReport->isMatched()) {
+            return false;
+        }
+
         // Sadece super admin düzenleyebilir
         return $user->hasRole(UserRoleEnum::SUPER_ADMIN->value);
     }
@@ -53,6 +58,11 @@ class NexptgReportPolicy
      */
     public function delete(User $user, NexptgReport $nexptgReport): bool
     {
+        // Eğer rapor bir hizmete eşleşmişse silinemez
+        if ($nexptgReport->isMatched()) {
+            return false;
+        }
+
         // Sadece super admin silebilir
         return $user->hasRole(UserRoleEnum::SUPER_ADMIN->value);
     }
