@@ -24,8 +24,8 @@ class NexptgTestController extends Controller
     {
         try {
             // Statik test credentials
-            $testUsername = 'olexfilms_N8YvN3LCwTRTDuoP';
-            $testPassword = '2ybhvRKRdojR1lOo';
+            $testUsername = 'olexfilms_HVdijjbGK0264rw4';
+            $testPassword = 'password';
 
             // API user'ı bul
             $apiUser = NexptgApiUser::where('username', $testUsername)
