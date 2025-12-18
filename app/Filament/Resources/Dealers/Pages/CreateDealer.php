@@ -17,6 +17,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Wizard\Step;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
 class CreateDealer extends CreateRecord
@@ -213,7 +215,15 @@ class CreateDealer extends CreateRecord
                                 ->label('E-posta')
                                 ->email()
                                 ->required(fn ($get) => $get('owner_type') === 'new')
-                                ->unique(User::class, 'email')
+                                ->unique(
+                                    table: 'users',
+                                    column: 'email',
+                                    modifyRuleUsing: function (Unique $rule) {
+                                        // Form Dealer model'ine kaydedildiği için ignoreRecord kullanıldığında
+                                        // dealers.id referansı ekleniyor. Bu yüzden kuralı tamamen yeniden oluşturuyoruz.
+                                        return Rule::unique('users', 'email');
+                                    }
+                                )
                                 ->maxLength(255)
                                 ->visible(fn ($get) => $get('owner_type') === 'new'),
 
