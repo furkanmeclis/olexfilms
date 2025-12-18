@@ -26,11 +26,19 @@ class CarPartPicker extends Field
         });
         
         // Dehydrate: Array'den JSON string'e çevir (sadece submit anında)
+        // NOT: Model'de 'array' cast var, bu yüzden Laravel otomatik encode yapacak
+        // Burada sadece array ise olduğu gibi bırak, Laravel model cast'i halledecek
         $this->dehydrateStateUsing(function ($state) {
             if (is_array($state)) {
-                return json_encode($state);
+                // Array ise olduğu gibi döndür, Laravel model cast'i JSON'a çevirecek
+                return $state;
             }
-            return is_string($state) ? $state : json_encode([]);
+            // String ise decode et ve array'e çevir
+            if (is_string($state)) {
+                $decoded = json_decode($state, true);
+                return is_array($decoded) ? $decoded : [];
+            }
+            return [];
         });
     }
 }

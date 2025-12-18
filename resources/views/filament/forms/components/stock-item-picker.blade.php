@@ -13,6 +13,25 @@
     // State erişimi - component metodlarını kullan
         $appliedParts = $field->getAppliedParts($get) ?? [];
         $dealerId = $field->getDealerId($get);
+        
+        // #region agent log
+        $logPath = base_path('.cursor/debug.log');
+        $logData = [
+            'sessionId' => 'debug-session',
+            'runId' => 'run1',
+            'hypothesisId' => 'G',
+            'location' => 'stock-item-picker.blade.php:render',
+            'message' => 'Blade render - initial values',
+            'data' => [
+                'appliedParts' => $appliedParts,
+                'appliedParts_count' => is_array($appliedParts) ? count($appliedParts) : 0,
+                'dealerId' => $dealerId,
+                'stockItems_count' => 0, // Will be set after query
+            ],
+            'timestamp' => (int)(microtime(true) * 1000),
+        ];
+        file_put_contents($logPath, json_encode($logData) . "\n", FILE_APPEND);
+        // #endregion
     
     // Eğer dealerId yoksa, kullanıcının dealer_id'sini kullan
     $user = Auth::user();
@@ -71,8 +90,41 @@
         $stockItemsQuery->whereRaw('1 = 0');
     }
     
+    // Debug bilgileri hazırla (query execute edilmeden önce)
+    $debugQuery = clone $stockItemsQuery;
+    $debugInfo = [
+        'appliedParts' => $appliedParts,
+        'appliedPartsCount' => is_array($appliedParts) ? count($appliedParts) : 0,
+        'dealerId' => $dealerId,
+        'hasAppliedParts' => !empty($appliedParts) && is_array($appliedParts) && count($appliedParts) > 0,
+        'querySql' => $debugQuery->toSql(),
+        'queryBindings' => $debugQuery->getBindings(),
+    ];
+    
     $stockItems = $stockItemsQuery->get();
     $selectedStockItem = $selectedStockItemId ? StockItem::with(['product.category', 'product'])->find($selectedStockItemId) : null;
+    
+    // Stock items count'u debug info'ya ekle
+    $debugInfo['stockItemsCount'] = $stockItems->count();
+    
+    // #region agent log
+    $logData2 = [
+        'sessionId' => 'debug-session',
+        'runId' => 'run1',
+        'hypothesisId' => 'G',
+        'location' => 'stock-item-picker.blade.php:render',
+        'message' => 'Blade render - stock items query result',
+        'data' => [
+            'stockItems_count' => $stockItems->count(),
+            'appliedParts' => $appliedParts,
+            'dealerId' => $dealerId,
+            'selectedStockItemId' => $selectedStockItemId,
+            'debugInfo' => $debugInfo,
+        ],
+        'timestamp' => (int)(microtime(true) * 1000),
+    ];
+    file_put_contents($logPath, json_encode($logData2) . "\n", FILE_APPEND);
+    // #endregion
     
     $partLabels = CarPartEnum::getLabels();
     $fallbackImage = asset('images/default-product.png');
@@ -145,11 +197,19 @@
                     try {
                         // Applied parts değişikliklerini dinle (wizard'da kritik)
                         $wire.watch('data.applied_parts', (newParts, oldParts) => {
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/261e2adb-9d76-4242-a8c4-ee4e70d4af52',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stock-item-picker.blade.php:applied_parts_watch',message:'applied_parts changed',data:{newParts:newParts,oldParts:oldParts,newPartsStr:Array.isArray(newParts)?JSON.stringify(newParts):newParts,oldPartsStr:Array.isArray(oldParts)?JSON.stringify(oldParts):oldParts},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                            // #endregion
+                            
                             // Applied parts değiştiyse ve yeni parts boş değilse
                             const newPartsStr = Array.isArray(newParts) ? JSON.stringify(newParts) : newParts;
                             const oldPartsStr = Array.isArray(oldParts) ? JSON.stringify(oldParts) : oldParts;
                             
                             if (newPartsStr !== oldPartsStr && newParts && (Array.isArray(newParts) ? newParts.length > 0 : true)) {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7242/ingest/261e2adb-9d76-4242-a8c4-ee4e70d4af52',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stock-item-picker.blade.php:applied_parts_watch',message:'applied_parts changed - refreshing',data:{newParts:newParts},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                                // #endregion
+                                
                                 // Component'i yeniden yükle (stok listesini güncellemek için)
                                 setTimeout(() => {
                                     $wire.$refresh();
@@ -159,8 +219,16 @@
                         
                         // Dealer ID değişikliklerini dinle (admin için kritik)
                         $wire.watch('data.dealer_id', (newDealerId, oldDealerId) => {
+                            // #region agent log
+                            fetch('http://127.0.0.1:7242/ingest/261e2adb-9d76-4242-a8c4-ee4e70d4af52',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stock-item-picker.blade.php:dealer_id_watch',message:'dealer_id changed',data:{newDealerId:newDealerId,oldDealerId:oldDealerId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                            // #endregion
+                            
                             // Dealer değiştiyse ve yeni dealer null değilse
                             if (newDealerId !== oldDealerId && newDealerId !== null) {
+                                // #region agent log
+                                fetch('http://127.0.0.1:7242/ingest/261e2adb-9d76-4242-a8c4-ee4e70d4af52',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stock-item-picker.blade.php:dealer_id_watch',message:'dealer_id changed - refreshing',data:{newDealerId:newDealerId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                                // #endregion
+                                
                                 // Seçili stok'u temizle
                                 self.selectedId = null;
                                 $wire.set('{{ $statePath }}', null, false);
@@ -172,6 +240,9 @@
                             }
                         });
                     } catch (e) {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7242/ingest/261e2adb-9d76-4242-a8c4-ee4e70d4af52',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'stock-item-picker.blade.php:watch_error',message:'watch failed',data:{error:e.message},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+                        // #endregion
                         // Watch başarısız olursa devam et
                     }
                 }
@@ -421,12 +492,38 @@
             </div>
             
             <!-- Uyarı Mesajları -->
-            <p 
+            <div 
                 x-show="stockItems.length === 0" 
-                class="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3"
+                class="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 space-y-2"
             >
-                Seçilen uygulama alanlarına uygun stok bulunamadı. Lütfen önce uygulama alanlarını seçin.
-            </p>
+                <p class="font-medium">
+                    Seçilen uygulama alanlarına uygun stok bulunamadı. Lütfen önce uygulama alanlarını seçin.
+                </p>
+                <details class="text-xs text-amber-700">
+                    <summary class="cursor-pointer font-medium hover:text-amber-800">🔍 Debug Bilgileri</summary>
+                    <div class="mt-2 space-y-1 font-mono bg-amber-100 p-2 rounded border border-amber-300">
+                        <div><strong>Uygulama Alanları:</strong> 
+                            <span x-text="JSON.stringify(@js($appliedParts) || [])"></span>
+                            <span class="text-gray-600">({{ $debugInfo['appliedPartsCount'] }} adet)</span>
+                        </div>
+                        <div><strong>Bayi ID:</strong> 
+                            <span x-text="@js($dealerId) || 'null'"></span>
+                        </div>
+                        <div><strong>Stok Sayısı:</strong> 
+                            <span x-text="stockItems.length"></span>
+                        </div>
+                        <div><strong>Uygulama Alanları Seçili mi:</strong> 
+                            <span x-text="{{ $debugInfo['hasAppliedParts'] ? 'true' : 'false' }}"></span>
+                        </div>
+                        @if(config('app.debug'))
+                        <div class="mt-2 pt-2 border-t border-amber-300">
+                            <div><strong>SQL Sorgusu:</strong> <code class="text-xs">{{ $debugInfo['querySql'] }}</code></div>
+                            <div class="mt-1"><strong>Bindings:</strong> <code class="text-xs">{{ json_encode($debugInfo['queryBindings']) }}</code></div>
+                        </div>
+                        @endif
+                    </div>
+                </details>
+            </div>
         </div>
         
         <!-- Modal -->
@@ -537,9 +634,35 @@
                         </template>
                     </div>
                     
-                    <p x-show="stockItems.length === 0" class="text-center text-gray-500 py-8">
-                        Seçilen uygulama alanlarına uygun stok bulunamadı.
-                    </p>
+                    <div x-show="stockItems.length === 0" class="text-center text-gray-500 py-8 space-y-2">
+                        <p class="font-medium">
+                            Seçilen uygulama alanlarına uygun stok bulunamadı.
+                        </p>
+                        <details class="text-xs text-gray-600 inline-block">
+                            <summary class="cursor-pointer font-medium hover:text-gray-700">🔍 Debug Bilgileri</summary>
+                            <div class="mt-2 text-left space-y-1 font-mono bg-gray-100 p-2 rounded border border-gray-300 max-w-md mx-auto">
+                                <div><strong>Uygulama Alanları:</strong> 
+                                    <span x-text="JSON.stringify(@js($appliedParts) || [])"></span>
+                                    <span class="text-gray-500">({{ $debugInfo['appliedPartsCount'] }} adet)</span>
+                                </div>
+                                <div><strong>Bayi ID:</strong> 
+                                    <span x-text="@js($dealerId) || 'null'"></span>
+                                </div>
+                                <div><strong>Stok Sayısı:</strong> 
+                                    <span x-text="stockItems.length"></span>
+                                </div>
+                                <div><strong>Uygulama Alanları Seçili mi:</strong> 
+                                    <span x-text="{{ $debugInfo['hasAppliedParts'] ? 'true' : 'false' }}"></span>
+                                </div>
+                                @if(config('app.debug'))
+                                <div class="mt-2 pt-2 border-t border-gray-300">
+                                    <div><strong>SQL Sorgusu:</strong> <code class="text-xs break-all">{{ $debugInfo['querySql'] }}</code></div>
+                                    <div class="mt-1"><strong>Bindings:</strong> <code class="text-xs">{{ json_encode($debugInfo['queryBindings']) }}</code></div>
+                                </div>
+                                @endif
+                            </div>
+                        </details>
+                    </div>
                     
                     <p x-show="stockItems.length > 0 && filteredStockItems.length === 0" class="text-center text-gray-500 py-8">
                         Arama kriterlerinize uygun stok bulunamadı.
