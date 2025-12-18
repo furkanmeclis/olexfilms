@@ -59,7 +59,7 @@
             // Dealer ID yoksa, sadece NULL (merkez stoku) olanları göster
             $q->whereNull('dealer_id');
         });
-    
+    /**
     // applied_parts'a göre filtrele - Optimize edilmiş JSON sorgusu
     if (!empty($appliedParts) && is_array($appliedParts)) {
         $stockItemsQuery->whereHas('product.category', function ($q) use ($appliedParts) {
@@ -78,18 +78,18 @@
                 });
             } else {
                 // MySQL/PostgreSQL için JSON_CONTAINS veya JSON_EXTRACT
-            $q->where(function ($subQuery) use ($appliedParts) {
-                foreach ($appliedParts as $part) {
-                        $subQuery->orWhereJsonContains('available_parts', $part);
-                }
-            });
+            //$q->where(function ($subQuery) use ($appliedParts) {
+             //   foreach ($appliedParts as $part) {
+              //          $subQuery->orWhereJsonContains('available_parts', $part);
+              //  }
+            //});
             }
         });
     } else {
         // Eğer applied_parts seçilmemişse boş liste
         $stockItemsQuery->whereRaw('1 = 0');
     }
-    
+    */
     // Debug bilgileri hazırla (query execute edilmeden önce)
     $debugQuery = clone $stockItemsQuery;
     $debugInfo = [
