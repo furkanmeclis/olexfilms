@@ -1,10 +1,11 @@
 <?php
 
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\WarrantyController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome');
+Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
 // Customer routes
 Route::get('/customer/{hash}', [CustomerController::class, 'index'])->name('customer.notify');
