@@ -8,7 +8,6 @@ use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Models\Product;
 use App\Models\StockItem;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -103,10 +102,37 @@ class OrderForm
                                     ->minValue(1)
                                     ->default(1)
                                     ->live()
+                                    ->helperText(function (Get $get) {
+                                        $productId = $get('product_id');
+                                        $quantity = $get('quantity') ?? 1;
+                                        
+                                        if (!$productId) {
+                                            return 'Önce ürün seçin';
+                                        }
+
+                                        $availableStock = StockItem::where('product_id', $productId)
+                                            ->where('location', StockLocationEnum::CENTER->value)
+                                            ->where('status', StockStatusEnum::AVAILABLE->value)
+                                            ->count();
+
+                                        $selectedStockCount = count($get('stock_items') ?? []);
+                                        
+                                        if ($selectedStockCount > 0) {
+                                            if ($selectedStockCount !== $quantity) {
+                                                return "⚠️ Seçilen stok sayısı ({$selectedStockCount}) adet ile eşleşmiyor. Mevcut stok: {$availableStock} adet";
+                                            }
+                                            return "✓ {$selectedStockCount} stok seçildi. Mevcut stok: {$availableStock} adet";
+                                        }
+
+                                        return "Mevcut stok: {$availableStock} adet (En az {$quantity} stok seçmelisiniz)";
+                                    })
                                     ->columnSpanFull(),
 
-                                CheckboxList::make('stock_items')
+                                Select::make('stock_items')
                                     ->label('Stok Kodları')
+                                    ->multiple()
+                                    ->searchable()
+                                    ->preload()
                                     ->dehydrated(true)
                                     ->options(function (Get $get) {
                                         $productId = $get('product_id');
@@ -135,9 +161,22 @@ class OrderForm
                                         // Tüm stokları birleştir (duplicate'leri önle)
                                         $allStock = $availableStock->merge($assignedStock)->unique('id');
 
-                                        return $allStock->pluck('barcode', 'id')->toArray();
+                                        return $allStock->mapWithKeys(function ($stock) {
+                                            $statusLabel = match($stock->status->value) {
+                                                StockStatusEnum::RESERVED->value => ' (Rezerve)',
+                                                StockStatusEnum::USED->value => ' (Kullanıldı)',
+                                                default => '',
+                                            };
+                                            $locationLabel = match($stock->location->value) {
+                                                StockLocationEnum::DEALER->value => ' - Bayi',
+                                                StockLocationEnum::SERVICE->value => ' - Servis',
+                                                default => '',
+                                            };
+                                            $label = "{$stock->barcode} - SKU: {$stock->sku}{$statusLabel}{$locationLabel}";
+                                            return [$stock->id => $label];
+                                        })->toArray();
                                     })
-                                    ->descriptions(function (Get $get) {
+                                    ->getSearchResultsUsing(function (string $search, Get $get) {
                                         $productId = $get('product_id');
                                         if (!$productId) {
                                             return [];
@@ -147,6 +186,11 @@ class OrderForm
                                         $availableStock = StockItem::where('product_id', $productId)
                                             ->where('location', StockLocationEnum::CENTER->value)
                                             ->where('status', StockStatusEnum::AVAILABLE->value)
+                                            ->where(function ($query) use ($search) {
+                                                $query->where('barcode', 'like', "%{$search}%")
+                                                    ->orWhere('sku', 'like', "%{$search}%");
+                                            })
+                                            ->limit(50)
                                             ->get();
 
                                         // Edit modunda: Bu order item'a atanmış stokları da ekle
@@ -157,6 +201,10 @@ class OrderForm
                                             if ($orderItem) {
                                                 $assignedStock = $orderItem->stockItems()
                                                     ->where('product_id', $productId)
+                                                    ->where(function ($query) use ($search) {
+                                                        $query->where('barcode', 'like', "%{$search}%")
+                                                            ->orWhere('sku', 'like', "%{$search}%");
+                                                    })
                                                     ->get();
                                             }
                                         }
@@ -175,10 +223,26 @@ class OrderForm
                                                 StockLocationEnum::SERVICE->value => ' - Servis',
                                                 default => '',
                                             };
-                                            return [
-                                                $stock->id => "SKU: {$stock->sku}{$statusLabel}{$locationLabel}",
-                                            ];
+                                            $label = "{$stock->barcode} - SKU: {$stock->sku}{$statusLabel}{$locationLabel}";
+                                            return [$stock->id => $label];
                                         })->toArray();
+                                    })
+                                    ->getOptionLabelUsing(function ($value) {
+                                        $stock = StockItem::find($value);
+                                        if (!$stock) {
+                                            return null;
+                                        }
+                                        $statusLabel = match($stock->status->value) {
+                                            StockStatusEnum::RESERVED->value => ' (Rezerve)',
+                                            StockStatusEnum::USED->value => ' (Kullanıldı)',
+                                            default => '',
+                                        };
+                                        $locationLabel = match($stock->location->value) {
+                                            StockLocationEnum::DEALER->value => ' - Bayi',
+                                            StockLocationEnum::SERVICE->value => ' - Servis',
+                                            default => '',
+                                        };
+                                        return "{$stock->barcode} - SKU: {$stock->sku}{$statusLabel}{$locationLabel}";
                                     })
                                     ->default(function (Get $get) {
                                         // Edit modunda, mevcut stok atamalarını default olarak göster
@@ -193,6 +257,8 @@ class OrderForm
                                     })
                                     ->helperText(function (Get $get) {
                                         $productId = $get('product_id');
+                                        $quantity = $get('quantity') ?? 1;
+                                        
                                         if (!$productId) {
                                             return 'Önce ürün seçin';
                                         }
@@ -202,8 +268,15 @@ class OrderForm
                                             ->where('status', StockStatusEnum::AVAILABLE->value)
                                             ->count();
 
-                                        return "Mevcut stok: {$availableStock} adet";
+                                        if ($availableStock < $quantity) {
+                                            return "⚠️ Yetersiz stok! Mevcut: {$availableStock}, İstenen: {$quantity}";
+                                        }
+
+                                        return "Mevcut stok: {$availableStock} adet. En az {$quantity} stok seçmelisiniz.";
                                     })
+                                    ->validationMessages([
+                                        'required' => 'En az bir stok seçmelisiniz.',
+                                    ])
                                     ->visible(fn () => $isAdminOrCenterStaff)
                                     ->columnSpanFull(),
 
