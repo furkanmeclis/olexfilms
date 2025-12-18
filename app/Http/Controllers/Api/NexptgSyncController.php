@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\NexptgApiLogTypeEnum;
 use App\Http\Controllers\Controller;
 use App\Services\NexptgSyncService;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +22,8 @@ class NexptgSyncController extends Controller
      */
     public function sync(Request $request): JsonResponse
     {
+        $apiUser = $request->get('nexptg_api_user');
+
         try {
             // Validate JSON structure
             $validator = Validator::make($request->all(), [
@@ -30,6 +33,21 @@ class NexptgSyncController extends Controller
             ]);
 
             if ($validator->fails()) {
+                if ($apiUser) {
+                    $apiUser->logError(
+                        NexptgApiLogTypeEnum::VALIDATION_ERROR->value,
+                        400,
+                        'Validation failed: ' . $validator->errors()->first(),
+                        [
+                            'validation_errors' => $validator->errors()->toArray(),
+                            'endpoint' => $request->path(),
+                            'ip_address' => $request->ip(),
+                            'user_agent' => $request->userAgent(),
+                            'request_data_sample' => $this->getRequestDataSample($request),
+                        ]
+                    );
+                }
+
                 return response()->json([
                     'error' => 'Invalid request format',
                     'details' => $validator->errors(),
@@ -37,7 +55,6 @@ class NexptgSyncController extends Controller
             }
 
             $data = $request->input('data');
-            $apiUser = $request->get('nexptg_api_user');
 
             if (! $apiUser) {
                 return response()->json([
@@ -59,10 +76,52 @@ class NexptgSyncController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
+            if ($apiUser) {
+                $apiUser->logError(
+                    NexptgApiLogTypeEnum::EXCEPTION->value,
+                    500,
+                    'Sync exception: ' . $e->getMessage(),
+                    [
+                        'exception_type' => get_class($e),
+                        'exception_message' => $e->getMessage(),
+                        'exception_trace' => $e->getTraceAsString(),
+                        'endpoint' => $request->path(),
+                        'ip_address' => $request->ip(),
+                        'user_agent' => $request->userAgent(),
+                        'request_data_sample' => $this->getRequestDataSample($request),
+                    ]
+                );
+            }
+
             return response()->json([
                 'error' => 'Internal server error',
                 'message' => 'An error occurred while processing the request',
             ], 500);
         }
+    }
+
+    /**
+     * Get a sample of request data for logging (without sensitive information)
+     */
+    private function getRequestDataSample(Request $request): array
+    {
+        $data = $request->all();
+        
+        // Limit array size and remove potentially large nested arrays
+        if (isset($data['data']['reports']) && is_array($data['data']['reports'])) {
+            $data['data']['reports'] = [
+                'count' => count($data['data']['reports']),
+                'sample' => array_slice($data['data']['reports'], 0, 1),
+            ];
+        }
+
+        if (isset($data['data']['history']) && is_array($data['data']['history'])) {
+            $data['data']['history'] = [
+                'count' => count($data['data']['history']),
+                'sample' => array_slice($data['data']['history'], 0, 1),
+            ];
+        }
+
+        return $data;
     }
 }

@@ -54,10 +54,31 @@ class NexptgApiUser extends Model
     }
 
     /**
+     * Get the logs associated with this API user.
+     */
+    public function logs(): HasMany
+    {
+        return $this->hasMany(NexptgApiUserLog::class);
+    }
+
+    /**
      * Update last used timestamp
      */
     public function updateLastUsedAt(): void
     {
         $this->update(['last_used_at' => now()]);
+    }
+
+    /**
+     * Log an error for this API user
+     */
+    public function logError(string $type, ?int $statusCode, string $message, array $details = []): NexptgApiUserLog
+    {
+        return $this->logs()->create([
+            'type' => $type,
+            'status_code' => $statusCode,
+            'message' => $message,
+            'details' => $details,
+        ]);
     }
 }

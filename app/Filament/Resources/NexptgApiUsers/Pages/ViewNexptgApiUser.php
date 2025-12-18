@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\NexptgApiUsers\Pages;
 
 use App\Filament\Resources\NexptgApiUsers\NexptgApiUserResource;
+use App\Filament\Resources\NexptgApiUsers\Widgets\ApiUserLogsTable;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -30,6 +31,13 @@ class ViewNexptgApiUser extends ViewRecord
                 })
                 ->modalSubmitActionLabel('Evet, Sil')
                 ->modalCancelActionLabel('İptal'),
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            ApiUserLogsTable::class,
         ];
     }
 }

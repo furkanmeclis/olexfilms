@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\NexptgApiLogTypeEnum;
 use App\Models\NexptgApiUser;
 use Closure;
 use Illuminate\Http\Request;
@@ -36,11 +37,42 @@ class NexptgBasicAuth
             return response()->json(['error' => 'Invalid credentials format'], 401);
         }
 
-        $apiUser = NexptgApiUser::where('username', $username)
-            ->where('is_active', true)
-            ->first();
+        $apiUser = NexptgApiUser::where('username', $username)->first();
 
-        if (! $apiUser || ! Hash::check($password, $apiUser->password)) {
+        // If user not found
+        if (! $apiUser) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        // If user is inactive
+        if (! $apiUser->is_active) {
+            $apiUser->logError(
+                NexptgApiLogTypeEnum::AUTH_ERROR->value,
+                403,
+                'Authentication failed: User is inactive',
+                [
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'username' => $username,
+                ]
+            );
+
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        // If password is wrong
+        if (! Hash::check($password, $apiUser->password)) {
+            $apiUser->logError(
+                NexptgApiLogTypeEnum::AUTH_ERROR->value,
+                403,
+                'Authentication failed: Invalid password',
+                [
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'username' => $username,
+                ]
+            );
+
             return response()->json(['error' => 'Forbidden'], 403);
         }
 
