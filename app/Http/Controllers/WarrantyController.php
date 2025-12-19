@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Service;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class WarrantyController extends Controller
@@ -69,14 +70,19 @@ class WarrantyController extends Controller
             // Brand logo path'ini oluştur
             $brandLogo = null;
             if ($service->carBrand && $service->carBrand->logo) {
-                // Logo path'i zaten tam path olabilir veya relative olabilir
                 $logoPath = $service->carBrand->logo;
+                
+                // Eğer tam URL ise direkt kullan
                 if (str_starts_with($logoPath, 'http')) {
                     $brandLogo = $logoPath;
-                } elseif (str_starts_with($logoPath, '/')) {
+                } 
+                // Eğer / ile başlıyorsa direkt kullan
+                elseif (str_starts_with($logoPath, '/')) {
                     $brandLogo = $logoPath;
-                } else {
-                    $brandLogo = asset('storage/' . $logoPath);
+                } 
+                // Storage path ise getFileUrl() kullan
+                else {
+                    $brandLogo = $this->getFileUrl($logoPath);
                 }
             }
 
@@ -111,6 +117,39 @@ class WarrantyController extends Controller
                 'error' => 'Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.',
             ]);
         }
+    }
+
+    /**
+     * Get file URL with temporaryUrl support for cloud disks
+     * 
+     * @param string $path File path in storage
+     * @return string|null File URL or null if file doesn't exist
+     */
+    private function getFileUrl(string $path): ?string
+    {
+        $defaultDisk = config('filesystems.default');
+        $disk = Storage::disk($defaultDisk);
+        
+        // Check if file exists
+        if (!$disk->exists($path)) {
+            return null;
+        }
+        
+        // Get disk driver
+        $driver = config("filesystems.disks.{$defaultDisk}.driver");
+        
+        // Cloud disk'lerde (s3, etc.) temporaryUrl kullan
+        if (in_array($driver, ['s3'])) {
+            try {
+                return $disk->temporaryUrl($path, now()->addHour());
+            } catch (\Exception $e) {
+                // Fallback to regular url if temporaryUrl fails
+                return $disk->url($path);
+            }
+        }
+        
+        // Local disk'lerde normal url
+        return $disk->url($path);
     }
 
     private function formatWarranty($warranty): string

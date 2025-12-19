@@ -52,6 +52,8 @@ class ProductForm
                     ->schema([
                         RichEditor::make('description')
                             ->label('Açıklama')
+                            ->fileAttachmentsDisk(config('filesystems.default'))
+                            ->fileAttachmentsVisibility('public')
                             ->columnSpanFull(),
                     ]),
 
@@ -86,7 +88,9 @@ class ProductForm
                         FileUpload::make('image_path')
                             ->label('Ürün Görseli')
                             ->image()
+                            ->disk(config('filesystems.default'))
                             ->directory('products/images')
+                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048)
                             ->nullable()
