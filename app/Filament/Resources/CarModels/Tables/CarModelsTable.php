@@ -10,12 +10,30 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Collection;
+use App\Models\CarModel;
 
 class CarModelsTable
 {
     public static function configure(Table $table): Table
     {
         $canManageActiveStatus = auth()->user()?->hasAnyRole(['super_admin', 'center_staff']) ?? false;
+
+        // Benzersiz powertrain değerlerini çek (cache ile sorgu yükünü azalt)
+        $powertrains = Cache::remember(
+            'car_models_powertrain_filter_options',
+            60 * 5, // 5 dakika cache
+            function (): array {
+                return CarModel::query()
+                    ->select('powertrain')
+                    ->whereNotNull('powertrain')
+                    ->distinct()
+                    ->pluck('powertrain', 'powertrain')
+                    ->toArray();
+            }
+        );
 
         return $table
             ->columns([
@@ -33,6 +51,22 @@ class CarModelsTable
                     ->label('Model Adı')
                     ->searchable()
                     ->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('powertrain')
+                    ->label('Motor Tipi')
+                    ->searchable()
+                    ->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('yearstart')
+                    ->label('Yıl Başlangıç')
+                    ->searchable()
+                    ->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('yearstop')
+                    ->label('Yıl Bitiş')
+                    ->searchable()
+                    ->sortable(),
+                \Filament\Tables\Columns\TextColumn::make('coupe')
+                    ->label('Kasa Tipi')
+                    ->searchable()
+                    ->sortable(),
 
                 \Filament\Tables\Columns\ToggleColumn::make('is_active')
                     ->label('Aktif')
@@ -46,7 +80,13 @@ class CarModelsTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('powertrain')
+                    ->label('Motor Tipi')
+                    ->options($powertrains)
+                    ->searchable()
+                    ->placeholder('Tüm motor tipleri'),
                 TrashedFilter::make(),
+
             ])
             ->recordActions([
                 ViewAction::make()

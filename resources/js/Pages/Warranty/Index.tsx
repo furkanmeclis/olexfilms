@@ -1,10 +1,16 @@
 import { Head } from '@inertiajs/react';
-import React from 'react';
+import React, { useState } from 'react';
+import { IPhoneMockup } from 'react-device-mockup';
 import OlexLogo from '@/components/OlexLogo';
-
-declare global {
-    function route(name: string, params?: any): string;
-}
+import useServiceTemplate from '@/hooks/useServiceTemplate';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 interface AppliedService {
     category: string;
@@ -36,6 +42,16 @@ interface WarrantyIndexProps {
 }
 
 const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData }) => {
+    const [visible, setVisible] = useState(false);
+    const { handlePrint, ServiceTemplate } = useServiceTemplate({
+        onAfterPrint: () => {
+            setTimeout(() => {
+                setVisible(false);
+            }, 1500);
+        },
+        serviceData,
+    });
+
     if (!serviceData) {
         return (
             <>
@@ -51,7 +67,7 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
     }
 
     const Content = ({ mobile = false }: { mobile?: boolean }) => {
-        return serviceData?.brand_logo ? (
+        return serviceData ? (
             <div className={`bg-gradient-to-b pt-10 h-full from-[#008951] to-[#003d24] ${mobile ? 'pb-10 pt-15' : ''}`}>
                 <div className="flex justify-center">
                     <OlexLogo text={true} dark className="w-1/2" />
@@ -66,11 +82,13 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                                 <td colSpan={2}>
                                     <div className="flex justify-between items-center py-2 px-4">
                                         <span className="text-center tracking-wide title w-full">
-                                            <img
-                                                src={serviceData.brand_logo}
-                                                className="h-[20px] mr-2 object-contain inline-flex"
-                                                alt="brandLogo"
-                                            />
+                                            {serviceData.brand_logo && (
+                                                <img
+                                                    src={serviceData.brand_logo}
+                                                    className="h-[20px] mr-2 object-contain inline-flex"
+                                                    alt="brandLogo"
+                                                />
+                                            )}
                                             {serviceData.brand} <br />
                                             {serviceData.model}{serviceData.generation ? ' ' + serviceData.generation : ''} ({serviceData.year})
                                         </span>
@@ -116,7 +134,7 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                                             <td colSpan={2}>
                                                 <div className="flex justify-between items-center py-2 px-4 gap-x-2">
                                                     <img
-                                                        src="/uploads/olex-logo-yatay.svg"
+                                                        src="/images/olex-logo-yatay.svg"
                                                         className="w-1/4"
                                                         alt="olex logo"
                                                     />
@@ -146,7 +164,7 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                                                             dangerouslySetInnerHTML={{
                                                                 __html: product.warranty.replace(
                                                                     'X',
-                                                                    '<span class="text-red-600">⚠️</span>'
+                                                                    '<i class="pi pi-exclamation-triangle text-red-600"></i>'
                                                                 ),
                                                             }}
                                                         />
@@ -170,7 +188,7 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                                 <td colSpan={2}>
                                     <div className="flex justify-between items-center py-2 px-4 gap-x-2">
                                         <img
-                                            src="/uploads/olex-logo-yatay.svg"
+                                            src="/images/olex-logo-yatay.svg"
                                             className="w-1/4"
                                             alt="olex logo"
                                         />
@@ -189,9 +207,8 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                 <div className="w-full flex justify-center items-center">
                     <button
                         onClick={() => {
-                            // PDF route'u eklenecek
-                            // window.open(route('warranty.pdf', serviceNo), '_blank');
-                            console.log('PDF açılacak:', serviceNo);
+                            window.open(`/warranty/${serviceNo}/pdf`, '_blank');
+                            // setVisible(true);
                         }}
                         className="py-2 px-6 bg-white rounded-lg text-black font-avaganti tracking-tight hover:font-bold delay-100 ring-0 outline-0 focus:outline-none focus:ring-2 focus:ring-green-300 focus:font-bold"
                     >
@@ -219,17 +236,30 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                 <div className="sm:hidden w-full h-screen overflow-y-auto">
                     <Content mobile />
                 </div>
-                <div className="hidden sm:block max-w-[400px] w-full">
-                    {/* iPhone mockup yerine basit bir container */}
-                    <div className="bg-black rounded-[40px] p-2 shadow-2xl">
-                        <div className="bg-white rounded-[32px] overflow-hidden" style={{ height: '812px' }}>
-                            <div className="h-full overflow-y-auto">
-                                <Content />
-                            </div>
-                        </div>
-                    </div>
+                <div className="hidden sm:block">
+                    <IPhoneMockup
+                        screenWidth={400}
+                        frameColor="#000"
+                        hideStatusBar
+                        transparentNavBar
+                    >
+                        <Content />
+                    </IPhoneMockup>
                 </div>
             </div>
+            <Dialog open={visible} onOpenChange={setVisible}>
+                <DialogContent className="max-w-[50vw] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Dijital Sertifika</DialogTitle>
+                    </DialogHeader>
+                    <div>
+                        <ServiceTemplate />
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handlePrint}>Yazdır</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 };

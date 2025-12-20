@@ -1,0 +1,186 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "brands": {
+      "type": "object",
+      "properties": {
+        "brand": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "required": [
+              "update",
+              "name",
+              "id"
+            ],
+            "properties": {
+              "update": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "models": {
+                "type": "object",
+                "properties": {
+                  "model": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 1,
+                    "items": {
+                      "required": [
+                        "update",
+                        "name",
+                        "id"
+                      ],
+                      "properties": {
+                        "update": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "name": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "generations": {
+                          "type": "object",
+                          "properties": {
+                            "generation": {
+                              "type": "array",
+                              "uniqueItems": true,
+                              "minItems": 1,
+                              "items": {
+                                "required": [
+                                  "prototype",
+                                  "update",
+                                  "name",
+                                  "modelYear",
+                                  "id"
+                                ],
+                                "properties": {
+                                  "prototype": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "update": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "name": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "modelYear": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "id": {
+                                    "type": "string",
+                                    "minLength": 1
+                                  },
+                                  "modifications": {
+                                    "type": "object",
+                                    "properties": {
+                                      "modification": {
+                                        "type": "array",
+                                        "uniqueItems": true,
+                                        "minItems": 1,
+                                        "items": {
+                                          "required": [
+                                            "id",
+                                            "update",
+                                            "brand",
+                                            "model",
+                                            "generation",
+                                            "powertrain",
+                                            "yearstart",
+                                            "yearstop",
+                                            "coupe"
+                                          ],
+                                          "properties": {
+                                            "id": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "update": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "brand": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "model": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "generation": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "powertrain": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "yearstart": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "yearstop": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            },
+                                            "coupe": {
+                                              "type": "string",
+                                              "minLength": 1
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "required": [
+                                      "modification"
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "required": [
+                            "generation"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "model"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "required": [
+        "brand"
+      ]
+    }
+  },
+  "required": [
+    "brands"
+  ]
+}

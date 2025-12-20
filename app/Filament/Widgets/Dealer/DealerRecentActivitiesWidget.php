@@ -98,3 +98,5 @@ class DealerRecentActivitiesWidget extends TableWidget
 }
 
 
+
+

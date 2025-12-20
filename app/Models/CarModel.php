@@ -20,6 +20,10 @@ class CarModel extends Model
         'external_id',
         'last_update',
         'is_active',
+        'powertrain',
+        'yearstart',
+        'yearstop',
+        'coupe',
     ];
 
     protected function casts(): array
@@ -27,6 +31,8 @@ class CarModel extends Model
         return [
             'is_active' => 'boolean',
             'last_update' => 'datetime',
+            'yearstart' => 'integer',
+            'yearstop' => 'integer',
         ];
     }
 

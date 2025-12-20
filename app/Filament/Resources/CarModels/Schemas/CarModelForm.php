@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Forms\Components\Textarea;
 
 class CarModelForm
 {
@@ -39,6 +40,29 @@ class CarModelForm
                             ->label('Aktif')
                             ->default(true)
                             ->required(),
+                    ])
+                    ->columns(2),
+                Section::make('Modification Bilgileri')
+                    ->schema([
+                        TextInput::make('powertrain')
+                            ->label('Güç Aktarımı')
+                            ->maxLength(255),
+
+                        TextInput::make('yearstart')
+                            ->label('Başlangıç Yılı')
+                            ->numeric()
+                            ->minValue(1900)
+                            ->maxValue(2100),
+
+                        TextInput::make('yearstop')
+                            ->label('Bitiş Yılı')
+                            ->numeric()
+                            ->minValue(1900)
+                            ->maxValue(2100),
+
+                        TextInput::make('coupe')
+                            ->label('Gövde Tipi')
+                            ->maxLength(255),
                     ])
                     ->columns(2),
             ]);

@@ -15,3 +15,4 @@ Route::post('/customer/otp-verify', [CustomerController::class, 'customerOtpVeri
 
 // Warranty routes
 Route::get('/warranty/{service_no}', [WarrantyController::class, 'index'])->name('warranty.show');
+Route::get('/warranty/{service_no}/pdf', [WarrantyController::class, 'pdf'])->name('warranty.pdf');

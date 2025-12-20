@@ -43,6 +43,25 @@ class CarModelInfolist
                             ->dateTime('d.m.Y H:i'),
                     ])
                     ->columns(2),
+                Section::make('Modification Bilgileri')
+                    ->schema([
+                        TextEntry::make('powertrain')
+                            ->label('Güç Aktarımı')
+                            ->placeholder('Belirtilmemiş'),
+
+                        TextEntry::make('yearstart')
+                            ->label('Başlangıç Yılı')
+                            ->placeholder('Belirtilmemiş'),
+
+                        TextEntry::make('yearstop')
+                            ->label('Bitiş Yılı')
+                            ->placeholder('Belirtilmemiş'),
+
+                        TextEntry::make('coupe')
+                            ->label('Gövde Tipi')
+                            ->placeholder('Belirtilmemiş'),
+                    ])
+                    ->columns(2),
             ]);
     }
 }
