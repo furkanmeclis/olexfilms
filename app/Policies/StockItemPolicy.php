@@ -31,9 +31,9 @@ class StockItemPolicy
             return true;
         }
 
-        // Bayi: Sadece kendi dealer_id'si eşit ve status != used olanları görebilir
+        // Bayi: Sadece kendi dealer_id'si eşitse tüm stokları görebilir (durum fark etmeksizin)
         if ($user->dealer_id && $stockItem->dealer_id === $user->dealer_id) {
-            return $stockItem->status !== StockStatusEnum::USED;
+            return true;
         }
 
         return false;

@@ -138,8 +138,8 @@ class Customer extends Model
                     'model' => $carModel ? $carModel->name : '',
                     'generation' => $carModel ? $carModel->name : '', // Generation same as model for now
                     'year' => $service->year ?? '',
-                    'plate' => $service->plate ?? '',
-                    'brand_logo' => $carBrand && $carBrand->logo ? asset('storage/' . $carBrand->logo) : 'https://www.carlogos.org/car-logos/bmw-logo-2020-blue-white.png',
+                    'plate' => $service->plate ?? '', 
+                    'brand_logo' => $carBrand && $carBrand->logo ? $carBrand->logo_url : 'https://www.carlogos.org/car-logos/bmw-logo-2020-blue-white.png',
                 ],
                 'created_at' => $service->created_at ? $service->created_at->toISOString() : now()->toISOString(),
                 'service_no' => $service->service_no ?? '',

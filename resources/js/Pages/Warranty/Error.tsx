@@ -12,11 +12,11 @@ const WarrantyError: React.FC<WarrantyErrorProps> = ({ serviceNo }) => {
             <Head title="Hizmet Bulunamadı" />
             <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-green-900 via-green-600 to-green-900">
                 <div className="w-full max-w-md mx-4">
-                    <div className="bg-gradient-to-b from-[#008951] to-[#003d24] rounded-[20px] p-8 shadow-2xl">
+                    <div className="bg-black rounded-[20px] p-8 shadow-2xl">
                         <div className="flex justify-center mb-6">
                             <OlexLogo text={true} dark className="w-1/2" />
                         </div>
-                        
+
                         <div className="text-center mb-8">
                             <div className="mb-4">
                                 <span className="text-6xl text-yellow-400">⚠️</span>

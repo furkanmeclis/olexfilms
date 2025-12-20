@@ -95,7 +95,7 @@ class Service extends Model
     public function warranties(): HasMany
     {
         return $this->hasMany(Warranty::class);
-    }
+    } 
 
     /**
      * Get the images for this service.

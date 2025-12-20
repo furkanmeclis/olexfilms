@@ -20,6 +20,40 @@ interface AppliedService {
     warrantyMultiple?: boolean;
 }
 
+interface MeasurementPosition {
+    1: string | null;
+    2: string | null;
+    3: string | null;
+    4: string | null;
+    5: string | null;
+}
+
+interface Measurement {
+    part_type: string;
+    part_label: string;
+    substrate_type: string;
+    min_value: number;
+    max_value: number;
+    avg_value: number;
+    positions: MeasurementPosition;
+}
+
+interface MeasurementPlaceGroup {
+    place_id: string;
+    place_label: string;
+    measurements: Measurement[];
+}
+
+interface MeasurementData {
+    measurements: MeasurementPlaceGroup[];
+    unit_of_measure: string;
+}
+
+interface MeasurementsResponse {
+    before?: MeasurementData;
+    after?: MeasurementData;
+}
+
 interface ServiceData {
     service_no: string;
     brand: string;
@@ -29,6 +63,7 @@ interface ServiceData {
     year: number;
     plate: string;
     applied_services: AppliedService[];
+    measurements?: MeasurementsResponse;
     dealer: {
         company_name: string;
         company_city: string;
@@ -43,6 +78,7 @@ interface WarrantyIndexProps {
 
 const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData }) => {
     const [visible, setVisible] = useState(false);
+    const [measurementsVisible, setMeasurementsVisible] = useState(false);
     const { handlePrint, ServiceTemplate } = useServiceTemplate({
         onAfterPrint: () => {
             setTimeout(() => {
@@ -204,7 +240,7 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                         </thead>
                     </table>
                 </div>
-                <div className="w-full flex justify-center items-center">
+                <div className="w-full flex flex-row flex-wrap justify-center items-center gap-3">
                     <button
                         onClick={() => {
                             window.open(`/warranty/${serviceNo}/pdf`, '_blank');
@@ -214,6 +250,14 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                     >
                         Dijital Sertifikayı Görüntüle
                     </button>
+                    {serviceData?.measurements && (serviceData.measurements.before || serviceData.measurements.after) && (
+                        <button
+                            onClick={() => setMeasurementsVisible(true)}
+                            className="py-2 px-6 bg-[#47a27d] rounded-lg text-white font-avaganti tracking-tight hover:bg-[#3d8a6a] delay-100 ring-0 outline-0 focus:outline-none focus:ring-2 focus:ring-green-300"
+                        >
+                            Araç Ölçüm Sonuçları
+                        </button>
+                    )}
                 </div>
                 <div className="w-full flex justify-center items-center mt-8">
                     <span className="font-thin text-[12px]">
@@ -257,6 +301,198 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                     </div>
                     <DialogFooter>
                         <Button onClick={handlePrint}>Yazdır</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={measurementsVisible} onOpenChange={setMeasurementsVisible}>
+                <DialogContent className="max-w-[90vw] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Araç Ölçüm Sonuçları</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6">
+                        {serviceData?.measurements && (serviceData.measurements.before || serviceData.measurements.after) ? (
+                            <>
+                                {/* Before Measurements */}
+                                {serviceData.measurements.before && serviceData.measurements.before.measurements.length > 0 && (
+                                    <div className="space-y-4">
+                                        <h2 className="text-2xl font-bold text-center text-[#003f26] mb-4">
+                                            Hizmet Öncesi Ölçümler
+                                            {serviceData.measurements.before.unit_of_measure && (
+                                                <span className="text-sm font-normal ml-2">
+                                                    ({serviceData.measurements.before.unit_of_measure})
+                                                </span>
+                                            )}
+                                        </h2>
+                                        {serviceData.measurements.before.measurements.map((placeGroup, placeIndex) => (
+                                            <div key={placeIndex} className="space-y-4">
+                                                <h3 className="text-xl font-bold text-center text-[#003f26]">
+                                                    {placeGroup.place_label.toUpperCase()} TARAF
+                                                </h3>
+                                                <div className="border-2 border-[#47a27d] rounded-lg overflow-hidden">
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full border-collapse">
+                                                            <thead className="bg-[#003821] text-white">
+                                                                <tr>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-left" style={{ width: '12%' }}>
+                                                                        Part Adı
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '8%' }}>
+                                                                        Kaplama
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '6%' }}>
+                                                                        Min
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '6%' }}>
+                                                                        Max
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '14%' }}>
+                                                                        Orta Değer
+                                                                    </th>
+                                                                    {[1, 2, 3, 4, 5].map((pos) => (
+                                                                        <th key={pos} className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '5%' }}>
+                                                                            <br />{pos}.
+                                                                        </th>
+                                                                    ))}
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {placeGroup.measurements.map((measurement, measIndex) => (
+                                                                    <tr key={measIndex} className="bg-[#002315] text-white">
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-left">
+                                                                            {measurement.part_label}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-left">
+                                                                            {measurement.substrate_type}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {Math.round(measurement.min_value).toLocaleString('tr-TR')}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {Math.round(measurement.max_value).toLocaleString('tr-TR')}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {measurement.avg_value.toFixed(1)}
+                                                                        </td>
+                                                                        {[1, 2, 3, 4, 5].map((pos) => {
+                                                                            const positionValue = measurement.positions[pos as keyof MeasurementPosition];
+                                                                            return (
+                                                                                <td
+                                                                                    key={pos}
+                                                                                    className={`border border-[#00482b] px-2 py-2 text-xs text-center ${positionValue === null ? 'text-gray-500' : ''
+                                                                                        }`}
+                                                                                >
+                                                                                    {positionValue !== null
+                                                                                        ? Math.round(parseFloat(positionValue)).toLocaleString('tr-TR')
+                                                                                        : '-'}
+                                                                                </td>
+                                                                            );
+                                                                        })}
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* After Measurements */}
+                                {serviceData.measurements.after && serviceData.measurements.after.measurements.length > 0 && (
+                                    <div className="space-y-4">
+                                        <h2 className="text-2xl font-bold text-center text-[#003f26] mb-4">
+                                            Hizmet Sonrası Ölçümler
+                                            {serviceData.measurements.after.unit_of_measure && (
+                                                <span className="text-sm font-normal ml-2">
+                                                    ({serviceData.measurements.after.unit_of_measure})
+                                                </span>
+                                            )}
+                                        </h2>
+                                        {serviceData.measurements.after.measurements.map((placeGroup, placeIndex) => (
+                                            <div key={placeIndex} className="space-y-4">
+                                                <h3 className="text-xl font-bold text-center text-[#003f26]">
+                                                    {placeGroup.place_label.toUpperCase()} TARAF
+                                                </h3>
+                                                <div className="border-2 border-[#47a27d] rounded-lg overflow-hidden">
+                                                    <div className="overflow-x-auto">
+                                                        <table className="w-full border-collapse">
+                                                            <thead className="bg-[#003821] text-white">
+                                                                <tr>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-left" style={{ width: '12%' }}>
+                                                                        Part Adı
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '8%' }}>
+                                                                        Kaplama
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '6%' }}>
+                                                                        Min
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '6%' }}>
+                                                                        Max
+                                                                    </th>
+                                                                    <th className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '14%' }}>
+                                                                        Orta Değer
+                                                                    </th>
+                                                                    {[1, 2, 3, 4, 5].map((pos) => (
+                                                                        <th key={pos} className="border border-[#00482b] px-2 py-2 text-xs text-center" style={{ width: '5%' }}>
+                                                                            <br />{pos}.
+                                                                        </th>
+                                                                    ))}
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {placeGroup.measurements.map((measurement, measIndex) => (
+                                                                    <tr key={measIndex} className="bg-[#002315] text-white">
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-left">
+                                                                            {measurement.part_label}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-left">
+                                                                            {measurement.substrate_type}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {Math.round(measurement.min_value).toLocaleString('tr-TR')}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {Math.round(measurement.max_value).toLocaleString('tr-TR')}
+                                                                        </td>
+                                                                        <td className="border border-[#00482b] px-2 py-2 text-xs text-center">
+                                                                            {measurement.avg_value.toFixed(1)}
+                                                                        </td>
+                                                                        {[1, 2, 3, 4, 5].map((pos) => {
+                                                                            const positionValue = measurement.positions[pos as keyof MeasurementPosition];
+                                                                            return (
+                                                                                <td
+                                                                                    key={pos}
+                                                                                    className={`border border-[#00482b] px-2 py-2 text-xs text-center ${positionValue === null ? 'text-gray-500' : ''
+                                                                                        }`}
+                                                                                >
+                                                                                    {positionValue !== null
+                                                                                        ? Math.round(parseFloat(positionValue)).toLocaleString('tr-TR')
+                                                                                        : '-'}
+                                                                                </td>
+                                                                            );
+                                                                        })}
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="text-center text-gray-500 py-8">
+                                Ölçüm sonucu bulunmamaktadır.
+                            </div>
+                        )}
+                    </div>
+                    <DialogFooter>
+                        <Button variant="destructive" onClick={() => setMeasurementsVisible(false)}>Kapat</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

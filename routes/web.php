@@ -14,5 +14,5 @@ Route::post('/api/customer/otp-login', [CustomerController::class, 'customerOtpL
 Route::post('/customer/otp-verify', [CustomerController::class, 'customerOtpVerify'])->name('customer-otp-verify');
 
 // Warranty routes
-Route::get('/warranty/{service_no}', [WarrantyController::class, 'index'])->name('warranty.show');
-Route::get('/warranty/{service_no}/pdf', [WarrantyController::class, 'pdf'])->name('warranty.pdf');
+Route::get('/warranty/{serviceNo}', [WarrantyController::class, 'index'])->name('warranty.show');
+Route::get('/warranty/{serviceNo}/pdf', [WarrantyController::class, 'downloadPdf'])->name('warranty.pdf');

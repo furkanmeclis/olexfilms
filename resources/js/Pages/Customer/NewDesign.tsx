@@ -241,7 +241,7 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
                                 carPlate={service.car.plate}
                                 serviceDayMonth={("0" + new Date(service.created_at).getDate()).slice(-2) + "." + ("0" + (new Date(service.created_at).getMonth() + 1)).slice(-2)}
                                 serviceYear={new Date(service.created_at).getFullYear()}
-                                serviceUrl={("warranty.index", service.service_no)}
+                                serviceUrl={`/warranty/${service.service_no}`}
                                 brandLogo={service.car.brand_logo}
                             />
                         ))}
@@ -266,7 +266,7 @@ const NewDesign: React.FC<NewDesignProps> = ({ customerB, csrf_token, hash, serv
                 <div className="max-w-4xl mx-auto flex flex-row gap-2 justify-between">
                     <button
                         onClick={() => setNotificationSidebarVisible(true)}
-                        className="flex-1 group relative overflow-hidden bg-gradient-to-br from-green-600/20 to-green-900/40 hover:from-green-500/30 hover:to-green-800/50 backdrop-blur-sm border border-green-900/30 text-white p-3 md:p-4 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-[1.02]"
+                        className="flex-1 hidden group relative overflow-hidden bg-gradient-to-br from-green-600/20 to-green-900/40 hover:from-green-500/30 hover:to-green-800/50 backdrop-blur-sm border border-green-900/30 text-white p-3 md:p-4 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-[1.02]"
                     >
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="w-24 h-24 bg-green-500/20 rounded-full blur-2xl transform group-hover:scale-150 transition-transform duration-500"></div>
