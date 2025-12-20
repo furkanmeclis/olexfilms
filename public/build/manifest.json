@@ -28,7 +28,7 @@
     "src": "node_modules/.pnpm/@fontsource-variable+inter@5.2.8/node_modules/@fontsource-variable/inter/files/inter-vietnamese-wght-normal.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-DuJUpXr3.css",
+    "file": "assets/app-BoDs0Swj.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -71,7 +71,7 @@
     "isEntry": true
   },
   "resources/js/guest.tsx": {
-    "file": "assets/guest-CJsAeN0P.js",
+    "file": "assets/guest-CkQIM37K.js",
     "name": "guest",
     "src": "resources/js/guest.tsx",
     "isEntry": true,
@@ -79,7 +79,7 @@
       "resources/js/app.js"
     ],
     "css": [
-      "assets/guest-DZlTg26y.css"
+      "assets/guest-Bh6IqBk3.css"
     ],
     "assets": [
       "assets/porsche_car-DelIB2X6.png",
