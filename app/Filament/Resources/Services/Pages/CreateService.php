@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\ServiceItem;
 use App\Models\StockItem;
 use App\Models\StockMovement;
+use App\Notifications\ServiceCreatedNotification;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Pages\CreateRecord\Concerns\HasWizard;
@@ -145,6 +146,19 @@ class CreateService extends CreateRecord
                         'created_at' => now(),
                     ]);
                 });
+            }
+        }
+
+        // Müşteriye SMS bildirimi gönder
+        $service->load('customer');
+        
+        if ($service->customer && $service->customer->phone) {
+            // Notification ayarlarını kontrol et (opsiyonel)
+            $notificationSettings = $service->customer->notification_settings;
+            $smsEnabled = $notificationSettings['sms'] ?? true; // Varsayılan olarak true
+            
+            if ($smsEnabled) {
+                $service->customer->notify(new ServiceCreatedNotification($service));
             }
         }
     }
