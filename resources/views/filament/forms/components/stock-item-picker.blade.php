@@ -15,12 +15,12 @@
     $dealerId = $field->getDealerId($get);
 
     // Eğer dealerId yoksa, kullanıcının dealer_id'sini kullan
-$user = Auth::user();
-if (!$dealerId) {
-    $dealerId = $user?->dealer_id;
-}
+    $user = Auth::user();
+    if (!$dealerId) {
+        $dealerId = $user?->dealer_id;
+    }
 
-// Record'dan dealer_id al (edit sayfası için)
+    // Record'dan dealer_id al (edit sayfası için)
     $record = $field->getRecord();
     if (!$dealerId && $record) {
         $dealerId = $record->dealer_id ?? null;
@@ -33,16 +33,18 @@ if (!$dealerId) {
         ->when(
             $dealerId,
             function ($q) use ($dealerId) {
-                // Dealer ID varsa, o dealer'a ait veya NULL (merkez stoku) olanları göster
-            $q->where(function ($subQuery) use ($dealerId) {
-                $subQuery->where('dealer_id', $dealerId)->orWhereNull('dealer_id');
-            });
-        },
-        function ($q) {
-            // Dealer ID yoksa, sadece NULL (merkez stoku) olanları göster
-            $q->whereNull('dealer_id');
-        },
-    );
+                // Dealer ID varsa, SADECE o dealer'a ait stokları göster
+                // Merkez stokları (dealer_id = NULL) dahil edilmemeli
+                // Hem dealer kullanıcıları hem de admin (seçilen dealer için) için geçerli
+                $q->where('dealer_id', $dealerId);
+            },
+            function ($q) {
+                // Dealer ID yoksa, sadece NULL (merkez stoku) olanları göster
+                // Bu durum normalde olmamalı çünkü dealer kullanıcılarının dealer_id'si olmalı
+                // Admin ise mutlaka bir dealer seçmeli
+                $q->whereNull('dealer_id');
+            },
+        );
 /**
     // applied_parts'a göre filtrele - Optimize edilmiş JSON sorgusu
         if (!empty($appliedParts) && is_array($appliedParts)) {
