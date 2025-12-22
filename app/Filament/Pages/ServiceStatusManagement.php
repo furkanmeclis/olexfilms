@@ -191,9 +191,9 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
         $this->resetTable();
     }
 
-    public function getServiceStatusLogsTableProperty(): Table
+    public function table(Table $table): Table
     {
-        return Table::make($this)
+        return $table
             ->query(function () {
                 if (!$this->service) {
                     return ServiceStatusLog::query()->whereRaw('1 = 0');

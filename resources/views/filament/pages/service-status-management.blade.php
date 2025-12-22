@@ -45,7 +45,7 @@
             {{-- Servis Geçmişi Tablosu --}}
             <div class="fi-section rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
                 <h3 class="text-lg font-semibold mb-4">Servis Geçmişi</h3>
-                {{ $this->serviceStatusLogsTable }}
+                {{ $this->table }}
             </div>
         @else
             <div class="fi-section rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
