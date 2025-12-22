@@ -33,9 +33,9 @@ class WarrantyPolicy
         }
 
         // Bayi yalnızca kendi bayisine ait servislerin garantisini görebilir
-        if ($user->dealer_id) {
+        if ($user->dealer) {
             $service = $warranty->service;
-            $result = $service && $service->dealer_id === $user->dealer_id;
+            $result = $service && $service->dealer_id === $user->dealer->id;
             return $result;
         }
 

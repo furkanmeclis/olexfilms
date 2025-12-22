@@ -85,10 +85,6 @@ class WarrantiesTable
                         false => 'Pasif',
                     ]),
 
-                SelectFilter::make('expired')
-                    ->label('Süresi Dolmuş')
-                    ->query(fn ($query) => $query->where('end_date', '<', now()->startOfDay())),
-
                 SelectFilter::make('service.dealer_id')
                     ->label('Bayi')
                     ->relationship('service.dealer', 'name')

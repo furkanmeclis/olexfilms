@@ -48,10 +48,10 @@ class WarrantyResource extends Resource
         
         // OrderResource ve StockItemResource pattern'ini takip ediyoruz
         // Admin ve merkez çalışanları için filtreleme yapmıyoruz
-        if ($user && $user->dealer_id && !$user->hasAnyRole(['super_admin', 'center_staff'])) {
+        if ($user && $user->dealer && !$user->hasAnyRole(['super_admin', 'center_staff'])) {
             // Bayi sadece kendi bayi hizmetlerinin garantilerini görür
             $query->whereHas('service', function ($q) use ($user) {
-                $q->where('dealer_id', $user->dealer_id);
+                $q->where('dealer_id', $user->dealer->id);
             });
         }
 
