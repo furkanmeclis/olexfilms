@@ -97,6 +97,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
             'TijsVerkoyen\\CssToInlineStyles\\' => 31,
             'Tests\\' => 6,
             'Termwind\\' => 9,
+            'Tapp\\FilamentProgressBarColumn\\' => 31,
         ),
         'S' => 
         array (
@@ -139,6 +140,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
             'Spatie\\LaravelSettings\\' => 23,
             'Spatie\\LaravelPackageTools\\' => 27,
             'Spatie\\Invade\\' => 14,
+            'Spatie\\Color\\' => 13,
             'Sabberworm\\CSS\\' => 15,
         ),
         'R' => 
@@ -334,6 +336,10 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         array (
             0 => __DIR__ . '/..' . '/nunomaduro/termwind/src',
         ),
+        'Tapp\\FilamentProgressBarColumn\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/tapp/filament-progress-bar-column/src',
+        ),
         'Symfony\\Polyfill\\Uuid\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-uuid',
@@ -489,6 +495,10 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'Spatie\\Invade\\' => 
         array (
             0 => __DIR__ . '/..' . '/spatie/invade/src',
+        ),
+        'Spatie\\Color\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spatie/color/src',
         ),
         'Sabberworm\\CSS\\' => 
         array (
@@ -1144,6 +1154,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\Warranty' => __DIR__ . '/../..' . '/app/Models/Warranty.php',
         'App\\Notifications\\Channels\\VatanSmsChannel' => __DIR__ . '/../..' . '/app/Notifications/Channels/VatanSmsChannel.php',
+        'App\\Notifications\\ServiceCreatedNotification' => __DIR__ . '/../..' . '/app/Notifications/ServiceCreatedNotification.php',
         'App\\Notifications\\VatanSmsNotification' => __DIR__ . '/../..' . '/app/Notifications/VatanSmsNotification.php',
         'App\\Observers\\OrderItemObserver' => __DIR__ . '/../..' . '/app/Observers/OrderItemObserver.php',
         'App\\Observers\\OrderObserver' => __DIR__ . '/../..' . '/app/Observers/OrderObserver.php',
@@ -1169,6 +1180,7 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'App\\Providers\\Filament\\AdminPanelProvider' => __DIR__ . '/../..' . '/app/Providers/Filament/AdminPanelProvider.php',
         'App\\Services\\GenerateCarSvg' => __DIR__ . '/../..' . '/app/Services/GenerateCarSvg.php',
         'App\\Services\\NexptgSyncService' => __DIR__ . '/../..' . '/app/Services/NexptgSyncService.php',
+        'App\\Services\\PdfService' => __DIR__ . '/../..' . '/app/Services/PdfService.php',
         'App\\Services\\SmsCacheService' => __DIR__ . '/../..' . '/app/Services/SmsCacheService.php',
         'App\\Services\\VatanSmsService' => __DIR__ . '/../..' . '/app/Services/VatanSmsService.php',
         'App\\Settings\\VatanSmsSettings' => __DIR__ . '/../..' . '/app/Settings/VatanSmsSettings.php',
@@ -10463,6 +10475,25 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'SebastianBergmann\\Type\\UnknownType' => __DIR__ . '/..' . '/sebastian/type/src/type/UnknownType.php',
         'SebastianBergmann\\Type\\VoidType' => __DIR__ . '/..' . '/sebastian/type/src/type/VoidType.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'Spatie\\Color\\CIELab' => __DIR__ . '/..' . '/spatie/color/src/CIELab.php',
+        'Spatie\\Color\\Cmyk' => __DIR__ . '/..' . '/spatie/color/src/Cmyk.php',
+        'Spatie\\Color\\Color' => __DIR__ . '/..' . '/spatie/color/src/Color.php',
+        'Spatie\\Color\\Contrast' => __DIR__ . '/..' . '/spatie/color/src/Contrast.php',
+        'Spatie\\Color\\Convert' => __DIR__ . '/..' . '/spatie/color/src/Convert.php',
+        'Spatie\\Color\\Distance' => __DIR__ . '/..' . '/spatie/color/src/Distance.php',
+        'Spatie\\Color\\Exceptions\\InvalidColorValue' => __DIR__ . '/..' . '/spatie/color/src/Exceptions/InvalidColorValue.php',
+        'Spatie\\Color\\Factory' => __DIR__ . '/..' . '/spatie/color/src/Factory.php',
+        'Spatie\\Color\\Hex' => __DIR__ . '/..' . '/spatie/color/src/Hex.php',
+        'Spatie\\Color\\HsPatterns' => __DIR__ . '/..' . '/spatie/color/src/HsPatterns.php',
+        'Spatie\\Color\\Hsb' => __DIR__ . '/..' . '/spatie/color/src/Hsb.php',
+        'Spatie\\Color\\Hsl' => __DIR__ . '/..' . '/spatie/color/src/Hsl.php',
+        'Spatie\\Color\\Hsla' => __DIR__ . '/..' . '/spatie/color/src/Hsla.php',
+        'Spatie\\Color\\Named' => __DIR__ . '/..' . '/spatie/color/src/Named.php',
+        'Spatie\\Color\\Names' => __DIR__ . '/..' . '/spatie/color/src/Names.php',
+        'Spatie\\Color\\Rgb' => __DIR__ . '/..' . '/spatie/color/src/Rgb.php',
+        'Spatie\\Color\\Rgba' => __DIR__ . '/..' . '/spatie/color/src/Rgba.php',
+        'Spatie\\Color\\Validate' => __DIR__ . '/..' . '/spatie/color/src/Validate.php',
+        'Spatie\\Color\\Xyz' => __DIR__ . '/..' . '/spatie/color/src/Xyz.php',
         'Spatie\\Invade\\Invader' => __DIR__ . '/..' . '/spatie/invade/src/Invader.php',
         'Spatie\\Invade\\StaticInvader' => __DIR__ . '/..' . '/spatie/invade/src/StaticInvader.php',
         'Spatie\\LaravelPackageTools\\Commands\\Concerns\\AskToRunMigrations' => __DIR__ . '/..' . '/spatie/laravel-package-tools/src/Commands/Concerns/AskToRunMigrations.php',
@@ -11657,6 +11688,8 @@ class ComposerStaticInitc514d8f7b9fc5970bdd94287905ef584
         'Symfony\\Polyfill\\Php84\\Php84' => __DIR__ . '/..' . '/symfony/polyfill-php84/Php84.php',
         'Symfony\\Polyfill\\Php85\\Php85' => __DIR__ . '/..' . '/symfony/polyfill-php85/Php85.php',
         'Symfony\\Polyfill\\Uuid\\Uuid' => __DIR__ . '/..' . '/symfony/polyfill-uuid/Uuid.php',
+        'Tapp\\FilamentProgressBarColumn\\FilamentProgressBarColumnServiceProvider' => __DIR__ . '/..' . '/tapp/filament-progress-bar-column/src/FilamentProgressBarColumnServiceProvider.php',
+        'Tapp\\FilamentProgressBarColumn\\Tables\\Columns\\ProgressBarColumn' => __DIR__ . '/..' . '/tapp/filament-progress-bar-column/src/Tables/Columns/ProgressBarColumn.php',
         'Termwind\\Actions\\StyleToMethod' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Actions/StyleToMethod.php',
         'Termwind\\Components\\Anchor' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Components/Anchor.php',
         'Termwind\\Components\\BreakLine' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Components/BreakLine.php',

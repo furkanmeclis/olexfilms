@@ -16,6 +16,7 @@
         "league/flysystem-aws-s3-v3": "^3.0",
         "spatie/laravel-permission": "^6.23",
         "spatie/laravel-settings": "^3.6",
+        "tapp/filament-progress-bar-column": "^1.0",
         "ysfkaya/filament-phone-input": "^4.0"
     },
     "require-dev": {
