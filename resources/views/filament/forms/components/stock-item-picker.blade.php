@@ -45,7 +45,6 @@
                 $q->whereNull('dealer_id');
             },
         );
-/**
     // applied_parts'a göre filtrele - Optimize edilmiş JSON sorgusu
         if (!empty($appliedParts) && is_array($appliedParts)) {
             $stockItemsQuery->whereHas('product.category', function ($q) use ($appliedParts) {
@@ -75,7 +74,6 @@
             // Eğer applied_parts seçilmemişse boş liste
             $stockItemsQuery->whereRaw('1 = 0');
         }
-        */
     // Debug bilgileri hazırla (query execute edilmeden önce)
     $debugQuery = clone $stockItemsQuery;
     $debugInfo = [
