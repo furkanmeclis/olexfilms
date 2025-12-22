@@ -45,34 +45,16 @@ class WarrantyResource extends Resource
         $query = parent::getEloquentQuery();
 
         $user = auth()->user();
-        // #region agent log
-        $logData = ['location' => 'WarrantyResource.php:47', 'message' => 'getEloquentQuery entry', 'data' => ['user_id' => $user?->id, 'user_email' => $user?->email], 'timestamp' => time(), 'sessionId' => 'debug-session', 'runId' => 'run2', 'hypothesisId' => 'A'];
-        file_put_contents('/Users/furkanmeclis/Documents/Herd/glorian-v2_3/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-        // #endregion
         
         // OrderResource ve StockItemResource pattern'ini takip ediyoruz
         // Admin ve merkez çalışanları için filtreleme yapmıyoruz
         if ($user && $user->dealer_id && !$user->hasAnyRole(['super_admin', 'center_staff'])) {
-            // #region agent log
-            $logData = ['location' => 'WarrantyResource.php:52', 'message' => 'Dealer user (not admin), applying whereHas filter', 'data' => ['dealer_id' => $user->dealer_id], 'timestamp' => time(), 'sessionId' => 'debug-session', 'runId' => 'run2', 'hypothesisId' => 'B'];
-            file_put_contents('/Users/furkanmeclis/Documents/Herd/glorian-v2_3/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-            // #endregion
             // Bayi sadece kendi bayi hizmetlerinin garantilerini görür
             $query->whereHas('service', function ($q) use ($user) {
                 $q->where('dealer_id', $user->dealer_id);
             });
-        } else {
-            // #region agent log
-            $logData = ['location' => 'WarrantyResource.php:60', 'message' => 'Admin/Center staff or no dealer_id, no filter applied', 'data' => ['dealer_id' => $user?->dealer_id, 'hasAnyRole' => $user ? $user->hasAnyRole(['super_admin', 'center_staff']) : false], 'timestamp' => time(), 'sessionId' => 'debug-session', 'runId' => 'run2', 'hypothesisId' => 'B'];
-            file_put_contents('/Users/furkanmeclis/Documents/Herd/glorian-v2_3/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-            // #endregion
         }
 
-        // #region agent log
-        $finalSql = $query->toSql();
-        $logData = ['location' => 'WarrantyResource.php:66', 'message' => 'Final query before return', 'data' => ['sql' => $finalSql, 'bindings' => $query->getBindings()], 'timestamp' => time(), 'sessionId' => 'debug-session', 'runId' => 'run2', 'hypothesisId' => 'E'];
-        file_put_contents('/Users/furkanmeclis/Documents/Herd/glorian-v2_3/.cursor/debug.log', json_encode($logData) . "\n", FILE_APPEND);
-        // #endregion
         return $query;
     }
 
