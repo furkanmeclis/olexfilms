@@ -15,12 +15,12 @@
     $dealerId = $field->getDealerId($get);
 
     // Eğer dealerId yoksa, kullanıcının dealer_id'sini kullan
-    $user = Auth::user();
-    if (!$dealerId) {
-        $dealerId = $user?->dealer_id;
-    }
+$user = Auth::user();
+if (!$dealerId) {
+    $dealerId = $user?->dealer_id;
+}
 
-    // Record'dan dealer_id al (edit sayfası için)
+// Record'dan dealer_id al (edit sayfası için)
     $record = $field->getRecord();
     if (!$dealerId && $record) {
         $dealerId = $record->dealer_id ?? null;
@@ -34,46 +34,44 @@
             $dealerId,
             function ($q) use ($dealerId) {
                 // Dealer ID varsa, SADECE o dealer'a ait stokları göster
-                // Merkez stokları (dealer_id = NULL) dahil edilmemeli
-                // Hem dealer kullanıcıları hem de admin (seçilen dealer için) için geçerli
-                $q->where('dealer_id', $dealerId);
-            },
-            function ($q) {
-                // Dealer ID yoksa, sadece NULL (merkez stoku) olanları göster
-                // Bu durum normalde olmamalı çünkü dealer kullanıcılarının dealer_id'si olmalı
+            // Merkez stokları (dealer_id = NULL) dahil edilmemeli
+            // Hem dealer kullanıcıları hem de admin (seçilen dealer için) için geçerli
+            $q->where('dealer_id', $dealerId);
+        },
+        function ($q) {
+            // Dealer ID yoksa, sadece NULL (merkez stoku) olanları göster
+            // Bu durum normalde olmamalı çünkü dealer kullanıcılarının dealer_id'si olmalı
                 // Admin ise mutlaka bir dealer seçmeli
                 $q->whereNull('dealer_id');
             },
         );
-    // applied_parts'a göre filtrele - Optimize edilmiş JSON sorgusu
-        if (!empty($appliedParts) && is_array($appliedParts)) {
-            $stockItemsQuery->whereHas('product.category', function ($q) use ($appliedParts) {
-                $dbDriver = DB::getDriverName();
-                
-                if ($dbDriver === 'sqlite') {
-                    // SQLite için JSON array içinde arama
-                    // SQLite'da JSON array'ler string olarak saklanır
-                    // Format: "[\"part1\",\"part2\"]" - escape karakterleri ile saklanır ama LIKE sorgusu escape olmadan çalışır
-                    $q->where(function ($subQuery) use ($appliedParts) {
-                        foreach ($appliedParts as $part) {
-                            // JSON array formatında arama: part adını direkt aramak yeterli
-                            // SQLite LIKE sorgusu escape karakterlerini dikkate almaz
-                            $subQuery->orWhere('available_parts', 'like', '%' . $part . '%');
-                        }
-                    });
-                } else {
-                    // MySQL/PostgreSQL için JSON_CONTAINS veya JSON_EXTRACT
-                //$q->where(function ($subQuery) use ($appliedParts) {
-                 //   foreach ($appliedParts as $part) {
-                  //          $subQuery->orWhereJsonContains('available_parts', $part);
-                  //  }
-                //});
-                }
-            });
-        } else {
-            // Eğer applied_parts seçilmemişse boş liste
-            $stockItemsQuery->whereRaw('1 = 0');
-        }
+    if (!empty($appliedParts) && is_array($appliedParts)) {
+        $stockItemsQuery->whereHas('product.category', function ($q) use ($appliedParts) {
+            $dbDriver = DB::getDriverName();
+
+            if ($dbDriver === 'sqlite') {
+                // SQLite için JSON array içinde arama
+                // SQLite'da JSON array'ler string olarak saklanır
+                // Format: "[\"part1\",\"part2\"]" - escape karakterleri ile saklanır ama LIKE sorgusu escape olmadan çalışır
+                $q->where(function ($subQuery) use ($appliedParts) {
+                    foreach ($appliedParts as $part) {
+                        // JSON array formatında arama: part adını direkt aramak yeterli
+                        // SQLite LIKE sorgusu escape karakterlerini dikkate almaz
+                        $subQuery->orWhere('available_parts', 'like', '%' . $part . '%');
+                    }
+                });
+            } else {
+                $q->where(function ($subQuery) use ($appliedParts) {
+                    foreach ($appliedParts as $part) {
+                        $subQuery->orWhereJsonContains('available_parts', $part);
+                    }
+                });
+            }
+        });
+    } else {
+        // Eğer applied_parts seçilmemişse boş liste
+        $stockItemsQuery->whereRaw('1 = 0');
+    }
     // Debug bilgileri hazırla (query execute edilmeden önce)
     $debugQuery = clone $stockItemsQuery;
     $debugInfo = [
