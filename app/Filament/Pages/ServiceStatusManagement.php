@@ -193,12 +193,14 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
 
     public function getServiceStatusLogsTableProperty(): Table
     {
-        $query = $this->service
-            ? ServiceStatusLog::query()->where('service_id', $this->service->id)
-            : ServiceStatusLog::query()->whereRaw('1 = 0');
-
         return Table::make($this)
-            ->query($query)
+            ->query(function () {
+                if (!$this->service) {
+                    return ServiceStatusLog::query()->whereRaw('1 = 0');
+                }
+                
+                return ServiceStatusLog::query()->where('service_id', $this->service->id);
+            })
             ->columns([
                 TextColumn::make('fromDealer.name')
                     ->label('Gelen Şube')

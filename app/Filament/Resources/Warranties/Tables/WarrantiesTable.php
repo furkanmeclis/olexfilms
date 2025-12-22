@@ -9,6 +9,9 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
+use Tapp\FilamentProgressBarColumn\Tables\Columns\ProgressBarColumn;
+use Filament\Actions\Action;
+use App\Filament\Resources\Services\ServiceResource;
 
 class WarrantiesTable
 {
@@ -48,18 +51,16 @@ class WarrantiesTable
                     ->date('d.m.Y')
                     ->sortable(),
 
-                TextColumn::make('days_remaining')
+                ProgressBarColumn::make('days_remaining')
                     ->label('Kalan Gün')
-                    ->formatStateUsing(fn ($state) => $state !== null 
-                        ? ($state > 0 ? "{$state} gün" : 'Süresi dolmuş')
-                        : 'Bilinmiyor')
-                    ->badge()
-                    ->color(fn ($state) => match (true) {
-                        $state === null => 'gray',
-                        $state <= 0 => 'danger',
-                        $state <= 30 => 'warning',
-                        default => 'success',
-                    })
+                    ->maxValue(fn ($record) => $record->total_days ?? 1)
+                    ->lowThreshold(fn ($record) => ($record->total_days ?? 1) * 0.3)
+                    ->dangerColor('rgb(239, 68, 68)')
+                    ->warningColor('rgb(245, 158, 11)')
+                    ->successColor('rgb(34, 197, 94)')
+                    ->dangerLabel(fn ($state) => $state !== null && $state <= 0 ? 'Süresi dolmuş' : ($state !== null ? "{$state} gün" : 'Bilinmiyor'))
+                    ->warningLabel(fn ($state) => $state !== null ? "{$state} gün" : 'Bilinmiyor')
+                    ->successLabel(fn ($state) => $state !== null ? "{$state} gün" : 'Bilinmiyor')
                     ->sortable(query: function ($query, string $direction): \Illuminate\Database\Eloquent\Builder {
                         return $query->orderBy('end_date', $direction);
                     }),
@@ -95,6 +96,18 @@ class WarrantiesTable
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
+                Action::make('viewWarranty')
+                    ->label('PDF Görüntüle')
+                    ->icon('heroicon-o-document-text')
+                    ->color('primary')
+                    ->url(fn ( $record) => route('warranty.pdf', ['serviceNo' => $record->service->service_no]))
+                    ->openUrlInNewTab(),
+                Action::make('viewService')
+                    ->label('Hizmet Görüntüle')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->url(fn ( $record) => ServiceResource::getUrl('view', ['record' => $record->service_id]))
+                    ->openUrlInNewTab(),
             ])
             ->defaultSort('end_date', 'asc');
     }

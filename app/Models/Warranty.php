@@ -45,6 +45,18 @@ class Warranty extends Model
     }
 
     /**
+     * Get the total number of days in the warranty period.
+     */
+    public function getTotalDaysAttribute(): ?int
+    {
+        if (!$this->start_date || !$this->end_date) {
+            return null;
+        }
+
+        return $this->start_date->startOfDay()->diffInDays($this->end_date->startOfDay(), false);
+    }
+
+    /**
      * Get the number of days remaining until warranty expires.
      */
     public function getDaysRemainingAttribute(): ?int
