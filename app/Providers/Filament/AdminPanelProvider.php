@@ -83,16 +83,21 @@ class AdminPanelProvider extends PanelProvider
                 BreezyCore::make()
                     ->myProfile(
                         shouldRegisterUserMenu: true,
-                        userMenuLabel: 'Profilim',
-                        shouldRegisterNavigation: false,
                         hasAvatars: true,
                         slug: 'my-profile'
                     )
+                    ->avatarUploadComponent(fn () => FileUpload::make('avatar_url')
+                        ->label('Avatar')
+                        ->avatar()
+                        ->image()
+                        ->disk(config('filesystems.default'))
+                        ->directory('avatars')
+                        ->visibility('public')
+                        ->imageEditor()
+                        ->circleCropper()
+                    )
                     ->enableBrowserSessions()
-                    ->enableTwoFactorAuthentication(
-                        force: false,
-                        scopeToPanel: true,
-                    ),
+                    ->enableTwoFactorAuthentication(),
             ]);
     }
 }
