@@ -7,3 +7,4 @@
 @source '../../../../vendor/tapp/filament-progress-bar-column';
 @source '../../../../vendor/cmsmaxinc/filament-error-pages/resources/**/*.blade.php';
 @source '../../../../vendor/jeffgreco13/filament-breezy/resources/**/*';
+@source '../../../../vendor/awcodes/filament-quick-create/resources/**/*.blade.php';

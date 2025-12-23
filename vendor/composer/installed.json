@@ -70,6 +70,81 @@
             "install-path": "../anourvalar/eloquent-serialize"
         },
         {
+            "name": "awcodes/filament-quick-create",
+            "version": "v4.0.1",
+            "version_normalized": "4.0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/awcodes/filament-quick-create.git",
+                "reference": "c8148011b30eb67b2ee1f62b5e3a8ca4a4e4bb01"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/awcodes/filament-quick-create/zipball/c8148011b30eb67b2ee1f62b5e3a8ca4a4e4bb01",
+                "reference": "c8148011b30eb67b2ee1f62b5e3a8ca4a4e4bb01",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.10",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.7",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "pestphp/pest-plugin-livewire": "^3.0",
+                "rector/rector": "^2.0",
+                "spatie/laravel-ray": "^1.26"
+            },
+            "time": "2025-08-12T17:12:34+00:00",
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Awcodes\\QuickCreate\\QuickCreateServiceProvider"
+                    ]
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-4": {
+                    "Awcodes\\QuickCreate\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Adam Weston",
+                    "email": "awcodes1@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Plugin for Filament Admin that adds a dropdown menu to the header to quickly create new items.",
+            "keywords": [
+                "awcodes",
+                "filament",
+                "laravel",
+                "plugins",
+                "quick-create"
+            ],
+            "support": {
+                "issues": "https://github.com/awcodes/filament-quick-create/issues",
+                "source": "https://github.com/awcodes/filament-quick-create/tree/v4.0.1"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/awcodes",
+                    "type": "github"
+                }
+            ],
+            "install-path": "../awcodes/filament-quick-create"
+        },
+        {
             "name": "aws/aws-crt-php",
             "version": "v1.2.7",
             "version_normalized": "1.2.7.0",
