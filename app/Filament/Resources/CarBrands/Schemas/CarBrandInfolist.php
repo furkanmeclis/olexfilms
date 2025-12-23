@@ -39,6 +39,10 @@ class CarBrandInfolist
                             ->formatStateUsing(fn ($state) => $state ? 'Gösteriliyor' : 'Gizli')
                             ->color(fn ($state) => $state ? 'success' : 'danger'),
 
+                        TextEntry::make('logo_height')
+                            ->label('Hizmet Ekranı Logo Yüksekliği')
+                            ->formatStateUsing(fn ($state) => ($state ?? 25).' px'),
+
                         TextEntry::make('last_update')
                             ->label('Son Güncelleme')
                             ->dateTime('d.m.Y H:i')

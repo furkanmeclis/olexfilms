@@ -21,6 +21,7 @@ class CarBrand extends Model
         'last_update',
         'is_active',
         'show_name',
+        'logo_height',
     ];
 
     protected function casts(): array

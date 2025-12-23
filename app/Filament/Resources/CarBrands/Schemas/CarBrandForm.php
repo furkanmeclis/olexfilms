@@ -47,6 +47,14 @@ class CarBrandForm
                             ->label('Marka Adını Göster')
                             ->default(true)
                             ->required(),
+
+                        TextInput::make('logo_height')
+                            ->label('Hizmet Ekranı Logo Yüksekliği')
+                            ->numeric()
+                            ->default(25)
+                            ->suffix('px')
+                            ->minValue(1)
+                            ->required(),
                     ])
                     ->columns(2),
             ]);

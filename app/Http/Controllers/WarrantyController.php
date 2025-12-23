@@ -100,6 +100,7 @@ class WarrantyController extends Controller
                     'brand' => $service->carBrand->name ?? '',
                     'brand_logo' => $brandLogo,
                     'show_brand_name' => $service->carBrand->show_name ?? true,
+                    'logo_height' => $service->carBrand->logo_height ?? 25,
                     'model' => $service->carModel->name ?? '',
                     'generation' => '', // Generation bilgisi yok, boş bırakıyoruz
                     'year' => $service->year ?? '',
@@ -245,6 +246,7 @@ class WarrantyController extends Controller
                 'brand_logo' => $brandLogo ?? '',
                 'brand' => $service->carBrand->name ?? '',
                 'show_brand_name' => $service->carBrand->show_name ?? true,
+                'logo_height' => $service->carBrand->logo_height ?? 25,
                 'model' => $service->carModel->name ?? '',
                 'generation' => '', // Generation bilgisi yok
                 'year' => $service->year ?? '',
