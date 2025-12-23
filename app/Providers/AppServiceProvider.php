@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Events\Orders\OrderCancelled;
+use App\Events\Orders\OrderCreated;
 use App\Events\Orders\OrderItemCreated;
 use App\Events\Orders\OrderItemDeleted;
 use App\Events\Orders\OrderItemUpdated;
@@ -11,15 +12,21 @@ use App\Listeners\Orders\HandleOrderCancellation;
 use App\Listeners\Orders\HandleOrderItemDeletion;
 use App\Listeners\Orders\HandleOrderItemStockAssignment;
 use App\Listeners\Orders\HandleOrderStatusChanged;
+use App\Listeners\Orders\SendOrderCreatedNotification;
+use App\Listeners\Orders\SendOrderNotifications;
+use App\Models\Dealer;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Service;
 use App\Models\ServiceItem;
+use App\Models\User;
 use App\Models\Warranty;
+use App\Observers\DealerObserver;
 use App\Observers\OrderItemObserver;
 use App\Observers\OrderObserver;
 use App\Observers\ServiceItemObserver;
 use App\Observers\ServiceObserver;
+use App\Observers\UserObserver;
 use App\Observers\WarrantyObserver;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
@@ -59,6 +66,8 @@ Section::configureUsing(fn (Section $section) => $section
         Warranty::observe(WarrantyObserver::class);
         Order::observe(OrderObserver::class);
         OrderItem::observe(OrderItemObserver::class);
+        Dealer::observe(DealerObserver::class);
+        User::observe(UserObserver::class);
 
         // Event-Listener mapping'lerini kaydet
         Event::listen(

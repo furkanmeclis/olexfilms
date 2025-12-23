@@ -6,6 +6,7 @@ use App\Enums\ServiceStatusEnum;
 use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
 use App\Listeners\ServiceStatusUpdatedListener;
+use App\Listeners\Services\SendServiceNotifications;
 use App\Models\Service;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\Auth;
@@ -80,6 +81,9 @@ class ServiceObserver
                     }
                 }
             }
+
+            // Notification gönder
+            (new SendServiceNotifications())->handle($service, $oldStatus, $newStatus);
         }
     }
 

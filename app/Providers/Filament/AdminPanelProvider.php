@@ -77,6 +77,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make('Sistem Yönetimi')
                     ->label('Sistem Yönetimi'),
             ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('5s')
             ->plugins([
                 FilamentErrorPagesPlugin::make()
                     ->routes(['admin/*']),
