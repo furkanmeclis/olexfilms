@@ -196,6 +196,7 @@ return [
     */
 
     'attributes' => [
+        // Genel
         'ÜRÜN KODU' => 'Ürün Kodu',
         'BAYİ' => 'Bayi',
         'ÜRÜN' => 'Ürün',
@@ -204,6 +205,184 @@ return [
         'TARİH' => 'Tarih',
         'KATEGORİ' => 'Kategori',
         'MARKA' => 'Marka',
+        
+        // Product
+        'category_id' => 'Kategori',
+        'name' => 'Ad',
+        'sku' => 'Stok Kodu',
+        'description' => 'Açıklama',
+        'warranty_duration' => 'Garanti Süresi',
+        'micron_thickness' => 'Mikron Kalınlığı',
+        'price' => 'Fiyat',
+        'image_path' => 'Görsel',
+        'is_active' => 'Aktif',
+        
+        // Dealer
+        'dealer_code' => 'Bayi Kodu',
+        'email' => 'E-posta',
+        'phone' => 'Telefon',
+        'address' => 'Adres',
+        'logo_path' => 'Logo',
+        'facebook_url' => 'Facebook',
+        'instagram_url' => 'Instagram',
+        'twitter_url' => 'Twitter/X',
+        'linkedin_url' => 'LinkedIn',
+        'website_url' => 'Web Sitesi',
+        'city' => 'İl',
+        'district' => 'İlçe',
+        
+        // User
+        'password' => 'Şifre',
+        'dealer_id' => 'Bayi',
+        'avatar_path' => 'Avatar',
+        'email_verified_at' => 'E-posta Doğrulandı',
+        
+        // Service
+        'service_no' => 'Hizmet Numarası',
+        'customer_id' => 'Müşteri',
+        'user_id' => 'Kullanıcı',
+        'car_brand_id' => 'Marka',
+        'car_model_id' => 'Model',
+        'year' => 'Yıl',
+        'vin' => 'Şasi No',
+        'plate' => 'Plaka',
+        'km' => 'Kilometre',
+        'package' => 'Paket',
+        'applied_parts' => 'Uygulanan Parçalar',
+        'notes' => 'Notlar',
+        'status' => 'Durum',
+        'completed_at' => 'Tamamlanma Tarihi',
+        
+        // Order
+        'created_by' => 'Oluşturan',
+        'cargo_company' => 'Kargo Firması',
+        'tracking_number' => 'Takip Numarası',
+        
+        // Customer
+        'type' => 'Tip',
+        'tc_no' => 'TC Kimlik No',
+        'tax_no' => 'Vergi No',
+        'tax_office' => 'Vergi Dairesi',
+        'fcm_token' => 'FCM Token',
+        'notification_settings' => 'Bildirim Ayarları',
+        
+        // CarBrand
+        'external_id' => 'Dış ID',
+        'logo' => 'Logo',
+        'last_update' => 'Son Güncelleme',
+        
+        // CarModel
+        'brand_id' => 'Marka',
+        'powertrain' => 'Güç Aktarımı',
+        'yearstart' => 'Başlangıç Yılı',
+        'yearstop' => 'Bitiş Yılı',
+        'coupe' => 'Gövde Tipi',
+        
+        // StockItem
+        'product_id' => 'Ürün',
+        'barcode' => 'Barkod',
+        'location' => 'Konum',
+        
+        // Warranty
+        'service_id' => 'Hizmet',
+        'stock_item_id' => 'Stok Kalemi',
+        'start_date' => 'Başlangıç Tarihi',
+        'end_date' => 'Bitiş Tarihi',
+        
+        // ProductCategory
+        'available_parts' => 'Uygulanabilir Parçalar',
+        
+        // OrderItem
+        'order_id' => 'Sipariş',
+        'quantity' => 'Adet',
+        
+        // ServiceItem
+        'usage_type' => 'Kullanım Tipi',
+        
+        // ServiceImage
+        'title' => 'Başlık',
+        'order' => 'Sıra',
+        
+        // ServiceStatusLog
+        'from_dealer_id' => 'Uygulayan Bayi',
+        'to_dealer_id' => 'Gidilen Şube',
+        
+        // StockMovement
+        'action' => 'Aksiyon',
+        
+        // BulkSms
+        'message' => 'Mesaj',
+        'sender' => 'Gönderici',
+        'message_type' => 'Mesaj Tipi',
+        'message_content_type' => 'Mesaj İçerik Tipi',
+        'target_type' => 'Hedef Tip',
+        'target_ids' => 'Hedef ID\'ler',
+        'total_recipients' => 'Toplam Alıcı',
+        'sent_count' => 'Gönderilen',
+        'failed_count' => 'Başarısız',
+        'sent_at' => 'Gönderilme Tarihi',
+        'completed_at' => 'Tamamlanma Tarihi',
+        
+        // SmsLog
+        'response_id' => 'Yanıt ID',
+        'amount' => 'Tutar',
+        'number_count' => 'Numara Sayısı',
+        'response_data' => 'Yanıt Verisi',
+        'invalid_phones' => 'Geçersiz Telefonlar',
+        'notifiable_type' => 'Bildirilebilir Tip',
+        'notifiable_id' => 'Bildirilebilir ID',
+        'bulk_sms_id' => 'Toplu SMS',
+        'sent_by' => 'Gönderen',
+        
+        // NexptgApiUser
+        'username' => 'Kullanıcı Adı',
+        'last_used_at' => 'Son Kullanım',
+        
+        // NexptgApiUserLog
+        'nexptg_api_user_id' => 'API Kullanıcı',
+        'status_code' => 'Durum Kodu',
+        'details' => 'Detaylar',
+        
+        // NexptgReport
+        'api_user_id' => 'API Kullanıcı',
+        'date' => 'Tarih',
+        'calibration_date' => 'Kalibrasyon Tarihi',
+        'device_serial_number' => 'Cihaz Seri No',
+        'model' => 'Model',
+        'brand' => 'Marka',
+        'type_of_body' => 'Gövde Tipi',
+        'capacity' => 'Kapasite',
+        'power' => 'Güç',
+        'fuel_type' => 'Yakıt Tipi',
+        'unit_of_measure' => 'Ölçü Birimi',
+        'extra_fields' => 'Ekstra Alanlar',
+        'comment' => 'Yorum',
+        
+        // NexptgReportMeasurement
+        'report_id' => 'Rapor',
+        'is_inside' => 'İç',
+        'place_id' => 'Yer ID',
+        'part_type' => 'Parça Tipi',
+        'value' => 'Değer',
+        'interpretation' => 'Yorumlama',
+        'substrate_type' => 'Alt Tabaka Tipi',
+        'timestamp' => 'Zaman Damgası',
+        'position' => 'Pozisyon',
+        
+        // NexptgReportTire
+        'width' => 'Genişlik',
+        'profile' => 'Profil',
+        'diameter' => 'Çap',
+        'maker' => 'Üretici',
+        'season' => 'Mevsim',
+        'section' => 'Bölüm',
+        'value1' => 'Değer 1',
+        'value2' => 'Değer 2',
+        
+        // NexptgHistory
+        'history_id' => 'Geçmiş',
+        
+        // NexptgHistoryMeasurement
     ],
 
 ];
