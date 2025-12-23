@@ -1,0 +1,62 @@
+<?php
+
+return [
+    'navigation_label' => 'Bayiler',
+    'model_label' => 'Bayi',
+    'plural_model_label' => 'Bayiler',
+    'fields' => [
+        'dealer_code' => 'Bayi Kodu',
+        'name' => 'Bayi Adı',
+        'email' => 'E-posta',
+        'phone' => 'Telefon',
+        'address' => 'Adres',
+        'city' => 'İl',
+        'district' => 'İlçe',
+        'website_url' => 'Web Sitesi',
+        'facebook_url' => 'Facebook',
+        'instagram_url' => 'Instagram',
+        'twitter_url' => 'Twitter/X',
+        'linkedin_url' => 'LinkedIn',
+        'logo_path' => 'Logo',
+        'is_active' => 'Aktif',
+        'users_count' => 'Kullanıcı Sayısı',
+        'created_at' => 'Oluşturulma',
+        'updated_at' => 'Güncellenme',
+    ],
+    'sections' => [
+        'bayi_bilgileri' => 'Bayi Bilgileri',
+        'konum_bilgileri' => 'Konum Bilgileri',
+        'sosyal_medya' => 'Sosyal Medya',
+        'logo' => 'Logo',
+        'durum' => 'Durum',
+    ],
+    'table' => [
+        'columns' => [
+            'logo' => 'Logo',
+            'dealer_code' => 'Bayi Kodu',
+            'name' => 'Bayi Adı',
+            'email' => 'E-posta',
+            'phone' => 'Telefon',
+            'city' => 'İl',
+            'district' => 'İlçe',
+            'address' => 'Adres',
+            'is_active' => 'Aktif',
+            'created_at' => 'Oluşturulma',
+            'updated_at' => 'Güncellenme',
+        ],
+        'filters' => [
+            'is_active' => 'Aktif Bayiler',
+            'is_inactive' => 'Pasif Bayiler',
+            'city' => 'İl',
+            'district' => 'İlçe',
+        ],
+    ],
+    'actions' => [
+        'view' => 'Görüntüle',
+        'edit' => 'Düzenle',
+        'export' => 'Dışa Aktar',
+        'export_selected' => 'Seçilenleri Dışa Aktar',
+        'delete' => 'Sil',
+    ],
+];
+
