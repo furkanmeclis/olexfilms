@@ -20,6 +20,7 @@ class CarBrand extends Model
         'logo',
         'last_update',
         'is_active',
+        'show_name',
     ];
 
     protected function casts(): array
@@ -27,6 +28,7 @@ class CarBrand extends Model
         return [
             'is_active' => 'boolean',
             'last_update' => 'datetime',
+            'show_name' => 'boolean',
         ];
     }
 

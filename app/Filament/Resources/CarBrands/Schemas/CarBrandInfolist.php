@@ -33,6 +33,12 @@ class CarBrandInfolist
                             ->formatStateUsing(fn ($state) => $state ? 'Aktif' : 'Pasif')
                             ->color(fn ($state) => $state ? 'success' : 'danger'),
 
+                        TextEntry::make('show_name')
+                            ->label('Marka Adını Göster')
+                            ->badge()
+                            ->formatStateUsing(fn ($state) => $state ? 'Gösteriliyor' : 'Gizli')
+                            ->color(fn ($state) => $state ? 'success' : 'danger'),
+
                         TextEntry::make('last_update')
                             ->label('Son Güncelleme')
                             ->dateTime('d.m.Y H:i')

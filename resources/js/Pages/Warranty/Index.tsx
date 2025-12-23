@@ -58,6 +58,7 @@ interface ServiceData {
     service_no: string;
     brand: string;
     brand_logo: string | null;
+    show_brand_name?: boolean;
     model: string;
     generation: string;
     year: number;
@@ -121,11 +122,11 @@ const WarrantyIndex: React.FC<WarrantyIndexProps> = ({ serviceNo, serviceData })
                                             {serviceData.brand_logo && (
                                                 <img
                                                     src={serviceData.brand_logo}
-                                                    className="h-[20px] mr-2 object-contain inline-flex"
+                                                    className={serviceData.show_brand_name ? 'h-[20px] mr-2 object-contain inline-flex' : 'h-[25px] object-contain inline-flex'}
                                                     alt="brandLogo"
                                                 />
                                             )}
-                                            {serviceData.brand} <br />
+                                            {serviceData.show_brand_name !== false && serviceData.brand} <br />
                                             {serviceData.model}{serviceData.generation ? ' ' + serviceData.generation : ''} ({serviceData.year})
                                         </span>
                                     </div>

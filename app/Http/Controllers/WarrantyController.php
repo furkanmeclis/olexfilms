@@ -99,6 +99,7 @@ class WarrantyController extends Controller
                     'service_no' => $service->service_no ?? '',
                     'brand' => $service->carBrand->name ?? '',
                     'brand_logo' => $brandLogo,
+                    'show_brand_name' => $service->carBrand->show_name ?? true,
                     'model' => $service->carModel->name ?? '',
                     'generation' => '', // Generation bilgisi yok, boş bırakıyoruz
                     'year' => $service->year ?? '',
@@ -243,6 +244,7 @@ class WarrantyController extends Controller
             $serviceDetails = (object) [
                 'brand_logo' => $brandLogo ?? '',
                 'brand' => $service->carBrand->name ?? '',
+                'show_brand_name' => $service->carBrand->show_name ?? true,
                 'model' => $service->carModel->name ?? '',
                 'generation' => '', // Generation bilgisi yok
                 'year' => $service->year ?? '',

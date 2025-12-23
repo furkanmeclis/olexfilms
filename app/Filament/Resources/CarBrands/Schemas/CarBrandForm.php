@@ -42,6 +42,11 @@ class CarBrandForm
                             ->label('Aktif')
                             ->default(true)
                             ->required(),
+
+                        Toggle::make('show_name')
+                            ->label('Marka Adını Göster')
+                            ->default(true)
+                            ->required(),
                     ])
                     ->columns(2),
             ]);
