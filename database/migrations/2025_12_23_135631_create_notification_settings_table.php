@@ -20,8 +20,8 @@ return new class extends Migration
             $table->string('status')->default('active'); // NotificationStatusEnum (active/inactive)
             $table->timestamps();
 
-            $table->unique(['event', 'role'], 'n_event_role_unique');
-            $table->index(['role', 'status'], 'n_role_status_index');
+            $table->unique(['event', 'role'], 'n_e_r_unique');
+            $table->index(['role', 'status'], 'n_r_s_index');
         });
     }
 
