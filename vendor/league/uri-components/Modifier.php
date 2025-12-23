@@ -31,6 +31,7 @@ use League\Uri\Contracts\Conditionable;
 use League\Uri\Contracts\FragmentDirective;
 use League\Uri\Contracts\FragmentInterface;
 use League\Uri\Contracts\PathInterface;
+use League\Uri\Contracts\SegmentedPathInterface;
 use League\Uri\Contracts\UriAccess;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\MissingFeature;
@@ -41,12 +42,15 @@ use League\Uri\IPv6\Converter as IPv6Converter;
 use League\Uri\KeyValuePair\Converter as KeyValuePairConverter;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
+use SensitiveParameter;
 use Stringable;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\Url as WhatWgUrl;
 use ValueError;
 
+use function array_keys;
 use function class_exists;
+use function count;
 use function filter_var;
 use function implode;
 use function in_array;
@@ -67,6 +71,8 @@ use const FILTER_VALIDATE_IP;
 
 class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
 {
+    private const MASK = '*****';
+
     final public function __construct(protected readonly Rfc3986Uri|WhatWgUrl|Psr7UriInterface|UriInterface $uri)
     {
     }
@@ -223,8 +229,10 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
         return new static($this->uri->withScheme(self::normalizeComponent($scheme, $this->uri)));
     }
 
-    public function withUserInfo(Stringable|string|null $username, Stringable|string|null $password): static
-    {
+    public function withUserInfo(
+        Stringable|string|null $username,
+        #[SensitiveParameter] Stringable|string|null $password
+    ): static {
         if ($this->uri instanceof Rfc3986Uri) {
             $userInfo = Encoder::encodeUser($username);
             if (null !== $password) {
@@ -256,23 +264,28 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
         ));
     }
 
-    public function withQuery(Stringable|string|null $query): static
+    /**
+     * Returns a new instance with the entire UserInfo component redacted.
+     *
+     * Examples:
+     *   http://user:pass@host → http://[REDACTED]@host
+     *   http://user@host      → http://[REDACTED]@host
+     */
+    public function redactUserInfo(): static
     {
-        $query = self::normalizeComponent($query, $this->uri);
-        $query = match (true) {
-            $this->uri instanceof Rfc3986Uri => match (true) {
-                Encoder::isQueryEncoded($query) => $query,
-                default => Encoder::encodeQueryOrFragment($query),
-            },
-            $this->uri instanceof WhatWgUrl => URLSearchParams::new($query)->value(),
-            default => $query,
-        };
+        if ($this->uri instanceof WhatWgUrl) {
+            if (null !== $this->uri->getUsername() || null !== $this->uri->getPassword()) {
+                return new static($this->uri->withUsername(self::MASK)->withPassword(null));
+            }
 
-        return match (true) {
-            $this->uri instanceof Rfc3986Uri && $query === $this->uri->getRawQuery(),
-            $query === $this->uri->getQuery() => $this,
-            default => new static($this->uri->withQuery($query)),
-        };
+            return $this;
+        }
+
+        if (null === $this->uri->getUserInfo()) {
+            return $this;
+        }
+
+        return new static($this->uri->withUserInfo(self::MASK));
     }
 
     public function withHost(Stringable|string|null $host): static
@@ -338,6 +351,25 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      * Query modifier methods
      *********************************/
 
+    public function withQuery(Stringable|string|null $query): static
+    {
+        $query = self::normalizeComponent($query, $this->uri);
+        $query = match (true) {
+            $this->uri instanceof Rfc3986Uri => match (true) {
+                Encoder::isQueryEncoded($query) => $query,
+                default => Encoder::encodeQueryOrFragment($query),
+            },
+            $this->uri instanceof WhatWgUrl => URLSearchParams::new($query)->value(),
+            default => $query,
+        };
+
+        return match (true) {
+            $this->uri instanceof Rfc3986Uri && $query === $this->uri->getRawQuery(),
+            $query === $this->uri->getQuery() => $this,
+            default => new static($this->uri->withQuery($query)),
+        };
+    }
+
     /**
      * Change the encoding of the query.
      */
@@ -380,11 +412,19 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     }
 
     /**
-     * Add the new query data to the existing URI query.
+     * Append the new query data to the existing URI query.
      */
     public function appendQuery(Stringable|string|null $query): static
     {
         return $this->withQuery(Query::fromUri($this->uri)->append($query)->value());
+    }
+
+    /**
+     * Prepend the new query data to the existing URI query.
+     */
+    public function prependQuery(Stringable|string|null $query): static
+    {
+        return $this->withQuery(Query::fromUri($this->uri)->prepend($query)->value());
     }
 
     /**
@@ -437,7 +477,35 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     }
 
     /**
-     * Merge query paris with the existing URI query.
+     * Returns a new instance with the specified query values redacted.
+     *
+     * Only values are redacted. Missing keys are ignored.
+     *
+     * Example: redactQueryPairs(token)
+     *   ?token=abc&mode=edit  → token=[REDACTED]&mode=edit (when 'token' is passed)
+     */
+    public function redactQueryPairs(string ...$keys): static
+    {
+        if ([] === $keys) {
+            return $this;
+        }
+
+        $hasChanged = false;
+        $pairs = [];
+        foreach (Query::fromUri($this->uri) as $pair) {
+            if (in_array($pair[0], $keys, true)) {
+                $hasChanged = true;
+                $pair[1] = self::MASK;
+            }
+
+            $pairs[] = $pair[0].'='.$pair[1];
+        }
+
+        return $hasChanged ? $this->withQuery(implode('&', $pairs)) : $this;
+    }
+
+    /**
+     * Merge query pairs with the existing URI query.
      *
      * @param iterable<int, array{0:string, 1:string|null}> $pairs
      */
@@ -901,11 +969,39 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     }
 
     /**
-     * Append a new segment or a new path to the URI path.
+     * Append a new path or add a path to the URI path.
      */
-    public function appendSegment(Stringable|string $segment): static
+    public function appendPath(Stringable|string $path): static
     {
-        return $this->withPath(HierarchicalPath::fromUri($this->uri)->append($segment));
+        return $this->withPath(HierarchicalPath::fromUri($this->uri)->append($path));
+    }
+
+    /**
+     * Prepend a path or add a new path to the URI path.
+     */
+    public function prependPath(Stringable|string $path): static
+    {
+        return $this->withPath(HierarchicalPath::fromUri($this->uri)->prepend($path));
+    }
+
+    /**
+     * Append a list of segments or a new path to the URI path.
+     *
+     * @param iterable<Stringable|string> $segments
+     */
+    public function appendSegments(iterable $segments): static
+    {
+        return $this->withPath(HierarchicalPath::fromUri($this->uri)->appendSegments($segments));
+    }
+
+    /**
+     * Prepend a list of segments or a new path to the URI path.
+     *
+     * @param iterable<Stringable|string> $segments
+     */
+    public function prependSegments(iterable $segments): static
+    {
+        return $this->withPath(HierarchicalPath::fromUri($this->uri)->prependSegments($segments));
     }
 
     /**
@@ -922,14 +1018,6 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     public function dataPathToBinary(): static
     {
         return $this->withPath(DataPath::fromUri($this->uri)->toBinary()->toString());
-    }
-
-    /**
-     * Prepend a new segment or a new path to the URI path.
-     */
-    public function prependSegment(Stringable|string $segment): static
-    {
-        return$this->withPath(HierarchicalPath::fromUri($this->uri)->prepend($segment));
     }
 
     /**
@@ -1043,6 +1131,97 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     }
 
     /**
+     * Returns a new instance with specific path segments redacted by index.
+     *
+     * Indexing starts at 0 for the first segment after the leading slash.
+     * Negative indexing is supported>
+     * Out-of-range offsets are ignored.
+     *
+     * Example: redactPathSegmentsByOffset(2, -2)
+     *   /api/users/john/orders/55/details → /api/users/[REDACTED]/orders/[REDACTED]/details
+     */
+    public function redactPathSegmentsByOffset(int ...$offsets): static
+    {
+        if ([] === $offsets || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
+            return $this;
+        }
+
+        $nbSegments = count($path);
+        $hasChanged = false;
+        foreach ($offsets as $offset) {
+            if ($offset < - $nbSegments - 1 || $offset > $nbSegments) {
+                continue;
+            }
+
+            if (0 > $offset) {
+                $offset += $nbSegments;
+            }
+
+            if (!in_array($path[$offset] ?? null, [null, self::MASK], true)) {
+                $hasChanged = true;
+                $path[$offset] = self::MASK;
+            }
+        }
+
+        return !$hasChanged ? $this : $this->withPath(implode('/', $path));
+    }
+
+    /**
+     * Returns a new instance with all path segments matching the given names redacted.
+     *
+     * Matching is strict string comparison on raw (decoded) segments.
+     *
+     * Example: redactPathSegments('john')
+     *  /api/user/john/orders -> /api/user/[REDACTED]/orders
+     */
+    public function redactPathSegments(string ...$segments): static
+    {
+        if ([] === $segments || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
+            return $this;
+        }
+
+        $hasChanged = false;
+        foreach ($segments as $segment) {
+            foreach (array_keys($path, $segment, true) as $key) {
+                $hasChanged = true;
+                $path[$key] = self::MASK;
+            }
+        }
+
+        return !$hasChanged ? $this : $this->withPath(implode('/', $path));
+    }
+
+    /**
+     * Returns a new instance where, for each matched segment,
+     * the **immediately following** segment is redacted.
+     *
+     * Only the next segment is masked — not all subsequent ones.
+     * If no following segment exists, it is ignored.
+     *
+     * Example: redactPathNextSegments('john')
+     *   /api/users/john/orders/55/details → /api/users/john/[REDACTED]/55/details
+     */
+    public function redactPathNextSegments(string ...$segments): static
+    {
+        if ([] === $segments || [] === ($path = [...HierarchicalPath::fromUri($this->uri)])) {
+            return $this;
+        }
+
+        $hasChanged = false;
+        foreach ($segments as $segment) {
+            foreach (array_keys($path, $segment, true) as $key) {
+                $nextKey = $key + 1;
+                if (!in_array($path[$nextKey] ?? null, [null, self::MASK], true)) {
+                    $hasChanged = true;
+                    $path[$nextKey] = self::MASK;
+                }
+            }
+        }
+
+        return !$hasChanged ? $this : $this->withPath(implode('/', $path));
+    }
+
+    /**
      * Normalize a URI path.
      *
      * Make sure the path always has a leading slash if an authority is present
@@ -1050,30 +1229,36 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      */
     final protected static function normalizePath(WhatWgUrl|Rfc3986Uri|Psr7UriInterface|UriInterface $uri, PathInterface $path): WhatWgUrl|Rfc3986Uri|Psr7UriInterface|UriInterface
     {
-        $pathString = $path->toString();
-        $authority = match (true) {
-            $uri instanceof Rfc3986Uri => UriString::buildAuthority([
-                'host' => $uri->getHost(),
-                'port' => $uri->getPort(),
-                'user' => $uri->getUsername(),
-                'pass' => $uri->getPassword(),
-            ]),
-            $uri instanceof WhatWgUrl => UriString::buildAuthority([
-                'host' => $uri->getAsciiHost(),
-                'port' => $uri->getPort(),
-                'user' => $uri->getUsername(),
-                'pass' => $uri->getPassword(),
-            ]),
-            default => $uri->getAuthority(),
-        };
+        if (!$uri instanceof Psr7UriInterface) {
+            return $uri->withPath($path->toString());
+        }
 
-        return match (true) {
-            '' === $pathString,
-            '/' === $pathString[0],
-            null === $authority,
-            '' === $authority => $uri->withPath($pathString),
-            default => $uri->withPath('/'.$pathString),
-        };
+        $pathString = $path->toString();
+        if ('' === $pathString) {
+            return $uri->withPath($pathString);
+        }
+
+        $authority = $uri->getAuthority();
+        if ('' !== $authority) {
+            return $uri->withPath(str_starts_with($pathString, '/') ? $pathString : '/'.$pathString);
+        }
+
+        // If there is no authority, the path cannot start with `//`
+        if (str_starts_with($pathString, '//')) {
+            return $uri->withPath('/.'.$pathString);
+        }
+
+        $colonPos = strpos($pathString, ':');
+        if (false !== $colonPos && '' === $uri->getScheme()) {
+            // In the absence of a scheme and of an authority,
+            // the first path segment cannot contain a colon (":") character.'
+            $slashPos = strpos($pathString, '/');
+            (false !== $slashPos && $colonPos > $slashPos) || throw new SyntaxError(
+                'In absence of the scheme and authority components, the first path segment cannot contain a colon (":") character.'
+            );
+        }
+
+        return $uri->withPath($pathString);
     }
 
     /**
@@ -1211,6 +1396,32 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
     /**
      * DEPRECATION WARNING! This method will be removed in the next major point release.
      *
+     * @deprecated Since version 7.7.0
+     * @codeCoverageIgnore
+     * @see Modifier::appendPath
+     */
+    #[Deprecated(message:'use League\Uri\Modifier::appendPath() instead', since:'league/uri-components:7.7.0')]
+    public function appendSegment(Stringable|string $segment): static
+    {
+        return $this->appendPath($segment);
+    }
+
+    /**
+     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     *
+     * @deprecated Since version 7.7.0
+     * @codeCoverageIgnore
+     * @see Modifier::prependPath
+     */
+    #[Deprecated(message:'use League\Uri\Modifier::prependPath() instead', since:'league/uri-components:7.7.0')]
+    public function prependSegment(Stringable|string $segment): static
+    {
+        return $this->prependPath($segment);
+    }
+
+    /**
+     * DEPRECATION WARNING! This method will be removed in the next major point release.
+     *
      * @deprecated Since version 7.6.0
      * @codeCoverageIgnore
      * @see Modifier::wrap()
@@ -1303,7 +1514,7 @@ class Modifier implements Stringable, JsonSerializable, UriAccess, Conditionable
      *
      * Remove query data according to their key name.
      */
-    #[Deprecated(message:'use League\Uri\Modifier::uri() instead', since:'league/uri-components:7.6.0')]
+    #[Deprecated(message:'use League\Uri\Modifier::unwrap() instead', since:'league/uri-components:7.6.0')]
     public function getUri(): Psr7UriInterface|UriInterface
     {
         if ($this->uri instanceof Rfc3986Uri || $this->uri instanceof WhatWgUrl) {
