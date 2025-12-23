@@ -88,14 +88,6 @@ class AdminPanelProvider extends PanelProvider
                         hasAvatars: true,
                         slug: 'my-profile'
                     )
-                    ->avatarUploadComponent(fn(FileUpload $fileUpload) => $fileUpload
-                        ->disk('public')
-                        ->directory('avatars')
-                        ->visibility('public')
-                        ->image()
-                        ->maxSize(2048)
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                    )
                     ->enableBrowserSessions()
                     ->enableTwoFactorAuthentication(
                         force: false,
