@@ -234,7 +234,7 @@ return [
         // User
         'password' => 'Şifre',
         'dealer_id' => 'Bayi',
-        'avatar_path' => 'Avatar',
+        'avatar_url' => 'Avatar',
         'email_verified_at' => 'E-posta Doğrulandı',
         
         // Service

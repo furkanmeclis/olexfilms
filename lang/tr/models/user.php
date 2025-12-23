@@ -7,7 +7,7 @@ return [
         'password' => 'Şifre',
         'dealer_id' => 'Bayi',
         'phone' => 'Telefon',
-        'avatar_path' => 'Avatar',
+        'avatar_url' => 'Avatar',
         'is_active' => 'Aktif',
     ],
 ];

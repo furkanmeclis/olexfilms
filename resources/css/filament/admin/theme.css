@@ -6,3 +6,4 @@
 @source '../../../../resources/views/components/**/*.blade.php';
 @source '../../../../vendor/tapp/filament-progress-bar-column';
 @source '../../../../vendor/cmsmaxinc/filament-error-pages/resources/**/*.blade.php';
+@source '../../../../vendor/jeffgreco13/filament-breezy/resources/**/*';

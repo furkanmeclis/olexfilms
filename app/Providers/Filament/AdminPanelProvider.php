@@ -4,6 +4,8 @@ namespace App\Providers\Filament;
 
 use App\Http\Middleware\CheckDealerActive;
 use Cmsmaxinc\FilamentErrorPages\FilamentErrorPagesPlugin;
+use Filament\Forms\Components\FileUpload;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -78,6 +80,27 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 FilamentErrorPagesPlugin::make()
                     ->routes(['admin/*']),
+                BreezyCore::make()
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                        userMenuLabel: 'Profilim',
+                        shouldRegisterNavigation: false,
+                        hasAvatars: true,
+                        slug: 'my-profile'
+                    )
+                    ->avatarUploadComponent(fn(FileUpload $fileUpload) => $fileUpload
+                        ->disk('public')
+                        ->directory('avatars')
+                        ->visibility('public')
+                        ->image()
+                        ->maxSize(2048)
+                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                    )
+                    ->enableBrowserSessions()
+                    ->enableTwoFactorAuthentication(
+                        force: false,
+                        scopeToPanel: true,
+                    ),
             ]);
     }
 }
