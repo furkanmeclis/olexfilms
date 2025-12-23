@@ -131,7 +131,14 @@ class User extends Authenticatable implements HasAvatar
      */
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->avatar_url ? Storage::url($this->avatar_url) : null;
+        $disk = config('filesystems.default');
+        if ($disk !== 's3') {
+            return $this->avatar_url ? Storage::disk($disk)->url($this->avatar_url) : null;
+        }
+        try {
+            return $this->avatar_url ? Storage::disk($disk)->temporaryUrl($this->avatar_url, now()->addHours(1)) : null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
-    
 }
