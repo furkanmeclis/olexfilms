@@ -49,7 +49,7 @@ class Warranty extends Model
      */
     public function getTotalDaysAttribute(): ?int
     {
-        if (!$this->start_date || !$this->end_date) {
+        if (! $this->start_date || ! $this->end_date) {
             return null;
         }
 
@@ -61,7 +61,7 @@ class Warranty extends Model
      */
     public function getDaysRemainingAttribute(): ?int
     {
-        if (!$this->end_date) {
+        if (! $this->end_date) {
             return null;
         }
 
@@ -76,7 +76,7 @@ class Warranty extends Model
      */
     public function getIsExpiredAttribute(): bool
     {
-        if (!$this->end_date) {
+        if (! $this->end_date) {
             return false;
         }
 

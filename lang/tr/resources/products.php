@@ -46,4 +46,3 @@ return [
         'restore' => 'Geri Yükle',
     ],
 ];
-

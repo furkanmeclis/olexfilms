@@ -2,17 +2,10 @@
 
 namespace App\Filament\Widgets\Admin;
 
-use App\Enums\OrderStatusEnum;
 use App\Enums\ServiceStatusEnum;
 use App\Enums\UserRoleEnum;
-use App\Filament\Resources\Customers\CustomerResource;
-use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\Services\ServiceResource;
-use App\Filament\Resources\StockItems\StockItemResource;
-use App\Models\Customer;
-use App\Models\Order;
 use App\Models\Service;
-use App\Models\StockMovement;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -25,11 +18,12 @@ class AdminRecentActivitiesWidget extends TableWidget
 
     protected static ?string $heading = 'Son Aktiviteler';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -99,4 +93,3 @@ class AdminRecentActivitiesWidget extends TableWidget
             ->paginated(false);
     }
 }
-

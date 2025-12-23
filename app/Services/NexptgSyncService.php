@@ -41,6 +41,7 @@ class NexptgSyncService
 
                 if (! $externalId) {
                     Log::warning('NexPTG sync: Report without external_id skipped', $reportData);
+
                     continue;
                 }
 
@@ -178,6 +179,7 @@ class NexptgSyncService
 
                 if (! $externalId) {
                     Log::warning('NexPTG sync: History without external_id skipped', $historyData);
+
                     continue;
                 }
 
@@ -242,6 +244,7 @@ class NexptgSyncService
             return Carbon::createFromTimestamp($timestamp);
         } catch (\Exception $e) {
             Log::warning('NexPTG sync: Invalid timestamp', ['timestamp' => $timestamp]);
+
             return null;
         }
     }
@@ -294,4 +297,3 @@ class NexptgSyncService
         return null;
     }
 }
-

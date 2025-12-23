@@ -2,9 +2,7 @@
 
 namespace App\Filament\Forms\Components;
 
-use Closure;
 use Filament\Forms\Components\Field;
-use Filament\Schemas\Components\Utilities\Get;
 
 class ServiceNumberInput extends Field
 {
@@ -15,7 +13,7 @@ class ServiceNumberInput extends Field
         parent::setUp();
 
         $this->default(null);
-        
+
         // Backend validation - unique kontrolü ve stok item kontrolü backend'de yapılacak
         // Frontend'de sadece required kontrolü yapılıyor
         $this->rules([
@@ -25,4 +23,3 @@ class ServiceNumberInput extends Field
         ]);
     }
 }
-

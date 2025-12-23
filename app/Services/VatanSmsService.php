@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Settings\VatanSmsSettings;
-use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -22,6 +21,7 @@ class VatanSmsService
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
         $phone = substr($phone, -10);
+
         return (substr($phone, 0, 1) === '5') ? $phone : null;
     }
 
@@ -46,7 +46,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return [
                 'success' => false,
                 'message' => 'SMS servisi yapılandırılmamış.',
@@ -54,7 +54,7 @@ class VatanSmsService
             ];
         }
 
-        list($formattedPhones, $invalidPhones) = self::filterAndFormatPhones($phones);
+        [$formattedPhones, $invalidPhones] = self::filterAndFormatPhones($phones);
 
         if (empty($formattedPhones)) {
             return [
@@ -77,7 +77,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . '/1toN', $params);
+            ])->post(self::$settings->endpoint.'/1toN', $params);
 
             $responseJson = $response->json();
             $isSuccessful = $response->successful();
@@ -99,7 +99,7 @@ class VatanSmsService
                 // Direkt response yapısı
                 $cacheData = $responseJson;
             }
-            
+
             if ($isSuccessful && $cacheData !== null) {
                 self::updateCacheFromResponse($cacheData);
             }
@@ -108,7 +108,7 @@ class VatanSmsService
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'message' => 'SMS gönderilirken hata oluştu: ' . $e->getMessage(),
+                'message' => 'SMS gönderilirken hata oluştu: '.$e->getMessage(),
                 'response' => null,
                 'invalidPhones' => $invalidPhones,
             ];
@@ -124,7 +124,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -135,7 +135,7 @@ class VatanSmsService
 
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
-        ])->post(self::$settings->endpoint . '/senders', $params);
+        ])->post(self::$settings->endpoint.'/senders', $params);
 
         return $response->json();
     }
@@ -144,7 +144,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -156,7 +156,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . '/user/information', $params);
+            ])->post(self::$settings->endpoint.'/user/information', $params);
 
             $userInfo = $response->json();
             $isSuccessful = $response->successful();
@@ -172,7 +172,7 @@ class VatanSmsService
                 // Direkt response yapısı
                 $cacheData = $userInfo;
             }
-            
+
             if ($isSuccessful && $cacheData !== null) {
                 self::updateCacheFromUserInfo($cacheData);
             }
@@ -187,7 +187,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -200,7 +200,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . "/report/detail?page={$page}&pageSize={$pageSize}", $params);
+            ])->post(self::$settings->endpoint."/report/detail?page={$page}&pageSize={$pageSize}", $params);
 
             return $response->json();
         } catch (\Exception $e) {
@@ -212,7 +212,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -226,7 +226,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . '/report/between', $params);
+            ])->post(self::$settings->endpoint.'/report/between', $params);
 
             return $response->json();
         } catch (\Exception $e) {
@@ -238,7 +238,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -251,7 +251,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . '/report/single', $params);
+            ])->post(self::$settings->endpoint.'/report/single', $params);
 
             return $response->json();
         } catch (\Exception $e) {
@@ -263,7 +263,7 @@ class VatanSmsService
     {
         self::init();
 
-        if (!self::$settings->installed) {
+        if (! self::$settings->installed) {
             return null;
         }
 
@@ -276,7 +276,7 @@ class VatanSmsService
         try {
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-            ])->post(self::$settings->endpoint . '/cancel/future-sms', $params);
+            ])->post(self::$settings->endpoint.'/cancel/future-sms', $params);
 
             return $response->json();
         } catch (\Exception $e) {
@@ -286,7 +286,7 @@ class VatanSmsService
 
     public static function shortenUrl($url): bool|string
     {
-        $requestUrl = 'https://is.gd/create.php?format=simple&url=' . urlencode($url);
+        $requestUrl = 'https://is.gd/create.php?format=simple&url='.urlencode($url);
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $requestUrl);
@@ -297,10 +297,12 @@ class VatanSmsService
 
         if (curl_errno($ch) || $httpCode != 200) {
             curl_close($ch);
+
             return false;
         }
 
         curl_close($ch);
+
         return $response;
     }
 
@@ -326,4 +328,3 @@ class VatanSmsService
         }
     }
 }
-

@@ -14,17 +14,17 @@ class CarPartPicker extends Field
 
         $this->default([]);
         $this->dehydrated(true);
-        
+
         // Hydrate: JSON string'den array'e çevir
         $this->afterStateHydrated(function (CarPartPicker $component, $state) {
             if (is_string($state)) {
                 $decoded = json_decode($state, true);
                 $component->state(is_array($decoded) ? $decoded : []);
-            } elseif (!is_array($state)) {
+            } elseif (! is_array($state)) {
                 $component->state([]);
             }
         });
-        
+
         // Dehydrate: Array'den JSON string'e çevir (sadece submit anında)
         // NOT: Model'de 'array' cast var, bu yüzden Laravel otomatik encode yapacak
         // Burada sadece array ise olduğu gibi bırak, Laravel model cast'i halledecek
@@ -36,10 +36,11 @@ class CarPartPicker extends Field
             // String ise decode et ve array'e çevir
             if (is_string($state)) {
                 $decoded = json_decode($state, true);
+
                 return is_array($decoded) ? $decoded : [];
             }
+
             return [];
         });
     }
 }
-

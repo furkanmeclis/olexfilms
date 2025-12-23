@@ -12,14 +12,14 @@ class VatanSmsChannel
 {
     public function send($notifiable, Notification $notification)
     {
-        if (!method_exists($notification, 'toSms')) {
+        if (! method_exists($notification, 'toSms')) {
             return;
         }
 
         $message = $notification->toSms($notifiable);
         $phone = $notifiable->phone ?? null;
 
-        if (!$phone) {
+        if (! $phone) {
             return;
         }
 
@@ -56,11 +56,8 @@ class VatanSmsChannel
         ]);
 
         // Cache'i güncelle
-        if ($result['success'] && !empty($responseData)) {
+        if ($result['success'] && ! empty($responseData)) {
             SmsCacheService::updateSmsInfo($responseData);
         }
     }
 }
-
-
-

@@ -16,23 +16,23 @@ class CreateBulkSms extends CreateRecord
     {
         $data['created_by'] = Auth::id();
         $data['status'] = 'draft';
-        
+
         // Sender'ı ayarlardan al (disabled alan form'da gönderilmez)
         $data['sender'] = app(\App\Settings\VatanSmsSettings::class)->sender;
-        
+
         // Yeni yapıya göre target_type ve total_recipients hesapla
         $sendToAll = $data['send_to_all'] ?? false;
         $includeCustomers = $data['include_customers'] ?? false;
         $includeDealers = $data['include_dealers'] ?? false;
-        
+
         // Validation: En az bir seçenek seçilmeli
-        if (!$sendToAll && !$includeCustomers && !$includeDealers) {
+        if (! $sendToAll && ! $includeCustomers && ! $includeDealers) {
             throw new \Illuminate\Validation\ValidationException(
                 validator([], []),
                 ['Hedef seçimi' => ['En az bir hedef seçmelisiniz: Tümüne gönder, Müşteriler veya Bayiler']]
             );
         }
-        
+
         if ($sendToAll) {
             $data['target_type'] = 'all';
         } elseif ($includeCustomers && $includeDealers) {
@@ -42,11 +42,11 @@ class CreateBulkSms extends CreateRecord
         } elseif ($includeDealers) {
             $data['target_type'] = 'dealers';
         }
-        
+
         // Tüm durumlarda total_recipients job'da hesaplanacak (tüm kayıtlar getirilecek)
         $data['total_recipients'] = 0;
         $data['target_ids'] = null; // Artık kullanılmıyor
-        
+
         // Form'dan gelen toggle değerlerini kaldır
         unset($data['send_to_all'], $data['include_customers'], $data['include_dealers']);
 

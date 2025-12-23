@@ -55,7 +55,7 @@ class ListStockItems extends ListRecords
                 ->action(function (array $data) {
                     $product = Product::findOrFail($data['product_id']);
                     $barcodesText = $data['barcodes'];
-                    
+
                     // Barkodları parse et (virgül veya yeni satır ile ayrılmış)
                     $barcodes = preg_split('/[,\n\r]+/', $barcodesText);
                     $barcodes = array_map('trim', $barcodes);
@@ -70,6 +70,7 @@ class ListStockItems extends ListRecords
                             // Barkod zaten varsa atla
                             if (StockItem::where('barcode', $barcode)->exists()) {
                                 $skippedCount++;
+
                                 continue;
                             }
 
@@ -99,7 +100,7 @@ class ListStockItems extends ListRecords
                     if ($createdCount > 0) {
                         \Filament\Notifications\Notification::make()
                             ->title('Başarılı')
-                            ->body("{$createdCount} adet stok kalemi eklendi." . ($skippedCount > 0 ? " {$skippedCount} adet barkod zaten mevcut olduğu için atlandı." : ''))
+                            ->body("{$createdCount} adet stok kalemi eklendi.".($skippedCount > 0 ? " {$skippedCount} adet barkod zaten mevcut olduğu için atlandı." : ''))
                             ->success()
                             ->send();
                     } else {

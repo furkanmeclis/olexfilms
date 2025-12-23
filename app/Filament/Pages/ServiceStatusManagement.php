@@ -6,9 +6,9 @@ use App\Enums\UserRoleEnum;
 use App\Models\Service;
 use App\Models\ServiceStatusLog;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
-use Filament\Infolists;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
@@ -16,12 +16,10 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
 class ServiceStatusManagement extends Page implements HasSchemas, HasTable
@@ -55,6 +53,7 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
     public static function canAccess(): bool
     {
         $user = auth()->user();
+
         return $user && $user->hasAnyRole([
             UserRoleEnum::DEALER_OWNER->value,
             UserRoleEnum::DEALER_STAFF->value,
@@ -98,12 +97,13 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
                         ->columnSpanFull(),
                 ])
                 ->action(function (array $data) {
-                    if (!$this->service) {
+                    if (! $this->service) {
                         Notification::make()
                             ->warning()
                             ->title('Hizmet Bulunamadı')
                             ->body('Önce bir hizmet araması yapmalısınız.')
                             ->send();
+
                         return;
                     }
 
@@ -139,19 +139,21 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
                 ->title('Hizmet No Gerekli')
                 ->body('Lütfen bir hizmet numarası girin.')
                 ->send();
+
             return;
         }
 
         $user = auth()->user();
         $service = Service::where('service_no', $serviceNo)->first();
 
-        if (!$service) {
+        if (! $service) {
             Notification::make()
                 ->danger()
                 ->title('Hizmet Bulunamadı')
                 ->body('Girdiğiniz hizmet numarasına ait bir servis bulunamadı.')
                 ->send();
             $this->service = null;
+
             return;
         }
 
@@ -165,15 +167,14 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
             ->send();
     }
 
-
     public function table(Table $table): Table
     {
         return $table
             ->query(function () {
-                if (!$this->service) {
+                if (! $this->service) {
                     return ServiceStatusLog::query()->whereRaw('1 = 0');
                 }
-                
+
                 return ServiceStatusLog::query()->where('service_id', $this->service->id);
             })
             ->columns([
@@ -212,7 +213,7 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
 
     public function getServiceInfolistProperty()
     {
-        if (!$this->service) {
+        if (! $this->service) {
             return null;
         }
 
@@ -224,4 +225,3 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
         );
     }
 }
-

@@ -9,4 +9,3 @@ return [
         'details' => 'Detaylar',
     ],
 ];
-

@@ -6,7 +6,6 @@ use App\Enums\UserRoleEnum;
 use App\Models\Dealer;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class AdminDealerPerformanceChartWidget extends ChartWidget
 {
@@ -14,11 +13,12 @@ class AdminDealerPerformanceChartWidget extends ChartWidget
 
     protected ?string $heading = 'Bayi Performansı';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -58,4 +58,3 @@ class AdminDealerPerformanceChartWidget extends ChartWidget
         return 'bar';
     }
 }
-

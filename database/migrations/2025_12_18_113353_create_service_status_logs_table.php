@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->text('notes')->nullable();
             $table->timestamps();
-            
+
             $table->index(['service_id', 'created_at'], 'srv_status_logs_idx');
             $table->index('user_id', 'user_id_idx');
         });

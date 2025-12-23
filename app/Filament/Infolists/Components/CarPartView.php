@@ -8,4 +8,3 @@ class CarPartView extends Entry
 {
     protected string $view = 'filament.infolists.components.car-part-view';
 }
-

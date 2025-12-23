@@ -33,6 +33,7 @@ class ProductCategoriesTable
                         }
                         $labels = \App\Enums\CarPartEnum::getLabels();
                         $formatted = array_map(fn ($part) => $labels[$part] ?? $part, $state);
+
                         return implode(', ', $formatted);
                     }),
 

@@ -25,6 +25,7 @@ class NotificationSettingsTable
                     ->label('Event')
                     ->formatStateUsing(function ($state): string {
                         $value = $state instanceof NotificationEventEnum ? $state->value : $state;
+
                         return NotificationEventEnum::getLabels()[$value] ?? $value;
                     })
                     ->badge()
@@ -56,11 +57,13 @@ class NotificationSettingsTable
                     ->label('Öncelik')
                     ->formatStateUsing(function ($state): string {
                         $value = $state instanceof NotificationPriorityEnum ? $state->value : $state;
+
                         return NotificationPriorityEnum::getLabels()[$value] ?? $value;
                     })
                     ->badge()
                     ->color(function ($state): string {
                         $value = $state instanceof NotificationPriorityEnum ? $state->value : $state;
+
                         return match ($value) {
                             NotificationPriorityEnum::CRITICAL->value => 'danger',
                             NotificationPriorityEnum::HIGH->value => 'warning',
@@ -76,11 +79,13 @@ class NotificationSettingsTable
                     ->label('Durum')
                     ->formatStateUsing(function ($state): string {
                         $value = $state instanceof NotificationStatusEnum ? $state->value : $state;
+
                         return NotificationStatusEnum::getLabels()[$value] ?? $value;
                     })
                     ->badge()
                     ->color(function ($state): string {
                         $value = $state instanceof NotificationStatusEnum ? $state->value : $state;
+
                         return match ($value) {
                             NotificationStatusEnum::ACTIVE->value => 'success',
                             NotificationStatusEnum::INACTIVE->value => 'gray',

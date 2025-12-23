@@ -45,4 +45,3 @@ return [
         'deliver_order' => 'Teslim Et',
     ],
 ];
-

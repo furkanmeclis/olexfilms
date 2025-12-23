@@ -22,4 +22,3 @@ return [
         'sent_at' => 'Gönderilme Tarihi',
     ],
 ];
-

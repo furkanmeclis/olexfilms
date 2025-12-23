@@ -27,7 +27,7 @@ class CustomersTable
         // İl-İlçe JSON verisini yükle
         $cityData = [];
         $districtData = [];
-        
+
         try {
             $jsonPath = storage_path('il-ilce.json');
             if (File::exists($jsonPath)) {
@@ -36,7 +36,7 @@ class CustomersTable
                     foreach ($jsonData['data'] as $city) {
                         $cityName = $city['il_adi'];
                         $cityData[$cityName] = $cityName;
-                        
+
                         if (isset($city['ilceler']) && is_array($city['ilceler'])) {
                             foreach ($city['ilceler'] as $district) {
                                 $districtName = $district['ilce_adi'];

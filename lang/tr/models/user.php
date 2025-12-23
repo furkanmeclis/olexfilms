@@ -11,4 +11,3 @@ return [
         'is_active' => 'Aktif',
     ],
 ];
-

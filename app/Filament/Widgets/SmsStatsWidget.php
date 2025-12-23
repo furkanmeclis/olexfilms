@@ -22,7 +22,6 @@ class SmsStatsWidget extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-chat-bubble-left-right')
                 ->color($remainingSms && $remainingSms < 100 ? 'danger' : 'success'),
 
-           
             Stat::make('Bugün Gönderilen', $totalSentToday)
                 ->description('Bu gün gönderilen SMS sayısı')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')

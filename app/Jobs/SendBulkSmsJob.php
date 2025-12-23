@@ -9,7 +9,6 @@ use App\Models\SmsLog;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\DB;
 
 class SendBulkSmsJob implements ShouldQueue
 {
@@ -17,14 +16,13 @@ class SendBulkSmsJob implements ShouldQueue
 
     public function __construct(
         public int $bulkSmsId
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {
         $bulkSms = BulkSms::find($this->bulkSmsId);
 
-        if (!$bulkSms || $bulkSms->status !== 'draft') {
+        if (! $bulkSms || $bulkSms->status !== 'draft') {
             return;
         }
 
@@ -36,7 +34,7 @@ class SendBulkSmsJob implements ShouldQueue
 
         // Alıcıları belirle
         $recipients = $this->getRecipients($bulkSms);
-        
+
         // Total recipients'ı güncelle (tümüne gönder durumunda)
         if ($bulkSms->target_type === 'all' && $bulkSms->total_recipients === 0) {
             $bulkSms->update(['total_recipients' => count($recipients)]);
@@ -45,8 +43,9 @@ class SendBulkSmsJob implements ShouldQueue
         // Her alıcı için SMS log kaydı oluştur ve job dispatch et
         foreach ($recipients as $recipient) {
             $phone = $recipient->phone ?? null;
-            if (!$phone) {
+            if (! $phone) {
                 $bulkSms->increment('failed_count');
+
                 continue;
             }
 
@@ -95,11 +94,11 @@ class SendBulkSmsJob implements ShouldQueue
     protected function getAllRecipients(): array
     {
         $recipients = [];
-        
+
         // Tüm müşteriler
         $customers = Customer::whereNotNull('phone')->get();
         $recipients = array_merge($recipients, $customers->all());
-        
+
         // Tüm bayiler (dealer_owner ve dealer_staff)
         $dealers = User::query()
             ->where('is_active', true)
@@ -111,9 +110,9 @@ class SendBulkSmsJob implements ShouldQueue
                 ]);
             })
             ->get();
-        
+
         $recipients = array_merge($recipients, $dealers->all());
-        
+
         return $recipients;
     }
 

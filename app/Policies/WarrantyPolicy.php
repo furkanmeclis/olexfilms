@@ -27,7 +27,7 @@ class WarrantyPolicy
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
         ]);
-        
+
         if ($isAdmin) {
             return true;
         }
@@ -36,6 +36,7 @@ class WarrantyPolicy
         if ($user->dealer) {
             $service = $warranty->service;
             $result = $service && $service->dealer_id === $user->dealer->id;
+
             return $result;
         }
 

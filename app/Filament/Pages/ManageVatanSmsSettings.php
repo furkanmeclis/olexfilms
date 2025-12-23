@@ -7,7 +7,6 @@ use App\Services\VatanSmsService;
 use App\Settings\VatanSmsSettings;
 use BackedEnum;
 use Filament\Forms\Components\Select;
-use UnitEnum;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -18,6 +17,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class ManageVatanSmsSettings extends Page implements HasSchemas
 {
@@ -41,7 +41,7 @@ class ManageVatanSmsSettings extends Page implements HasSchemas
     public static function canAccess(): bool
     {
         $user = Auth::user();
-        
+
         return $user && $user->hasRole(UserRoleEnum::SUPER_ADMIN->value);
     }
 
@@ -94,14 +94,14 @@ class ManageVatanSmsSettings extends Page implements HasSchemas
                             ->label('Gönderici Adı')
                             ->options(function () {
                                 $senders = VatanSmsService::getSenderNames();
-                                
-                                if (!$senders) {
+
+                                if (! $senders) {
                                     return [];
                                 }
-                                
+
                                 // API'den dönen yapı: {"code":200,"status":"success","data":[...]}
                                 $senderList = $senders['data'] ?? $senders['response'] ?? [];
-                                
+
                                 if (is_array($senderList)) {
                                     $options = [];
                                     foreach ($senderList as $sender) {
@@ -109,9 +109,10 @@ class ManageVatanSmsSettings extends Page implements HasSchemas
                                             $options[$sender['sender']] = $sender['sender'];
                                         }
                                     }
+
                                     return $options;
                                 }
-                                
+
                                 return [];
                             })
                             ->searchable()
@@ -146,5 +147,4 @@ class ManageVatanSmsSettings extends Page implements HasSchemas
             ->body('SMS ayarları başarıyla güncellendi.')
             ->send();
     }
-
 }

@@ -4,8 +4,8 @@ namespace App\Filament\Resources\SmsLogs\Tables;
 
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -56,7 +56,7 @@ class SmsLogsTable
                 TextColumn::make('amount')
                     ->label('SMS Adedi')
                     ->numeric()
-                    ->suffix(' Adet')   
+                    ->suffix(' Adet')
                     ->sortable(),
 
                 TextColumn::make('sent_at')

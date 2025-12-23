@@ -81,8 +81,8 @@ class ImportCarDataFromExport extends Command
                 $brandName = $brandData['name'];
 
                 // Try to find logo URL: first by external_id, then by name
-                $logoUrl = $logoLookup['by_external_id'][$externalId] ?? 
-                          $logoLookup['by_name'][strtolower(trim($brandName))] ?? 
+                $logoUrl = $logoLookup['by_external_id'][$externalId] ??
+                          $logoLookup['by_name'][strtolower(trim($brandName))] ??
                           null;
 
                 // If logo URL found in export, download it; otherwise try template URLs
@@ -118,6 +118,7 @@ class ImportCarDataFromExport extends Command
 
                 if (! $brand) {
                     $this->warn("Brand not found for external_id: {$brandData['id']}");
+
                     continue;
                 }
 
@@ -218,6 +219,7 @@ class ImportCarDataFromExport extends Command
 
         if (! file_exists($exportFilePath)) {
             $this->warn("Logo export file not found: {$exportFilePath}. Will use template URLs as fallback.");
+
             return ['by_external_id' => [], 'by_name' => []];
         }
 
@@ -226,6 +228,7 @@ class ImportCarDataFromExport extends Command
 
         if (! $exportData || ! is_array($exportData)) {
             $this->warn('Invalid logo export file format. Will use template URLs as fallback.');
+
             return ['by_external_id' => [], 'by_name' => []];
         }
 
@@ -357,7 +360,7 @@ class ImportCarDataFromExport extends Command
         $totalChunks = count($chunks);
 
         foreach ($chunks as $index => $chunk) {
-            $this->info("Processing chunk ".($index + 1)."/{$totalChunks}...");
+            $this->info('Processing chunk '.($index + 1)."/{$totalChunks}...");
 
             foreach ($chunk as $item) {
                 $uniqueValue = $item[$uniqueKey];
@@ -396,7 +399,6 @@ class ImportCarDataFromExport extends Command
             }
         }
     }
-
 
     /**
      * Download logo from URL and save to storage
@@ -504,4 +506,3 @@ class ImportCarDataFromExport extends Command
         $this->info('Import completed successfully!');
     }
 }
-

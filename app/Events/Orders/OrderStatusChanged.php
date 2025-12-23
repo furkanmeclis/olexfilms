@@ -15,7 +15,5 @@ class OrderStatusChanged
         public Order $order,
         public OrderStatusEnum $oldStatus,
         public OrderStatusEnum $newStatus
-    ) {
-    }
+    ) {}
 }
-

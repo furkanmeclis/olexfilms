@@ -4,9 +4,7 @@ namespace App\Filament\Resources\Orders\Tables;
 
 use App\Enums\OrderStatusEnum;
 use App\Enums\UserRoleEnum;
-use App\Models\Order;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -84,6 +82,7 @@ class OrdersTable
                     })
                     ->visible(function ($record) {
                         $user = Auth::user();
+
                         return $user && $user->hasAnyRole([
                             UserRoleEnum::SUPER_ADMIN->value,
                             UserRoleEnum::CENTER_STAFF->value,

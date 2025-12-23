@@ -103,7 +103,7 @@ class ServicesTable
                             ->label('Yeni Durum')
                             ->options(function ($record) use ($isAdmin) {
                                 $allStatuses = ServiceStatusEnum::getLabels();
-                                
+
                                 if ($isAdmin) {
                                     return $allStatuses;
                                 }
@@ -127,7 +127,7 @@ class ServicesTable
                         $newStatus = ServiceStatusEnum::from($data['status']);
                         $record->status = $newStatus;
 
-                        if ($newStatus === ServiceStatusEnum::COMPLETED && !$record->completed_at) {
+                        if ($newStatus === ServiceStatusEnum::COMPLETED && ! $record->completed_at) {
                             $record->completed_at = now();
                         }
 

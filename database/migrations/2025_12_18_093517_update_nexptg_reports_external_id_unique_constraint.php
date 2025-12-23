@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::table('nexptg_reports', function (Blueprint $table) {
             // Mevcut unique constraint'i kaldır
             $table->dropUnique(['external_id']);
-            
+
             // api_user_id ve external_id kombinasyonu için composite unique constraint ekle
             $table->unique(['api_user_id', 'external_id'], 'nexptg_reports_api_user_external_unique');
         });
@@ -28,7 +28,7 @@ return new class extends Migration
         Schema::table('nexptg_reports', function (Blueprint $table) {
             // Composite unique constraint'i kaldır
             $table->dropUnique('nexptg_reports_api_user_external_unique');
-            
+
             // Eski unique constraint'i geri ekle
             $table->unique('external_id');
         });

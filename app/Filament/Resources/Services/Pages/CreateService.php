@@ -49,7 +49,7 @@ class CreateService extends CreateRecord
     protected function mutateFormDataBeforeValidate(array $data): array
     {
         // Backend validation: Hizmet numarası unique olmalı
-        if (isset($data['service_no']) && !empty($data['service_no'])) {
+        if (isset($data['service_no']) && ! empty($data['service_no'])) {
             $serviceExists = Service::where('service_no', $data['service_no'])->exists();
 
             if ($serviceExists) {
@@ -89,7 +89,7 @@ class CreateService extends CreateRecord
             // Stok item'ın başka bir serviste kullanılıp kullanılmadığını kontrol et
             if ($stockItem->status->value === StockStatusEnum::USED->value) {
                 $otherServiceItem = ServiceItem::where('stock_item_id', $stockItem->id)->first();
-                
+
                 if ($otherServiceItem) {
                     return [
                         'valid' => false,
@@ -100,7 +100,7 @@ class CreateService extends CreateRecord
 
             return [
                 'valid' => true,
-                'message' => 'Hizmet numarası doğrulandı. Stok kalemi: ' . $stockItem->product->name,
+                'message' => 'Hizmet numarası doğrulandı. Stok kalemi: '.$stockItem->product->name,
                 'stock_item_id' => $stockItem->id,
             ];
         }
@@ -119,7 +119,7 @@ class CreateService extends CreateRecord
         $formData = $this->form->getState();
 
         // Hizmet numarası bir stok item'ın barcode'u ise, o stok item'ı servise bağla
-        if (isset($formData['service_no']) && !empty($formData['service_no'])) {
+        if (isset($formData['service_no']) && ! empty($formData['service_no'])) {
             $stockItem = StockItem::where('barcode', $formData['service_no'])->first();
 
             if ($stockItem) {
@@ -151,12 +151,12 @@ class CreateService extends CreateRecord
 
         // Müşteriye SMS bildirimi gönder
         $service->load('customer');
-        
+
         if ($service->customer && $service->customer->phone) {
             // Notification ayarlarını kontrol et (opsiyonel)
             $notificationSettings = $service->customer->notification_settings;
             $smsEnabled = $notificationSettings['sms'] ?? true; // Varsayılan olarak true
-            
+
             if ($smsEnabled) {
                 $service->customer->notify(new ServiceCreatedNotification($service));
             }

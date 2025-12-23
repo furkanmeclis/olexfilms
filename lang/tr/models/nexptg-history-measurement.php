@@ -9,4 +9,3 @@ return [
         'date' => 'Tarih',
     ],
 ];
-

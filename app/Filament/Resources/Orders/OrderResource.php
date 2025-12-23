@@ -39,7 +39,7 @@ class OrderResource extends Resource
         $query = parent::getEloquentQuery();
 
         $user = auth()->user();
-        if ($user && $user->dealer_id && !$user->hasAnyRole(['super_admin', 'center_staff'])) {
+        if ($user && $user->dealer_id && ! $user->hasAnyRole(['super_admin', 'center_staff'])) {
             // Bayi sadece kendi siparişlerini görür
             $query->where('dealer_id', $user->dealer_id);
         }

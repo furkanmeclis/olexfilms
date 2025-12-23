@@ -32,7 +32,7 @@ class CreateDealer extends CreateRecord
         // İl-İlçe JSON verisini yükle
         $cityData = [];
         $cityDistrictMap = [];
-        
+
         try {
             $jsonPath = storage_path('il-ilce.json');
             if (File::exists($jsonPath)) {
@@ -41,7 +41,7 @@ class CreateDealer extends CreateRecord
                     foreach ($jsonData['data'] as $city) {
                         $cityName = $city['il_adi'];
                         $cityData[$cityName] = $cityName;
-                        
+
                         if (isset($city['ilceler']) && is_array($city['ilceler'])) {
                             $districts = [];
                             foreach ($city['ilceler'] as $district) {
@@ -108,11 +108,12 @@ class CreateDealer extends CreateRecord
                                     if ($city && isset($cityDistrictMap[$city])) {
                                         return $cityDistrictMap[$city];
                                     }
+
                                     return [];
                                 })
                                 ->searchable()
                                 ->preload()
-                                ->disabled(fn ($get) => !$get('city'))
+                                ->disabled(fn ($get) => ! $get('city'))
                                 ->nullable(),
                         ])
                         ->columns(2),

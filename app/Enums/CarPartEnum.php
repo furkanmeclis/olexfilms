@@ -116,4 +116,3 @@ enum CarPartEnum: string
         ];
     }
 }
-

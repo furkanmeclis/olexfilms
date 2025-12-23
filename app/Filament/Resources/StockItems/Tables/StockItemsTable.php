@@ -4,7 +4,6 @@ namespace App\Filament\Resources\StockItems\Tables;
 
 use App\Enums\StockLocationEnum;
 use App\Enums\StockStatusEnum;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;

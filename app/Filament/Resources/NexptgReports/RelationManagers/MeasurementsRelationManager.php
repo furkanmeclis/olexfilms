@@ -106,6 +106,7 @@ class MeasurementsRelationManager extends RelationManager
                         if (is_string($state) && isset(NexptgPartTypeEnum::getLabels()[$state])) {
                             return NexptgPartTypeEnum::getLabels()[$state];
                         }
+
                         return $state ?? '-';
                     })
                     ->searchable()
@@ -168,4 +169,3 @@ class MeasurementsRelationManager extends RelationManager
             ->defaultSort('position', 'asc');
     }
 }
-

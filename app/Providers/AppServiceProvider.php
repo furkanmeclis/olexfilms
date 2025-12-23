@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Events\Orders\OrderCancelled;
-use App\Events\Orders\OrderCreated;
 use App\Events\Orders\OrderItemCreated;
 use App\Events\Orders\OrderItemDeleted;
 use App\Events\Orders\OrderItemUpdated;
@@ -12,8 +11,6 @@ use App\Listeners\Orders\HandleOrderCancellation;
 use App\Listeners\Orders\HandleOrderItemDeletion;
 use App\Listeners\Orders\HandleOrderItemStockAssignment;
 use App\Listeners\Orders\HandleOrderStatusChanged;
-use App\Listeners\Orders\SendOrderCreatedNotification;
-use App\Listeners\Orders\SendOrderNotifications;
 use App\Models\Dealer;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -28,12 +25,11 @@ use App\Observers\ServiceItemObserver;
 use App\Observers\ServiceObserver;
 use App\Observers\UserObserver;
 use App\Observers\WarrantyObserver;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\ServiceProvider;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -51,15 +47,15 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
 
-Fieldset::configureUsing(fn (Fieldset $fieldset) => $fieldset
-->columnSpanFull());
+        Fieldset::configureUsing(fn (Fieldset $fieldset) => $fieldset
+            ->columnSpanFull());
 
-Grid::configureUsing(fn (Grid $grid) => $grid
-->columnSpanFull());
+        Grid::configureUsing(fn (Grid $grid) => $grid
+            ->columnSpanFull());
 
-Section::configureUsing(fn (Section $section) => $section
-->columnSpanFull());
-        
+        Section::configureUsing(fn (Section $section) => $section
+            ->columnSpanFull());
+
         // Observer'ları kaydet
         Service::observe(ServiceObserver::class);
         ServiceItem::observe(ServiceItemObserver::class);

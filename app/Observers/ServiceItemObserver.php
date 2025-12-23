@@ -15,7 +15,7 @@ class ServiceItemObserver
     {
         // ServiceItem oluşturulduğunda StockItem'ı RESERVED yap
         $stockItem = $serviceItem->stockItem;
-        
+
         if ($stockItem && $stockItem->status !== StockStatusEnum::RESERVED) {
             $stockItem->update([
                 'status' => StockStatusEnum::RESERVED->value,
@@ -47,7 +47,7 @@ class ServiceItemObserver
     {
         // ServiceItem geri yüklendiğinde StockItem'ı tekrar RESERVED yap
         $stockItem = $serviceItem->stockItem;
-        
+
         if ($stockItem && $stockItem->status === StockStatusEnum::AVAILABLE) {
             $stockItem->update([
                 'status' => StockStatusEnum::RESERVED->value,
@@ -55,4 +55,3 @@ class ServiceItemObserver
         }
     }
 }
-

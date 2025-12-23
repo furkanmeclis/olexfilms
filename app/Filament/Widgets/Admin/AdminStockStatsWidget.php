@@ -4,7 +4,6 @@ namespace App\Filament\Widgets\Admin;
 
 use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
-use App\Models\Product;
 use App\Models\StockItem;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -20,6 +19,7 @@ class AdminStockStatsWidget extends StatsOverviewWidget
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -72,4 +72,3 @@ class AdminStockStatsWidget extends StatsOverviewWidget
         });
     }
 }
-

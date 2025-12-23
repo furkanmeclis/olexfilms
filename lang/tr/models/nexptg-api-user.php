@@ -10,4 +10,3 @@ return [
         'created_by' => 'Oluşturan',
     ],
 ];
-

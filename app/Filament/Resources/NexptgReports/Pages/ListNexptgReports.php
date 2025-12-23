@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\NexptgReports\Pages;
 
 use App\Filament\Resources\NexptgReports\NexptgReportResource;
-use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListNexptgReports extends ListRecords

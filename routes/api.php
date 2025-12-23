@@ -12,4 +12,3 @@ if (app()->environment('local', 'testing')) {
     Route::get('/nexptg/test', [NexptgTestController::class, 'test'])
         ->middleware(['api']);
 }
-

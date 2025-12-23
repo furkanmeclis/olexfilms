@@ -3,17 +3,18 @@
 namespace App\Services;
 
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class PdfService
 {
     private GenerateCarSvg $carSvgService;
+
     private array $logoCache = [];
 
     public function __construct(GenerateCarSvg $carSvgService)
     {
-        $this->carSvgService = $carSvgService; 
+        $this->carSvgService = $carSvgService;
     }
 
     public function generateWarrantyPdf(object $serviceDetails): \Barryvdh\DomPDF\PDF
@@ -65,10 +66,10 @@ class PdfService
             curl_close($ch);
 
             if ($logoData === false || $httpCode !== 200) {
-                throw new \Exception('Failed to fetch logo: HTTP ' . $httpCode);
+                throw new \Exception('Failed to fetch logo: HTTP '.$httpCode);
             }
 
-            $base64Logo = 'data:image/png;base64,' . base64_encode($logoData);
+            $base64Logo = 'data:image/png;base64,'.base64_encode($logoData);
             $this->logoCache[$url] = $base64Logo;
 
             return $base64Logo;
@@ -77,27 +78,28 @@ class PdfService
             $defaultPath = storage_path('pdf_logos/default.png');
             if (file_exists($defaultPath)) {
                 $defaultData = file_get_contents($defaultPath);
-                return 'data:image/png;base64,' . base64_encode($defaultData);
+
+                return 'data:image/png;base64,'.base64_encode($defaultData);
             }
-            
-            throw new \Exception('Failed to fetch logo and no default logo available: ' . $e->getMessage());
+
+            throw new \Exception('Failed to fetch logo and no default logo available: '.$e->getMessage());
         }
     }
 
     private function getStorageLogoBase64(string $path): string
     {
         $fullPath = storage_path($path);
-        $cacheKey = 'storage_logo_' . $path;
+        $cacheKey = 'storage_logo_'.$path;
 
         if (isset($this->logoCache[$cacheKey])) {
             return $this->logoCache[$cacheKey];
         }
 
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             throw new \Exception("Logo file not found: {$path} (checked: {$fullPath})");
         }
 
-        $base64Logo = 'data:image/png;base64,' . base64_encode(file_get_contents($fullPath));
+        $base64Logo = 'data:image/png;base64,'.base64_encode(file_get_contents($fullPath));
         $this->logoCache[$cacheKey] = $base64Logo;
 
         return $base64Logo;
@@ -107,17 +109,17 @@ class PdfService
     {
         // pdf_pages/Page 3.png formatında path geliyor
         $fullPath = storage_path($path);
-        $cacheKey = 'storage_pdf_page_' . $path;
+        $cacheKey = 'storage_pdf_page_'.$path;
 
         if (isset($this->logoCache[$cacheKey])) {
             return $this->logoCache[$cacheKey];
         }
 
-        if (!file_exists($fullPath)) {
+        if (! file_exists($fullPath)) {
             throw new \Exception("PDF page file not found: {$path} (checked: {$fullPath})");
         }
 
-        $base64Page = 'data:image/png;base64,' . base64_encode(file_get_contents($fullPath));
+        $base64Page = 'data:image/png;base64,'.base64_encode(file_get_contents($fullPath));
         $this->logoCache[$cacheKey] = $base64Page;
 
         return $base64Page;
@@ -125,10 +127,10 @@ class PdfService
 
     /**
      * PDF'i cache'den al veya yeni oluştur
-     * 
-     * @param string $serviceNo Servis numarası
-     * @param object $serviceDetails Servis detayları
-     * @param bool $forceGenerate Zorla yeniden oluştur
+     *
+     * @param  string  $serviceNo  Servis numarası
+     * @param  object  $serviceDetails  Servis detayları
+     * @param  bool  $forceGenerate  Zorla yeniden oluştur
      * @return string PDF dosya path'i
      */
     public function getOrGeneratePdf(string $serviceNo, object $serviceDetails, bool $forceGenerate = false): string
@@ -155,7 +157,7 @@ class PdfService
         }
 
         // Dosya yoksa veya eskiyse yeni oluştur
-        if (!$fileExists || $this->isPdfExpired($filePath)) {
+        if (! $fileExists || $this->isPdfExpired($filePath)) {
             return $this->generateAndSavePdf($serviceNo, $serviceDetails, $filePath);
         }
 
@@ -165,30 +167,31 @@ class PdfService
 
     /**
      * PDF dosya path'ini oluştur (tarih ile)
-     * 
-     * @param string $serviceNo Servis numarası
+     *
+     * @param  string  $serviceNo  Servis numarası
      * @return string Dosya path'i
      */
     private function getPdfFilePath(string $serviceNo): string
     {
         $today = Carbon::now()->format('Y-m-d');
         $fileName = "service-{$serviceNo}-{$today}.pdf";
+
         return "service-pdfs/{$fileName}";
     }
 
     /**
      * PDF'in süresi dolmuş mu kontrol et (1 aydan fazla)
-     * 
-     * @param string $filePath Dosya path'i
+     *
+     * @param  string  $filePath  Dosya path'i
      * @return bool True ise süresi dolmuş
      */
     private function isPdfExpired(string $filePath): bool
     {
         $disk = Storage::disk(config('filesystems.default'));
-        
+
         // Dosya var mı kontrol et (S3 için try-catch ile)
         try {
-            if (!$disk->exists($filePath)) {
+            if (! $disk->exists($filePath)) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -197,6 +200,7 @@ class PdfService
                 'path' => $filePath,
                 'error' => $e->getMessage(),
             ]);
+
             return true;
         }
 
@@ -206,7 +210,7 @@ class PdfService
             try {
                 $fileDate = Carbon::parse($matches[1]);
                 $oneMonthAgo = Carbon::now()->subMonth();
-                
+
                 return $fileDate->isBefore($oneMonthAgo);
             } catch (\Exception $e) {
                 // Tarih parse edilemezse eski kabul et
@@ -215,6 +219,7 @@ class PdfService
                     'date' => $matches[1] ?? null,
                     'error' => $e->getMessage(),
                 ]);
+
                 return true;
             }
         }
@@ -225,26 +230,25 @@ class PdfService
 
     /**
      * PDF oluştur ve kaydet
-     * 
-     * @param string $serviceNo Servis numarası
-     * @param object $serviceDetails Servis detayları
-     * @param string $filePath Kaydedilecek dosya path'i
+     *
+     * @param  string  $serviceNo  Servis numarası
+     * @param  object  $serviceDetails  Servis detayları
+     * @param  string  $filePath  Kaydedilecek dosya path'i
      * @return string Kaydedilen dosya path'i
      */
     private function generateAndSavePdf(string $serviceNo, object $serviceDetails, string $filePath): string
     {
         $disk = Storage::disk(config('filesystems.default'));
-        
+
         // PDF oluştur
         $pdf = $this->generateWarrantyPdf($serviceDetails);
-        
+
         // PDF içeriğini al
         $pdfContent = $pdf->output();
-        
+
         // Dosyayı kaydet
         $disk->put($filePath, $pdfContent);
-        
+
         return $filePath;
     }
 }
-

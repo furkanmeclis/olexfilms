@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Service;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class AdminMonthlyTrendsChartWidget extends ChartWidget
 {
@@ -16,11 +15,12 @@ class AdminMonthlyTrendsChartWidget extends ChartWidget
 
     protected ?string $heading = 'Aylık Trendler';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -88,4 +88,3 @@ class AdminMonthlyTrendsChartWidget extends ChartWidget
         return 'line';
     }
 }
-

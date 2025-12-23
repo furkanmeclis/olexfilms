@@ -11,7 +11,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Validation\Rule;
 
 class NotificationSettingForm
 {
@@ -35,12 +34,12 @@ class NotificationSettingForm
                                         if ($role) {
                                             $query = NotificationSetting::where('event', $value)
                                                 ->where('role', $role);
-                                            
+
                                             // Edit sayfasında mevcut kaydı hariç tut
                                             if (isset($livewire->record)) {
                                                 $query->where('id', '!=', $livewire->record->id);
                                             }
-                                            
+
                                             if ($query->exists()) {
                                                 $fail('Bu event ve rol kombinasyonu zaten mevcut.');
                                             }
@@ -68,12 +67,12 @@ class NotificationSettingForm
                                         if ($event) {
                                             $query = NotificationSetting::where('event', $event)
                                                 ->where('role', $value);
-                                            
+
                                             // Edit sayfasında mevcut kaydı hariç tut
                                             if (isset($livewire->record)) {
                                                 $query->where('id', '!=', $livewire->record->id);
                                             }
-                                            
+
                                             if ($query->exists()) {
                                                 $fail('Bu event ve rol kombinasyonu zaten mevcut.');
                                             }

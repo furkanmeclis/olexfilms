@@ -12,13 +12,12 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class ServiceReportsWidget extends TableWidget
 {
     public ?Model $record = null;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -108,7 +107,7 @@ class ServiceReportsWidget extends TableWidget
                     ->action(function (NexptgReport $record) {
                         if ($this->record instanceof Service) {
                             $this->record->reports()->detach($record->id);
-                            
+
                             \Filament\Notifications\Notification::make()
                                 ->title('Eşleşme kaldırıldı')
                                 ->success()
@@ -137,4 +136,3 @@ class ServiceReportsWidget extends TableWidget
         return "Ölçüm Eşleştirmeleri ({$beforeCount} Öncesi, {$afterCount} Sonrası)";
     }
 }
-

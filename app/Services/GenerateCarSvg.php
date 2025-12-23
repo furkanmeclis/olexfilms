@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Routing\UrlGenerator;
+use Illuminate\Foundation\Application;
 
 class GenerateCarSvg
 {
@@ -121,4 +121,3 @@ class GenerateCarSvg
         return 'data:image/svg+xml;base64,'.$base64;
     }
 }
-

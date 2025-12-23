@@ -9,4 +9,3 @@ class ListWarranties extends ListRecords
 {
     protected static string $resource = WarrantyResource::class;
 }
-

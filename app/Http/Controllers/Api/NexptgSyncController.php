@@ -14,8 +14,7 @@ class NexptgSyncController extends Controller
 {
     public function __construct(
         protected NexptgSyncService $syncService
-    ) {
-    }
+    ) {}
 
     /**
      * Handle NexPTG sync POST request
@@ -37,7 +36,7 @@ class NexptgSyncController extends Controller
                     $apiUser->logError(
                         NexptgApiLogTypeEnum::VALIDATION_ERROR->value,
                         400,
-                        'Validation failed: ' . $validator->errors()->first(),
+                        'Validation failed: '.$validator->errors()->first(),
                         [
                             'validation_errors' => $validator->errors()->toArray(),
                             'endpoint' => $request->path(),
@@ -80,7 +79,7 @@ class NexptgSyncController extends Controller
                 $apiUser->logError(
                     NexptgApiLogTypeEnum::EXCEPTION->value,
                     500,
-                    'Sync exception: ' . $e->getMessage(),
+                    'Sync exception: '.$e->getMessage(),
                     [
                         'exception_type' => get_class($e),
                         'exception_message' => $e->getMessage(),
@@ -106,7 +105,7 @@ class NexptgSyncController extends Controller
     private function getRequestDataSample(Request $request): array
     {
         $data = $request->all();
-        
+
         // Limit array size and remove potentially large nested arrays
         if (isset($data['data']['reports']) && is_array($data['data']['reports'])) {
             $data['data']['reports'] = [

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Customers\Pages;
 
-use App\Enums\UserRoleEnum;
 use App\Filament\Resources\Customers\CustomerResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
@@ -19,7 +18,7 @@ class CreateCustomer extends CreateRecord
         $data['created_by'] = $user->id;
 
         // Bayi için dealer_id otomatik set edilir (eğer form'da yoksa)
-        if ($user && $user->dealer_id && !isset($data['dealer_id'])) {
+        if ($user && $user->dealer_id && ! isset($data['dealer_id'])) {
             $data['dealer_id'] = $user->dealer_id;
         }
 

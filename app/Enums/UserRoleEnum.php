@@ -9,4 +9,3 @@ enum UserRoleEnum: string
     case DEALER_OWNER = 'dealer_owner';
     case DEALER_STAFF = 'dealer_staff';
 }
-

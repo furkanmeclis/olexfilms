@@ -71,4 +71,3 @@ return [
         'match_report' => 'Rapor Eşleştir',
     ],
 ];
-

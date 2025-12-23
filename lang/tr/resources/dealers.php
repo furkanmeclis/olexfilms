@@ -59,4 +59,3 @@ return [
         'delete' => 'Sil',
     ],
 ];
-

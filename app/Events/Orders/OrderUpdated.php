@@ -12,7 +12,5 @@ class OrderUpdated
 
     public function __construct(
         public Order $order
-    ) {
-    }
+    ) {}
 }
-

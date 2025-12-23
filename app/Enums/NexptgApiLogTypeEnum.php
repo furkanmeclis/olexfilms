@@ -24,5 +24,3 @@ enum NexptgApiLogTypeEnum: string
         ];
     }
 }
-
-

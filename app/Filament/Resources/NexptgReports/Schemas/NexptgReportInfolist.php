@@ -109,7 +109,7 @@ class NexptgReportInfolist
                             ->placeholder('Yorum eklenmemiş')
                             ->columnSpanFull(),
                     ])
-                    ->visible(fn ($record) => !empty($record->comment)),
+                    ->visible(fn ($record) => ! empty($record->comment)),
 
                 Section::make('API Bilgileri')
                     ->schema([
@@ -156,4 +156,3 @@ class NexptgReportInfolist
             ]);
     }
 }
-

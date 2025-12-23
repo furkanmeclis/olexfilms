@@ -25,7 +25,7 @@ class WarrantyController extends Controller
                 ])
                 ->first();
 
-            if (!$service) {
+            if (! $service) {
                 return Inertia::render('Warranty/Error', [
                     'serviceNo' => $serviceNo,
                 ]);
@@ -37,14 +37,14 @@ class WarrantyController extends Controller
 
             foreach ($service->items as $item) {
                 // Null check'ler
-                if (!$item->stockItem || !$item->stockItem->product || !$item->stockItem->product->category) {
+                if (! $item->stockItem || ! $item->stockItem->product || ! $item->stockItem->product->category) {
                     continue;
                 }
 
                 $category = $item->stockItem->product->category;
                 $categoryName = $category->name ?? 'Bilinmeyen Kategori';
-                
-                if (!isset($itemsByCategory[$categoryName])) {
+
+                if (! isset($itemsByCategory[$categoryName])) {
                     $itemsByCategory[$categoryName] = [];
                 }
 
@@ -61,7 +61,7 @@ class WarrantyController extends Controller
             foreach ($itemsByCategory as $categoryName => $items) {
                 $warranties = array_unique(array_column($items, 'warranty'));
                 $names = array_column($items, 'name');
-                
+
                 $appliedServices[] = [
                     'category' => $categoryName,
                     'name' => implode(', ', $names),
@@ -75,15 +75,15 @@ class WarrantyController extends Controller
             $brandLogo = null;
             if ($service->carBrand && $service->carBrand->logo) {
                 $logoPath = $service->carBrand->logo;
-                
+
                 // Eğer tam URL ise direkt kullan
                 if (str_starts_with($logoPath, 'http')) {
                     $brandLogo = $logoPath;
-                } 
+                }
                 // Eğer / ile başlıyorsa direkt kullan
                 elseif (str_starts_with($logoPath, '/')) {
                     $brandLogo = $logoPath;
-                } 
+                }
                 // Storage path ise getFileUrl() kullan
                 else {
                     $brandLogo = $this->getFileUrl($logoPath);
@@ -114,7 +114,7 @@ class WarrantyController extends Controller
             ]);
         } catch (\Exception $e) {
             // Hataları logla
-            \Log::error('WarrantyController Error: ' . $e->getMessage(), [
+            \Log::error('WarrantyController Error: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'service_no' => $serviceNo,
             ]);
@@ -129,23 +129,23 @@ class WarrantyController extends Controller
 
     /**
      * Get file URL with temporaryUrl support for cloud disks
-     * 
-     * @param string $path File path in storage
+     *
+     * @param  string  $path  File path in storage
      * @return string|null File URL or null if file doesn't exist
      */
     private function getFileUrl(string $path): ?string
     {
         $defaultDisk = config('filesystems.default');
         $disk = Storage::disk($defaultDisk);
-        
+
         // Check if file exists
-        if (!$disk->exists($path)) {
+        if (! $disk->exists($path)) {
             return null;
         }
-        
+
         // Get disk driver
         $driver = config("filesystems.disks.{$defaultDisk}.driver");
-        
+
         // Cloud disk'lerde (s3, etc.) temporaryUrl kullan
         if (in_array($driver, ['s3'])) {
             try {
@@ -155,7 +155,7 @@ class WarrantyController extends Controller
                 return $disk->url($path);
             }
         }
-        
+
         // Local disk'lerde normal url
         return $disk->url($path);
     }
@@ -174,7 +174,7 @@ class WarrantyController extends Controller
                 ])
                 ->first();
 
-            if (!$service) {
+            if (! $service) {
                 abort(404, 'Service not found');
             }
 
@@ -184,14 +184,14 @@ class WarrantyController extends Controller
 
             foreach ($service->items as $item) {
                 // Null check'ler
-                if (!$item->stockItem || !$item->stockItem->product || !$item->stockItem->product->category) {
+                if (! $item->stockItem || ! $item->stockItem->product || ! $item->stockItem->product->category) {
                     continue;
                 }
 
                 $category = $item->stockItem->product->category;
                 $categoryName = $category->name ?? 'Bilinmeyen Kategori';
-                
-                if (!isset($itemsByCategory[$categoryName])) {
+
+                if (! isset($itemsByCategory[$categoryName])) {
                     $itemsByCategory[$categoryName] = [];
                 }
 
@@ -221,15 +221,15 @@ class WarrantyController extends Controller
             $brandLogo = null;
             if ($service->carBrand && $service->carBrand->logo) {
                 $logoPath = $service->carBrand->logo;
-                
+
                 // Eğer tam URL ise direkt kullan
                 if (str_starts_with($logoPath, 'http')) {
                     $brandLogo = $logoPath;
-                } 
+                }
                 // Eğer / ile başlıyorsa direkt kullan
                 elseif (str_starts_with($logoPath, '/')) {
                     $brandLogo = $logoPath;
-                } 
+                }
                 // Storage path ise getFileUrl() kullan
                 else {
                     $brandLogo = $this->getFileUrl($logoPath);
@@ -259,24 +259,24 @@ class WarrantyController extends Controller
             $pdfPath = $pdfService->getOrGeneratePdf($serviceNo, $serviceDetails, $forceGenerate);
 
             // PDF dosyasını oku ve stream et
-            if (!$disk->exists($pdfPath)) {
+            if (! $disk->exists($pdfPath)) {
                 abort(500, 'PDF dosyası bulunamadı');
             }
 
             $pdfContent = $disk->get($pdfPath);
-            $fileName = 'service-' . $serviceNo . '.pdf';
+            $fileName = 'service-'.$serviceNo.'.pdf';
 
             return response($pdfContent, 200)
                 ->header('Content-Type', 'application/pdf')
-                ->header('Content-Disposition', 'inline; filename="' . $fileName . '"');
+                ->header('Content-Disposition', 'inline; filename="'.$fileName.'"');
         } catch (\Exception $e) {
             // Hataları logla
-            \Log::error('WarrantyController PDF Error: ' . $e->getMessage(), [
+            \Log::error('WarrantyController PDF Error: '.$e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'service_no' => $serviceNo,
             ]);
 
-            abort(500, 'PDF oluşturulurken bir hata oluştu: ' . $e->getMessage());
+            abort(500, 'PDF oluşturulurken bir hata oluştu: '.$e->getMessage());
         }
     }
 
@@ -293,7 +293,7 @@ class WarrantyController extends Controller
         $afterReport = $service->afterReports()->with('measurements')->first();
 
         // Eğer hiç ölçüm yoksa boş array döndür
-        if (!$beforeReport && !$afterReport) {
+        if (! $beforeReport && ! $afterReport) {
             return [
                 'before' => ['measurements' => [], 'unit_of_measure' => null],
                 'after' => ['measurements' => [], 'unit_of_measure' => null],
@@ -312,16 +312,16 @@ class WarrantyController extends Controller
             foreach ($beforeReport->measurements as $measurement) {
                 $placeId = $measurement->place_id ?? null;
                 $partType = $measurement->part_type->value ?? null;
-                
-                if (!$placeId || !$partType) {
+
+                if (! $placeId || ! $partType) {
                     continue;
                 }
 
-                if (!isset($placeGroups[$placeId])) {
+                if (! isset($placeGroups[$placeId])) {
                     $placeGroups[$placeId] = [];
                 }
 
-                if (!isset($placeGroups[$placeId][$partType])) {
+                if (! isset($placeGroups[$placeId][$partType])) {
                     $placeGroups[$placeId][$partType] = [
                         'before_positions' => [1 => null, 2 => null, 3 => null, 4 => null, 5 => null],
                         'after_positions' => [1 => null, 2 => null, 3 => null, 4 => null, 5 => null],
@@ -354,16 +354,16 @@ class WarrantyController extends Controller
             foreach ($afterReport->measurements as $measurement) {
                 $placeId = $measurement->place_id ?? null;
                 $partType = $measurement->part_type->value ?? null;
-                
-                if (!$placeId || !$partType) {
+
+                if (! $placeId || ! $partType) {
                     continue;
                 }
 
-                if (!isset($placeGroups[$placeId])) {
+                if (! isset($placeGroups[$placeId])) {
                     $placeGroups[$placeId] = [];
                 }
 
-                if (!isset($placeGroups[$placeId][$partType])) {
+                if (! isset($placeGroups[$placeId][$partType])) {
                     $placeGroups[$placeId][$partType] = [
                         'before_positions' => [1 => null, 2 => null, 3 => null, 4 => null, 5 => null],
                         'after_positions' => [1 => null, 2 => null, 3 => null, 4 => null, 5 => null],
@@ -402,39 +402,39 @@ class WarrantyController extends Controller
                 $afterValues = $data['after_values'] ?? [];
 
                 // BEFORE measurements için veri hazırla
-                $hasBeforeData = !empty($beforeValues) || array_filter($data['before_positions'], fn($val) => $val !== null);
+                $hasBeforeData = ! empty($beforeValues) || array_filter($data['before_positions'], fn ($val) => $val !== null);
                 if ($hasBeforeData) {
                     $beforePlaceMeasurements[] = [
                         'part_type' => $partType,
                         'part_label' => $partLabels[$partType] ?? $partType,
-                        'substrate_type' => !empty($data['substrate_types']) 
+                        'substrate_type' => ! empty($data['substrate_types'])
                             ? implode(' + ', array_keys($data['substrate_types']))
                             : '-',
-                        'min_value' => !empty($beforeValues) ? min($beforeValues) : null,
-                        'max_value' => !empty($beforeValues) ? max($beforeValues) : null,
-                        'avg_value' => !empty($beforeValues) ? round(array_sum($beforeValues) / count($beforeValues), 1) : null,
+                        'min_value' => ! empty($beforeValues) ? min($beforeValues) : null,
+                        'max_value' => ! empty($beforeValues) ? max($beforeValues) : null,
+                        'avg_value' => ! empty($beforeValues) ? round(array_sum($beforeValues) / count($beforeValues), 1) : null,
                         'positions' => $data['before_positions'],
                     ];
                 }
 
                 // AFTER measurements için veri hazırla
-                $hasAfterData = !empty($afterValues) || array_filter($data['after_positions'], fn($val) => $val !== null);
+                $hasAfterData = ! empty($afterValues) || array_filter($data['after_positions'], fn ($val) => $val !== null);
                 if ($hasAfterData) {
                     $afterPlaceMeasurements[] = [
                         'part_type' => $partType,
                         'part_label' => $partLabels[$partType] ?? $partType,
-                        'substrate_type' => !empty($data['substrate_types']) 
+                        'substrate_type' => ! empty($data['substrate_types'])
                             ? implode(' + ', array_keys($data['substrate_types']))
                             : '-',
-                        'min_value' => !empty($afterValues) ? min($afterValues) : null,
-                        'max_value' => !empty($afterValues) ? max($afterValues) : null,
-                        'avg_value' => !empty($afterValues) ? round(array_sum($afterValues) / count($afterValues), 1) : null,
+                        'min_value' => ! empty($afterValues) ? min($afterValues) : null,
+                        'max_value' => ! empty($afterValues) ? max($afterValues) : null,
+                        'avg_value' => ! empty($afterValues) ? round(array_sum($afterValues) / count($afterValues), 1) : null,
                         'positions' => $data['after_positions'],
                     ];
                 }
             }
 
-            if (!empty($beforePlaceMeasurements)) {
+            if (! empty($beforePlaceMeasurements)) {
                 $beforeMeasurementsByPlace[] = [
                     'place_id' => $placeId,
                     'place_label' => $placeLabels[$placeId] ?? strtoupper($placeId),
@@ -442,7 +442,7 @@ class WarrantyController extends Controller
                 ];
             }
 
-            if (!empty($afterPlaceMeasurements)) {
+            if (! empty($afterPlaceMeasurements)) {
                 $afterMeasurementsByPlace[] = [
                     'place_id' => $placeId,
                     'place_label' => $placeLabels[$placeId] ?? strtoupper($placeId),
@@ -469,28 +469,29 @@ class WarrantyController extends Controller
 
     private function formatWarranty($warranty): string
     {
-        if (!$warranty || !$warranty->end_date) {
+        if (! $warranty || ! $warranty->end_date) {
             return 'Garanti yok';
         }
 
         $now = now();
         $endDate = $warranty->end_date;
-        
+
         if ($now->greaterThan($endDate)) {
             return 'X Garanti süresi doldu';
         }
 
         $daysRemaining = $now->diffInDays($endDate);
-        
+
         if ($daysRemaining >= 365) {
             $years = floor($daysRemaining / 365);
-            return $years . ' yıl garanti';
+
+            return $years.' yıl garanti';
         } elseif ($daysRemaining >= 30) {
             $months = floor($daysRemaining / 30);
-            return $months . ' ay garanti';
+
+            return $months.' ay garanti';
         } else {
-            return $daysRemaining . ' gün garanti';
+            return $daysRemaining.' gün garanti';
         }
     }
 }
-

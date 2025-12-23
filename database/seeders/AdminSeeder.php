@@ -47,8 +47,3 @@ class AdminSeeder extends Seeder
         $this->command->info('Şifre: password');
     }
 }
-
-
-
-
-

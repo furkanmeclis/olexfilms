@@ -12,7 +12,5 @@ class OrderItemDeleted
 
     public function __construct(
         public OrderItem $orderItem
-    ) {
-    }
+    ) {}
 }
-

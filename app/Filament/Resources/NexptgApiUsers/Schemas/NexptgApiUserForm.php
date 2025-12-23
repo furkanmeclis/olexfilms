@@ -27,6 +27,7 @@ class NexptgApiUserForm
                                     return $query->whereDoesntHave('nexptgApiUser')
                                         ->orWhere('id', $record->user_id);
                                 }
+
                                 // Create modunda sadece API user'ı olmayanları göster
                                 return $query->whereDoesntHave('nexptgApiUser');
                             })
@@ -44,7 +45,7 @@ class NexptgApiUserForm
                                     ->label('Rastgele Üret')
                                     ->icon('heroicon-m-sparkles')
                                     ->action(function ($set) {
-                                        $set('username', strtolower(env("APP_NAME")).'_' . Str::random(16));
+                                        $set('username', strtolower(env('APP_NAME')).'_'.Str::random(16));
                                     })
                             ),
 

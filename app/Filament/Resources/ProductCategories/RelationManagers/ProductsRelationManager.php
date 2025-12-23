@@ -4,20 +4,15 @@ namespace App\Filament\Resources\ProductCategories\RelationManagers;
 
 use App\Filament\Resources\Products\Schemas\ProductForm;
 use App\Filament\Resources\Products\Tables\ProductsTable;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -47,12 +42,14 @@ class ProductsRelationManager extends RelationManager
                             return Hidden::make('category_id')
                                 ->default(fn () => $this->ownerRecord->id);
                         }
+
                         return $field;
                     })->toArray();
 
                     return $component->schema($sectionComponents);
                 }
             }
+
             return $component;
         })->toArray();
 

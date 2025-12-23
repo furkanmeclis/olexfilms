@@ -18,4 +18,3 @@ return [
         'notification_settings' => 'Bildirim Ayarları',
     ],
 ];
-

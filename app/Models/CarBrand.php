@@ -54,10 +54,11 @@ class CarBrand extends Model
     {
         $query->where('is_active', true);
     }
+
     public function getLogoUrlAttribute(): string
     {
         $disk = config('filesystems.default');
-        if ($disk === "s3") {
+        if ($disk === 's3') {
             try {
                 return Storage::disk($disk)->temporaryUrl($this->logo, now()->addHours(5));
             } catch (\Exception $e) {

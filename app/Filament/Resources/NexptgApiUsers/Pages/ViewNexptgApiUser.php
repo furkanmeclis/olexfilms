@@ -22,11 +22,11 @@ class ViewNexptgApiUser extends ViewRecord
                 ->modalHeading('API Kullanıcısını Sil')
                 ->modalDescription(function ($record) {
                     $reportsCount = $record->reports()->count();
-                    
+
                     if ($reportsCount > 0) {
                         return "Bu API kullanıcısının {$reportsCount} adet raporu bulunmaktadır. Silme işlemi devam ederse bu raporlar silinmeyecektir, ancak API kullanıcı bağlantısı kaldırılacaktır. Devam etmek istediğinize emin misiniz?";
                     }
-                    
+
                     return 'Bu API kullanıcısını silmek istediğinize emin misiniz?';
                 })
                 ->modalSubmitActionLabel('Evet, Sil')

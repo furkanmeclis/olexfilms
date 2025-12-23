@@ -21,6 +21,3 @@ class VatanSmsSettings extends Settings
         return 'vatan_sms';
     }
 }
-
-
-

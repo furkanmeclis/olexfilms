@@ -8,26 +8,26 @@ use App\Filament\Resources\Services\Pages\CreateService;
 use App\Filament\Resources\Services\Pages\EditService;
 use App\Filament\Resources\Services\Pages\ListServices;
 use App\Filament\Resources\Services\Pages\ViewService;
-use App\Filament\Resources\Services\RelationManagers\ServiceItemsRelationManager;
 use App\Filament\Resources\Services\Schemas\ServiceForm;
 use App\Filament\Resources\Services\Tables\ServicesTable;
 use App\Models\Service;
 use BackedEnum;
-use UnitEnum;
 use Filament\Infolists;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class ServiceResource extends Resource
 {
     protected static ?string $model = Service::class;
 
     protected static ?string $navigationLabel = 'Hizmetler';
+
     protected static UnitEnum|string|null $navigationGroup = 'Hizmet Yönetimi';
- 
+
     protected static ?string $modelLabel = 'Hizmet';
 
     protected static ?string $pluralModelLabel = 'Hizmetler';
@@ -46,7 +46,7 @@ class ServiceResource extends Resource
         $query = parent::getEloquentQuery();
 
         $user = auth()->user();
-        if ($user && $user->dealer_id && !$user->hasAnyRole(['super_admin', 'center_staff'])) {
+        if ($user && $user->dealer_id && ! $user->hasAnyRole(['super_admin', 'center_staff'])) {
             // Bayi sadece kendi hizmetlerini görür
             $query->where('dealer_id', $user->dealer_id);
         }
@@ -95,7 +95,7 @@ class ServiceResource extends Resource
 
                         Infolists\Components\TextEntry::make('items_count')
                             ->label('Kullanılan Ürün Sayısı')
-                            ->formatStateUsing(fn ($record) => $record->items()->count() . ' ürün')
+                            ->formatStateUsing(fn ($record) => $record->items()->count().' ürün')
                             ->badge()
                             ->color('info')
                             ->icon('heroicon-o-cube')
@@ -103,7 +103,7 @@ class ServiceResource extends Resource
 
                         Infolists\Components\TextEntry::make('images_count')
                             ->label('Galeri Görsel Sayısı')
-                            ->formatStateUsing(fn ($record) => $record->images()->count() . ' görsel')
+                            ->formatStateUsing(fn ($record) => $record->images()->count().' görsel')
                             ->badge()
                             ->color('success')
                             ->icon('heroicon-o-photo')
@@ -124,13 +124,13 @@ class ServiceResource extends Resource
                         Infolists\Components\TextEntry::make('customer.phone')
                             ->label('Telefon')
                             ->icon('heroicon-o-phone')
-                            ->url(fn ($record) => $record->customer ? 'tel:' . $record->customer->phone : null)
+                            ->url(fn ($record) => $record->customer ? 'tel:'.$record->customer->phone : null)
                             ->openUrlInNewTab(false),
 
                         Infolists\Components\TextEntry::make('customer.email')
                             ->label('E-posta')
                             ->icon('heroicon-o-envelope')
-                            ->url(fn ($record) => $record->customer && $record->customer->email ? 'mailto:' . $record->customer->email : null)
+                            ->url(fn ($record) => $record->customer && $record->customer->email ? 'mailto:'.$record->customer->email : null)
                             ->openUrlInNewTab(false)
                             ->placeholder('E-posta yok'),
 
@@ -205,8 +205,10 @@ class ServiceResource extends Resource
                                     if (str_starts_with($logoPath, 'storage/')) {
                                         return asset($logoPath);
                                     }
-                                    return asset('storage/' . $logoPath);
+
+                                    return asset('storage/'.$logoPath);
                                 }
+
                                 return null;
                             })
                             ->circular()
@@ -246,7 +248,7 @@ class ServiceResource extends Resource
 
                         Infolists\Components\TextEntry::make('km')
                             ->label('Kilometre')
-                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '.') . ' km' : 'Girilmemiş')
+                            ->formatStateUsing(fn ($state) => $state ? number_format($state, 0, ',', '.').' km' : 'Girilmemiş')
                             ->icon('heroicon-o-map-pin'),
                     ])
                     ->columns(2)
@@ -343,7 +345,7 @@ class ServiceResource extends Resource
                     ->schema([
                         Infolists\Components\TextEntry::make('warranties_count')
                             ->label('Toplam Garanti Sayısı')
-                            ->formatStateUsing(fn ($record) => $record->warranties()->count() . ' garanti')
+                            ->formatStateUsing(fn ($record) => $record->warranties()->count().' garanti')
                             ->badge()
                             ->color('info')
                             ->icon('heroicon-o-shield-check')
@@ -351,7 +353,7 @@ class ServiceResource extends Resource
 
                         Infolists\Components\TextEntry::make('active_warranties_count')
                             ->label('Aktif Garanti Sayısı')
-                            ->formatStateUsing(fn ($record) => $record->warranties()->where('is_active', true)->count() . ' aktif')
+                            ->formatStateUsing(fn ($record) => $record->warranties()->where('is_active', true)->count().' aktif')
                             ->badge()
                             ->color('success')
                             ->icon('heroicon-o-check-circle')
@@ -362,7 +364,7 @@ class ServiceResource extends Resource
                             ->formatStateUsing(fn ($record) => $record->warranties()
                                 ->where('is_active', true)
                                 ->where('end_date', '<', now()->startOfDay())
-                                ->count() . ' süresi dolmuş')
+                                ->count().' süresi dolmuş')
                             ->badge()
                             ->color('danger')
                             ->icon('heroicon-o-clock')
@@ -391,7 +393,7 @@ class ServiceResource extends Resource
 
                                 Infolists\Components\TextEntry::make('days_remaining')
                                     ->label('Kalan Gün')
-                                    ->formatStateUsing(fn ($state) => $state !== null 
+                                    ->formatStateUsing(fn ($state) => $state !== null
                                         ? ($state > 0 ? "{$state} gün" : 'Süresi dolmuş')
                                         : 'Bilinmiyor')
                                     ->badge()
@@ -406,11 +408,11 @@ class ServiceResource extends Resource
                                 Infolists\Components\TextEntry::make('is_active')
                                     ->label('Durum')
                                     ->badge()
-                                    ->formatStateUsing(fn ($state, $record) => $state 
+                                    ->formatStateUsing(fn ($state, $record) => $state
                                         ? ($record->is_expired ? 'Süresi Dolmuş' : 'Aktif')
                                         : 'Pasif')
                                     ->color(fn ($state, $record) => match (true) {
-                                        !$state => 'gray',
+                                        ! $state => 'gray',
                                         $record->is_expired => 'danger',
                                         default => 'success',
                                     }),

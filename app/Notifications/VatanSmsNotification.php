@@ -24,6 +24,3 @@ class VatanSmsNotification extends Notification
         return $this->message;
     }
 }
-
-
-

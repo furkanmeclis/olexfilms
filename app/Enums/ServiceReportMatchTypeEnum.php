@@ -22,12 +22,9 @@ enum ServiceReportMatchTypeEnum: string
 
     /**
      * Get the label for this enum case
-     *
-     * @return string
      */
     public function getLabel(): string
     {
         return self::getLabels()[$this->value] ?? $this->value;
     }
 }
-

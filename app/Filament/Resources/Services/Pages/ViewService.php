@@ -239,7 +239,8 @@ class ViewService extends ViewRecord
                             ->orderBy('date', 'desc')
                             ->get()
                             ->mapWithKeys(function ($report) {
-                                $label = $report->name . ' - ' . ($report->date ? $report->date->format('d.m.Y H:i') : 'Tarih yok');
+                                $label = $report->name.' - '.($report->date ? $report->date->format('d.m.Y H:i') : 'Tarih yok');
+
                                 return [$report->id => $label];
                             })
                             ->toArray();
@@ -256,8 +257,8 @@ class ViewService extends ViewRecord
             ])
             ->action(function (array $data) use ($record) {
                 $report = NexptgReport::find($data['nexptg_report_id']);
-                
-                if ($report && !$report->isMatched()) {
+
+                if ($report && ! $report->isMatched()) {
                     $record->reports()->attach($report->id, [
                         'match_type' => $data['match_type'],
                     ]);
@@ -286,4 +287,3 @@ class ViewService extends ViewRecord
         ];
     }
 }
-

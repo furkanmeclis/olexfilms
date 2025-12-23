@@ -5,7 +5,6 @@ namespace App\Filament\Resources\NotificationSettings;
 use App\Filament\Resources\NotificationSettings\Pages\CreateNotificationSetting;
 use App\Filament\Resources\NotificationSettings\Pages\EditNotificationSetting;
 use App\Filament\Resources\NotificationSettings\Pages\ListNotificationSettings;
-use App\Filament\Resources\NotificationSettings\Pages\ViewNotificationSetting;
 use App\Filament\Resources\NotificationSettings\Schemas\NotificationSettingForm;
 use App\Filament\Resources\NotificationSettings\Tables\NotificationSettingsTable;
 use App\Models\NotificationSetting;

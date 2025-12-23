@@ -205,7 +205,7 @@ return [
         'TARİH' => 'Tarih',
         'KATEGORİ' => 'Kategori',
         'MARKA' => 'Marka',
-        
+
         // Product
         'category_id' => 'Kategori',
         'name' => 'Ad',
@@ -216,7 +216,7 @@ return [
         'price' => 'Fiyat',
         'image_path' => 'Görsel',
         'is_active' => 'Aktif',
-        
+
         // Dealer
         'dealer_code' => 'Bayi Kodu',
         'email' => 'E-posta',
@@ -230,13 +230,13 @@ return [
         'website_url' => 'Web Sitesi',
         'city' => 'İl',
         'district' => 'İlçe',
-        
+
         // User
         'password' => 'Şifre',
         'dealer_id' => 'Bayi',
         'avatar_url' => 'Avatar',
         'email_verified_at' => 'E-posta Doğrulandı',
-        
+
         // Service
         'service_no' => 'Hizmet Numarası',
         'customer_id' => 'Müşteri',
@@ -252,12 +252,12 @@ return [
         'notes' => 'Notlar',
         'status' => 'Durum',
         'completed_at' => 'Tamamlanma Tarihi',
-        
+
         // Order
         'created_by' => 'Oluşturan',
         'cargo_company' => 'Kargo Firması',
         'tracking_number' => 'Takip Numarası',
-        
+
         // Customer
         'type' => 'Tip',
         'tc_no' => 'TC Kimlik No',
@@ -265,51 +265,51 @@ return [
         'tax_office' => 'Vergi Dairesi',
         'fcm_token' => 'FCM Token',
         'notification_settings' => 'Bildirim Ayarları',
-        
+
         // CarBrand
         'external_id' => 'Dış ID',
         'logo' => 'Logo',
         'last_update' => 'Son Güncelleme',
-        
+
         // CarModel
         'brand_id' => 'Marka',
         'powertrain' => 'Güç Aktarımı',
         'yearstart' => 'Başlangıç Yılı',
         'yearstop' => 'Bitiş Yılı',
         'coupe' => 'Gövde Tipi',
-        
+
         // StockItem
         'product_id' => 'Ürün',
         'barcode' => 'Barkod',
         'location' => 'Konum',
-        
+
         // Warranty
         'service_id' => 'Hizmet',
         'stock_item_id' => 'Stok Kalemi',
         'start_date' => 'Başlangıç Tarihi',
         'end_date' => 'Bitiş Tarihi',
-        
+
         // ProductCategory
         'available_parts' => 'Uygulanabilir Parçalar',
-        
+
         // OrderItem
         'order_id' => 'Sipariş',
         'quantity' => 'Adet',
-        
+
         // ServiceItem
         'usage_type' => 'Kullanım Tipi',
-        
+
         // ServiceImage
         'title' => 'Başlık',
         'order' => 'Sıra',
-        
+
         // ServiceStatusLog
         'from_dealer_id' => 'Uygulayan Bayi',
         'to_dealer_id' => 'Gidilen Şube',
-        
+
         // StockMovement
         'action' => 'Aksiyon',
-        
+
         // BulkSms
         'message' => 'Mesaj',
         'sender' => 'Gönderici',
@@ -322,7 +322,7 @@ return [
         'failed_count' => 'Başarısız',
         'sent_at' => 'Gönderilme Tarihi',
         'completed_at' => 'Tamamlanma Tarihi',
-        
+
         // SmsLog
         'response_id' => 'Yanıt ID',
         'amount' => 'Tutar',
@@ -333,16 +333,16 @@ return [
         'notifiable_id' => 'Bildirilebilir ID',
         'bulk_sms_id' => 'Toplu SMS',
         'sent_by' => 'Gönderen',
-        
+
         // NexptgApiUser
         'username' => 'Kullanıcı Adı',
         'last_used_at' => 'Son Kullanım',
-        
+
         // NexptgApiUserLog
         'nexptg_api_user_id' => 'API Kullanıcı',
         'status_code' => 'Durum Kodu',
         'details' => 'Detaylar',
-        
+
         // NexptgReport
         'api_user_id' => 'API Kullanıcı',
         'date' => 'Tarih',
@@ -357,7 +357,7 @@ return [
         'unit_of_measure' => 'Ölçü Birimi',
         'extra_fields' => 'Ekstra Alanlar',
         'comment' => 'Yorum',
-        
+
         // NexptgReportMeasurement
         'report_id' => 'Rapor',
         'is_inside' => 'İç',
@@ -368,7 +368,7 @@ return [
         'substrate_type' => 'Alt Tabaka Tipi',
         'timestamp' => 'Zaman Damgası',
         'position' => 'Pozisyon',
-        
+
         // NexptgReportTire
         'width' => 'Genişlik',
         'profile' => 'Profil',
@@ -378,12 +378,11 @@ return [
         'section' => 'Bölüm',
         'value1' => 'Değer 1',
         'value2' => 'Değer 2',
-        
+
         // NexptgHistory
         'history_id' => 'Geçmiş',
-        
+
         // NexptgHistoryMeasurement
     ],
 
 ];
-

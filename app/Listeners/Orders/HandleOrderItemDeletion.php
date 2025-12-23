@@ -5,7 +5,6 @@ namespace App\Listeners\Orders;
 use App\Enums\StockLocationEnum;
 use App\Enums\StockStatusEnum;
 use App\Events\Orders\OrderItemDeleted;
-use App\Models\StockItem;
 use Illuminate\Support\Facades\DB;
 
 class HandleOrderItemDeletion
@@ -24,7 +23,7 @@ class HandleOrderItemDeletion
             // Stokları serbest bırak (eğer CENTER'da ve RESERVED ise)
             // Merkeze ait stokları AVAILABLE yap
             foreach ($stockItems as $stockItem) {
-                if ($stockItem->location->value === StockLocationEnum::CENTER->value 
+                if ($stockItem->location->value === StockLocationEnum::CENTER->value
                     && $stockItem->status->value === StockStatusEnum::RESERVED->value) {
                     $stockItem->update([
                         'status' => StockStatusEnum::AVAILABLE->value,
@@ -38,4 +37,3 @@ class HandleOrderItemDeletion
         });
     }
 }
-

@@ -4,11 +4,7 @@ namespace App\Filament\Widgets\Dealer;
 
 use App\Enums\ServiceStatusEnum;
 use App\Enums\UserRoleEnum;
-use App\Filament\Resources\Customers\CustomerResource;
-use App\Filament\Resources\Orders\OrderResource;
 use App\Filament\Resources\Services\ServiceResource;
-use App\Models\Customer;
-use App\Models\Order;
 use App\Models\Service;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -22,11 +18,12 @@ class DealerRecentActivitiesWidget extends TableWidget
 
     protected static ?string $heading = 'Son Aktiviteler';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::DEALER_OWNER->value,
             UserRoleEnum::DEALER_STAFF->value,
@@ -37,7 +34,7 @@ class DealerRecentActivitiesWidget extends TableWidget
     {
         $dealerId = auth()->user()->dealer_id;
 
-        if (!$dealerId) {
+        if (! $dealerId) {
             return $table->query(fn () => Service::query()->whereRaw('1 = 0'));
         }
 
@@ -96,7 +93,3 @@ class DealerRecentActivitiesWidget extends TableWidget
             ->paginated(false);
     }
 }
-
-
-
-

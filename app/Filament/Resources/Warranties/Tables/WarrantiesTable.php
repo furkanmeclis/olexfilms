@@ -3,15 +3,14 @@
 namespace App\Filament\Resources\Warranties\Tables;
 
 use App\Enums\UserRoleEnum;
+use App\Filament\Resources\Services\ServiceResource;
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Tapp\FilamentProgressBarColumn\Tables\Columns\ProgressBarColumn;
-use Filament\Actions\Action;
-use App\Filament\Resources\Services\ServiceResource;
 
 class WarrantiesTable
 {
@@ -68,11 +67,11 @@ class WarrantiesTable
                 TextColumn::make('is_active')
                     ->label('Durum')
                     ->badge()
-                    ->formatStateUsing(fn ($state, $record) => $state 
+                    ->formatStateUsing(fn ($state, $record) => $state
                         ? ($record->is_expired ? 'Süresi Dolmuş' : 'Aktif')
                         : 'Pasif')
                     ->color(fn ($state, $record) => match (true) {
-                        !$state => 'gray',
+                        ! $state => 'gray',
                         $record->is_expired => 'danger',
                         default => 'success',
                     })
@@ -100,16 +99,15 @@ class WarrantiesTable
                     ->label('PDF Görüntüle')
                     ->icon('heroicon-o-document-text')
                     ->color('primary')
-                    ->url(fn ( $record) => route('warranty.pdf', ['serviceNo' => $record->service->service_no]))
+                    ->url(fn ($record) => route('warranty.pdf', ['serviceNo' => $record->service->service_no]))
                     ->openUrlInNewTab(),
                 Action::make('viewService')
                     ->label('Hizmet Görüntüle')
                     ->icon('heroicon-o-eye')
                     ->color('info')
-                    ->url(fn ( $record) => ServiceResource::getUrl('view', ['record' => $record->service_id]))
+                    ->url(fn ($record) => ServiceResource::getUrl('view', ['record' => $record->service_id]))
                     ->openUrlInNewTab(),
             ])
             ->defaultSort('end_date', 'asc');
     }
 }
-

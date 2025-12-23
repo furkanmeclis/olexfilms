@@ -38,4 +38,3 @@ return [
         'view_service' => 'Hizmet Görüntüle',
     ],
 ];
-

@@ -84,4 +84,3 @@ class ServiceItemsRelationManager extends RelationManager
             ]);
     }
 }
-

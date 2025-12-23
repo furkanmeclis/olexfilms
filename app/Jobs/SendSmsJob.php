@@ -22,8 +22,7 @@ class SendSmsJob implements ShouldQueue
         public string $messageContentType = 'bilgi',
         public ?int $smsLogId = null,
         public ?int $bulkSmsId = null,
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {
@@ -42,7 +41,7 @@ class SendSmsJob implements ShouldQueue
         // Veya nested olabilir: {"response": {"id":..., "quantity":..., "amount":...}}
         $response = $result['response'] ?? [];
         $responseData = null;
-        
+
         if (isset($response['response']) && is_array($response['response'])) {
             // Nested response yapısı
             $responseData = $response['response'];
@@ -90,7 +89,7 @@ class SendSmsJob implements ShouldQueue
         }
 
         // Cache'i güncelle
-        if ($result['success'] && !empty($responseData)) {
+        if ($result['success'] && ! empty($responseData)) {
             SmsCacheService::updateSmsInfo($responseData);
         }
 

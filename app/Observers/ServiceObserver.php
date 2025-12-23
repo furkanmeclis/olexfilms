@@ -5,8 +5,8 @@ namespace App\Observers;
 use App\Enums\ServiceStatusEnum;
 use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
-use App\Listeners\ServiceStatusUpdatedListener;
 use App\Listeners\Services\SendServiceNotifications;
+use App\Listeners\ServiceStatusUpdatedListener;
 use App\Models\Service;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\Auth;
@@ -31,8 +31,8 @@ class ServiceObserver
         if ($service->wasChanged('status')) {
             // getOriginal() enum instance döndürebilir, bu durumda direkt kullan
             $originalStatus = $service->getOriginal('status');
-            $oldStatus = $originalStatus instanceof ServiceStatusEnum 
-                ? $originalStatus 
+            $oldStatus = $originalStatus instanceof ServiceStatusEnum
+                ? $originalStatus
                 : ServiceStatusEnum::from($originalStatus);
             $newStatus = $service->status;
 
@@ -40,12 +40,12 @@ class ServiceObserver
             if ($newStatus === ServiceStatusEnum::COMPLETED) {
                 // Tüm ServiceItem'ların StockItem'larını USED yap
                 $service->loadMissing('items.stockItem');
-                
+
                 foreach ($service->items as $serviceItem) {
                     $stockItem = $serviceItem->stockItem;
 
                     // StockItem null ise atla
-                    if (!$stockItem) {
+                    if (! $stockItem) {
                         continue;
                     }
 
@@ -65,14 +65,14 @@ class ServiceObserver
                 }
 
                 // Garanti başlat
-                $listener = new ServiceStatusUpdatedListener();
+                $listener = new ServiceStatusUpdatedListener;
                 $listener->handle($service);
-            } 
+            }
             // Eğer status COMPLETED'dan başka bir duruma geri alınırsa
             elseif ($oldStatus === ServiceStatusEnum::COMPLETED && $newStatus !== ServiceStatusEnum::COMPLETED) {
                 // İlgili garantileri pasifleştir (silme, sadece is_active = false)
                 $service->loadMissing('warranties');
-                
+
                 foreach ($service->warranties as $warranty) {
                     if ($warranty->is_active) {
                         $warranty->update([
@@ -83,7 +83,7 @@ class ServiceObserver
             }
 
             // Notification gönder
-            (new SendServiceNotifications())->handle($service, $oldStatus, $newStatus);
+            (new SendServiceNotifications)->handle($service, $oldStatus, $newStatus);
         }
     }
 

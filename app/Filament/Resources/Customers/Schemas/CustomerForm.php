@@ -24,7 +24,7 @@ class CustomerForm
         // İl-İlçe JSON verisini yükle
         $cityData = [];
         $cityDistrictMap = [];
-        
+
         try {
             $jsonPath = storage_path('il-ilce.json');
             if (File::exists($jsonPath)) {
@@ -33,7 +33,7 @@ class CustomerForm
                     foreach ($jsonData['data'] as $city) {
                         $cityName = $city['il_adi'];
                         $cityData[$cityName] = $cityName;
-                        
+
                         if (isset($city['ilceler']) && is_array($city['ilceler'])) {
                             $districts = [];
                             foreach ($city['ilceler'] as $district) {
@@ -119,11 +119,12 @@ class CustomerForm
                                 if ($city && isset($cityDistrictMap[$city])) {
                                     return $cityDistrictMap[$city];
                                 }
+
                                 return [];
                             })
                             ->searchable()
                             ->preload()
-                            ->disabled(fn ($get) => !$get('city'))
+                            ->disabled(fn ($get) => ! $get('city'))
                             ->reactive(),
 
                         Textarea::make('address')

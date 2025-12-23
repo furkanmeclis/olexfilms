@@ -45,4 +45,3 @@ return [
         'open_customer_page' => 'Müşteri Sayfasını Aç',
     ],
 ];
-

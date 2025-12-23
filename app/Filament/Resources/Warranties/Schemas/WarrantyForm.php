@@ -57,7 +57,7 @@ class WarrantyForm
 
                         Toggle::make('is_active')
                             ->label('Aktif')
-                            ->disabled(!$isAdmin)
+                            ->disabled(! $isAdmin)
                             ->helperText($isAdmin ? 'Garanti durumunu değiştirebilirsiniz' : 'Sadece yöneticiler garanti durumunu değiştirebilir')
                             ->default(true),
                     ])
@@ -65,4 +65,3 @@ class WarrantyForm
             ]);
     }
 }
-

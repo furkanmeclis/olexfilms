@@ -18,6 +18,7 @@ class DealerServiceStatsWidget extends StatsOverviewWidget
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::DEALER_OWNER->value,
             UserRoleEnum::DEALER_STAFF->value,
@@ -28,7 +29,7 @@ class DealerServiceStatsWidget extends StatsOverviewWidget
     {
         $dealerId = auth()->user()->dealer_id;
 
-        if (!$dealerId) {
+        if (! $dealerId) {
             return [];
         }
 
@@ -84,4 +85,3 @@ class DealerServiceStatsWidget extends StatsOverviewWidget
         });
     }
 }
-

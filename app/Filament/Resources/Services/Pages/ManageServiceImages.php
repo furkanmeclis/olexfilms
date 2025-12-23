@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Services\Pages;
 
-use App\Enums\ServiceStatusEnum;
 use App\Filament\Resources\Services\Schemas\ServiceForm;
 use App\Filament\Resources\Services\ServiceResource;
 use Filament\Actions;
@@ -31,7 +30,7 @@ class ManageServiceImages extends EditRecord
     {
         $record = $this->record;
         $currentStatus = $record?->status ?? null;
-        
+
         return $schema
             ->components([
                 ...ServiceForm::getGalleryStep($currentStatus),
@@ -44,14 +43,14 @@ class ManageServiceImages extends EditRecord
         // Ancak yeni eklenen görseller için order değerlerini kontrol et
         $images = $this->record->images()->orderBy('order')->get();
         $needsUpdate = false;
-        
+
         foreach ($images as $index => $image) {
             if ($image->order !== $index) {
                 $image->update(['order' => $index]);
                 $needsUpdate = true;
             }
         }
-        
+
         // Eğer order değerleri güncellendiyse, tekrar yükle
         if ($needsUpdate) {
             $this->record->refresh();

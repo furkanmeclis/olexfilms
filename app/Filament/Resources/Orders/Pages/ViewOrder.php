@@ -8,7 +8,6 @@ use App\Filament\Resources\Orders\OrderResource;
 use App\Models\StockItem;
 use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Auth;
@@ -55,16 +54,17 @@ class ViewOrder extends ViewRecord
                         } else {
                             $schema[] = \Filament\Forms\Components\Placeholder::make("no_stock_{$item->id}")
                                 ->label("{$item->product->name}")
-                                ->content("⚠️ Bu ürün için merkezde müsait stok yok!");
+                                ->content('⚠️ Bu ürün için merkezde müsait stok yok!');
                         }
                     }
+
                     return $schema;
                 })
-                ->action(function (array $data) use ($order, $user) {
+                ->action(function (array $data) use ($order) {
                     DB::transaction(function () use ($data, $order) {
                         foreach ($order->items as $item) {
                             $key = "order_item_{$item->id}";
-                            if (!isset($data[$key]) || empty($data[$key])) {
+                            if (! isset($data[$key]) || empty($data[$key])) {
                                 continue;
                             }
 
@@ -150,7 +150,7 @@ class ViewOrder extends ViewRecord
         }
 
         // Teslim Al (sadece Bayi, shipped için)
-        if ($user && $user->dealer_id && !$user->hasAnyRole([
+        if ($user && $user->dealer_id && ! $user->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
         ]) && $order->status->value === 'shipped' && $order->dealer_id === $user->dealer_id) {

@@ -2,10 +2,6 @@
 
 namespace App\Filament\Resources\BulkSms\Schemas;
 
-use App\Enums\UserRoleEnum;
-use App\Models\Customer;
-use App\Models\User;
-use App\Services\VatanSmsService;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;

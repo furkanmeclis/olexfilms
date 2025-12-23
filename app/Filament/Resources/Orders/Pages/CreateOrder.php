@@ -6,7 +6,6 @@ use App\Enums\OrderStatusEnum;
 use App\Enums\StockLocationEnum;
 use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
-use App\Events\Orders\OrderItemUpdated;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\OrderItem;
 use Filament\Resources\Pages\CreateRecord;
@@ -30,9 +29,9 @@ class CreateOrder extends CreateRecord
 
         // created_by otomatik set edilir
         $data['created_by'] = $user->id;
-        
+
         // Statü admin/center_staff tarafından set edilmişse kullan, yoksa pending
-        if (!isset($data['status'])) {
+        if (! isset($data['status'])) {
             $data['status'] = OrderStatusEnum::PENDING->value;
         }
 
@@ -54,12 +53,12 @@ class CreateOrder extends CreateRecord
 
         // OrderItem'ları oluştur ve stok atamalarını yap
         // Stok yönetimi ve movement logları observer tarafından yapılacak
-        if (!empty($this->stockAssignments)) {
+        if (! empty($this->stockAssignments)) {
             DB::transaction(function () use ($order, $user) {
                 foreach ($this->stockAssignments as $itemData) {
                     // Stok atamalarını al
                     $selectedStockIds = array_filter($itemData['stock_items'] ?? []);
-                    
+
                     if (empty($selectedStockIds)) {
                         continue;
                     }
@@ -73,17 +72,17 @@ class CreateOrder extends CreateRecord
 
                     // Stok atamalarını yap
                     $orderItem->stockItems()->attach($selectedStockIds);
-                    
+
                     // Stokları attach ettikten sonra OrderItem'ı refresh et
                     $orderItem->refresh();
-                    
+
                     // Order status'una göre stokları güncelle
-                    $orderStatus = $order->status instanceof OrderStatusEnum 
-                        ? $order->status 
+                    $orderStatus = $order->status instanceof OrderStatusEnum
+                        ? $order->status
                         : OrderStatusEnum::from($order->status);
-                    
+
                     $stockItems = $orderItem->stockItems;
-                    
+
                     if ($orderStatus === OrderStatusEnum::DELIVERED) {
                         // Delivered ise direkt dealer'a transfer et
                         foreach ($stockItems as $stockItem) {
@@ -120,7 +119,7 @@ class CreateOrder extends CreateRecord
                                 ->where('description', 'like', "%Sipariş #{$order->id}%")
                                 ->first();
 
-                            if (!$existingMovement) {
+                            if (! $existingMovement) {
                                 \App\Models\StockMovement::create([
                                     'stock_item_id' => $stockItem->id,
                                     'user_id' => $user?->id ?? $order->created_by,

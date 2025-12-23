@@ -22,4 +22,3 @@ return [
         'settings_saved_body' => 'SMS ayarları başarıyla güncellendi.',
     ],
 ];
-

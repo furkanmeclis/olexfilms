@@ -9,10 +9,10 @@ use App\Filament\Resources\SmsLogs\Tables\SmsLogsTable;
 use App\Models\SmsLog;
 use BackedEnum;
 use Filament\Resources\Resource;
-use UnitEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class SmsLogResource extends Resource
 {
@@ -60,7 +60,7 @@ class SmsLogResource extends Resource
         $query = parent::getEloquentQuery();
 
         // Sadece super_admin görebilir
-        if (!auth()->user()?->hasRole('super_admin')) {
+        if (! auth()->user()?->hasRole('super_admin')) {
             $query->whereRaw('1 = 0'); // Hiçbir kayıt gösterme
         }
 

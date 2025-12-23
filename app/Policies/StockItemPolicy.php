@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Enums\StockStatusEnum;
 use App\Enums\UserRoleEnum;
 use App\Models\StockItem;
 use App\Models\User;

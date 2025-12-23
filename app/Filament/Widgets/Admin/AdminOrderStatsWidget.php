@@ -19,6 +19,7 @@ class AdminOrderStatsWidget extends StatsOverviewWidget
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -66,7 +67,7 @@ class AdminOrderStatsWidget extends StatsOverviewWidget
                     ->descriptionIcon('heroicon-m-check-badge')
                     ->color('success'),
 
-                Stat::make('Bu Ay Toplam Tutar', number_format($totalAmountThisMonth, 2) . ' $')
+                Stat::make('Bu Ay Toplam Tutar', number_format($totalAmountThisMonth, 2).' $')
                     ->description('Bu ayki siparişlerin toplam tutarı')
                     ->descriptionIcon('heroicon-m-currency-dollar')
                     ->color('success'),
@@ -74,4 +75,3 @@ class AdminOrderStatsWidget extends StatsOverviewWidget
         });
     }
 }
-

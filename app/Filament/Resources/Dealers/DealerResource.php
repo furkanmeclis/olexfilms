@@ -6,7 +6,6 @@ use App\Filament\Resources\Dealers\Pages\CreateDealer;
 use App\Filament\Resources\Dealers\Pages\EditDealer;
 use App\Filament\Resources\Dealers\Pages\ListDealers;
 use App\Filament\Resources\Dealers\Pages\ViewDealer;
-use App\Filament\Resources\Dealers\RelationManagers;
 use App\Filament\Resources\Dealers\Schemas\DealerForm;
 use App\Filament\Resources\Dealers\Tables\DealersTable;
 use App\Models\Dealer;

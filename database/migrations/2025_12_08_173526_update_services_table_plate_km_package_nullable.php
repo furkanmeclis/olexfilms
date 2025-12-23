@@ -15,13 +15,13 @@ return new class extends Migration
         if (\DB::getDriverName() === 'sqlite') {
             \DB::statement('DROP TABLE IF EXISTS "__temp__services"');
         }
-        
+
         Schema::table('services', function (Blueprint $table) {
             // Önce mevcut NULL değerleri düzelt
             \DB::table('services')
                 ->whereNull('plate')
                 ->update(['plate' => 'PLAKA-YOK']);
-            
+
             // Şimdi kolonları güncelle
             $table->string('plate')->nullable(false)->change();
             $table->integer('km')->nullable()->change();

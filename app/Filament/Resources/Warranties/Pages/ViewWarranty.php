@@ -18,11 +18,10 @@ class ViewWarranty extends ViewRecord
                 ->label('Hizmeti Görüntüle')
                 ->icon('heroicon-o-wrench-screwdriver')
                 ->color('primary')
-                ->url(fn () => $this->record->service 
+                ->url(fn () => $this->record->service
                     ? ServiceResource::getUrl('view', ['record' => $this->record->service])
                     : null)
                 ->visible(fn () => $this->record->service !== null),
         ];
     }
 }
-

@@ -58,4 +58,3 @@ class NotificationSetting extends Model
         $query->where('event', $event);
     }
 }
-

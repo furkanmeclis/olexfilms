@@ -9,42 +9,43 @@ use Filament\Schemas\Components\Utilities\Get;
 class StockItemPicker extends Field
 {
     protected string $view = 'filament.forms.components.stock-item-picker';
-    
-    protected array | Closure | null $appliedParts = null;
-    protected int | Closure | null $dealerId = null;
-    
+
+    protected array|Closure|null $appliedParts = null;
+
+    protected int|Closure|null $dealerId = null;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->default(null);
         $this->dehydrated(true);
-        
+
         // Reactive güncelleme için live() modifier
         $this->live(onBlur: false);
-        
+
         // State değişikliklerini dinle
         // Not: dispatch() metodu form component'lerinde yok, Livewire watch ile dinleniyor
-        
+
     }
-    
-    public function appliedParts(array | Closure | null $appliedParts): static
+
+    public function appliedParts(array|Closure|null $appliedParts): static
     {
         $this->appliedParts = $appliedParts;
-        
+
         return $this;
     }
-    
+
     public function getAppliedParts(?Get $get = null): array
     {
         if ($get === null) {
             return [];
         }
-        
+
         // Wizard içinde Repeater içindeyken state erişimi
         // Önce wizard root'a çıkmayı dene
         $appliedParts = null;
-        
+
         // Farklı yolları dene
         $paths = [
             'applied_parts',           // Direkt erişim
@@ -52,11 +53,11 @@ class StockItemPicker extends Field
             '../../applied_parts',     // Wizard step
             '../../../applied_parts',  // Wizard root (fallback)
         ];
-        
+
         foreach ($paths as $path) {
             try {
                 $value = $get($path);
-                
+
                 if ($value !== null) {
                     $appliedParts = $value;
                     break;
@@ -66,38 +67,38 @@ class StockItemPicker extends Field
                 continue;
             }
         }
-        
+
         // Eğer hala null ise, closure'ı evaluate et
         if ($appliedParts === null && $this->appliedParts !== null) {
             $appliedParts = $this->evaluate($this->appliedParts, [
                 'get' => $get,
             ]);
         }
-        
+
         // String ise JSON decode et
         if (is_string($appliedParts)) {
             $appliedParts = json_decode($appliedParts, true) ?? [];
         }
-        
+
         return is_array($appliedParts) ? $appliedParts : [];
     }
-    
-    public function dealerId(int | Closure | null $dealerId): static
+
+    public function dealerId(int|Closure|null $dealerId): static
     {
         $this->dealerId = $dealerId;
-        
+
         return $this;
     }
-    
+
     public function getDealerId(?Get $get = null): ?int
     {
         if ($get === null) {
             return null;
         }
-        
+
         // Wizard içinde Repeater içindeyken state erişimi
         $dealerId = null;
-        
+
         // Farklı yolları dene
         $paths = [
             'dealer_id',           // Direkt erişim (normal form)
@@ -105,11 +106,11 @@ class StockItemPicker extends Field
             '../../dealer_id',     // Wizard step
             '../../../dealer_id',  // Wizard root (fallback)
         ];
-        
+
         foreach ($paths as $path) {
             try {
                 $value = $get($path);
-                
+
                 if ($value !== null) {
                     $dealerId = $value;
                     break;
@@ -119,7 +120,7 @@ class StockItemPicker extends Field
                 continue;
             }
         }
-        
+
         // Eğer hala null ise, closure'ı evaluate et
         if ($dealerId === null && $this->dealerId !== null) {
             try {
@@ -130,7 +131,7 @@ class StockItemPicker extends Field
                 // Hata durumunda devam et
             }
         }
-        
+
         // Record'dan al (edit sayfası için)
         if ($dealerId === null) {
             $record = $this->getRecord();
@@ -138,8 +139,7 @@ class StockItemPicker extends Field
                 $dealerId = $record->dealer_id;
             }
         }
-        
+
         return is_numeric($dealerId) ? (int) $dealerId : null;
     }
 }
-

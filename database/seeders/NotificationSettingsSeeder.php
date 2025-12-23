@@ -345,4 +345,3 @@ class NotificationSettingsSeeder extends Seeder
         }
     }
 }
-

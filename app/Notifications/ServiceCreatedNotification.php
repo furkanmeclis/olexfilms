@@ -23,13 +23,13 @@ class ServiceCreatedNotification extends Notification
     public function toSms($notifiable): string
     {
         $service = $this->service;
-        
+
         // İlişkileri yükle
         $service->load(['customer', 'carBrand', 'carModel', 'dealer']);
-        
+
         $customerName = $service->customer->name ?? 'Değerli Müşterimiz';
         $serviceNo = $service->service_no ?? 'N/A';
-        
+
         // Araç bilgileri
         $carInfo = [];
         if ($service->carBrand) {
@@ -41,26 +41,25 @@ class ServiceCreatedNotification extends Notification
         if ($service->plate) {
             $carInfo[] = $service->plate;
         }
-        $carInfoStr = !empty($carInfo) ? implode(' ', $carInfo) : '';
-        
+        $carInfoStr = ! empty($carInfo) ? implode(' ', $carInfo) : '';
+
         // Bayi bilgisi
         $dealerInfo = '';
         if ($service->dealer) {
             $dealerInfo = " {$service->dealer->name} bayisi.";
         }
-        
+
         // SMS mesajını oluştur
         $message = "Sayın {$customerName}, hizmet kaydınız oluşturuldu. Hizmet No: {$serviceNo}.";
-        
+
         if ($carInfoStr) {
             $message .= " Araç: {$carInfoStr}.";
         }
-        
+
         if ($dealerInfo) {
             $message .= $dealerInfo;
         }
-        
+
         return $message;
     }
 }
-

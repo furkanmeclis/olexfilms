@@ -19,7 +19,7 @@ class WarrantyInfolist
                             ->badge()
                             ->color('primary')
                             ->icon('heroicon-o-wrench-screwdriver')
-                            ->url(fn ($record) => $record->service 
+                            ->url(fn ($record) => $record->service
                                 ? \App\Filament\Resources\Services\ServiceResource::getUrl('view', ['record' => $record->service])
                                 : null),
 
@@ -37,16 +37,16 @@ class WarrantyInfolist
                         TextEntry::make('is_active')
                             ->label('Durum')
                             ->badge()
-                            ->formatStateUsing(fn ($state, $record) => $state 
+                            ->formatStateUsing(fn ($state, $record) => $state
                                 ? ($record->is_expired ? 'Süresi Dolmuş' : 'Aktif')
                                 : 'Pasif')
                             ->color(fn ($state, $record) => match (true) {
-                                !$state => 'gray',
+                                ! $state => 'gray',
                                 $record->is_expired => 'danger',
                                 default => 'success',
                             })
                             ->icon(fn ($state, $record) => match (true) {
-                                !$state => 'heroicon-o-x-circle',
+                                ! $state => 'heroicon-o-x-circle',
                                 $record->is_expired => 'heroicon-o-clock',
                                 default => 'heroicon-o-check-circle',
                             }),
@@ -72,7 +72,7 @@ class WarrantyInfolist
 
                         TextEntry::make('days_remaining')
                             ->label('Kalan Gün')
-                            ->formatStateUsing(fn ($state) => $state !== null 
+                            ->formatStateUsing(fn ($state) => $state !== null
                                 ? ($state > 0 ? "{$state} gün" : 'Süresi dolmuş')
                                 : 'Bilinmiyor')
                             ->badge()
@@ -146,4 +146,3 @@ class WarrantyInfolist
             ]);
     }
 }
-

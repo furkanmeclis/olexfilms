@@ -21,4 +21,3 @@ return [
         'comment' => 'Yorum',
     ],
 ];
-

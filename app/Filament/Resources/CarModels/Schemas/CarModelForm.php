@@ -2,13 +2,11 @@
 
 namespace App\Filament\Resources\CarModels\Schemas;
 
-use App\Models\CarBrand;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Forms\Components\Textarea;
 
 class CarModelForm
 {

@@ -29,7 +29,7 @@ class EditService extends EditRecord
     protected function mutateFormDataBeforeValidate(array $data): array
     {
         // Backend validation: Hizmet numarası unique olmalı
-        if (isset($data['service_no']) && !empty($data['service_no'])) {
+        if (isset($data['service_no']) && ! empty($data['service_no'])) {
             $serviceExists = Service::where('service_no', $data['service_no'])
                 ->where('id', '!=', $this->record->id)
                 ->exists();
@@ -78,7 +78,7 @@ class EditService extends EditRecord
             if ($existingServiceItem) {
                 return [
                     'valid' => true,
-                    'message' => 'Hizmet numarası doğrulandı. Stok kalemi: ' . $stockItem->product->name,
+                    'message' => 'Hizmet numarası doğrulandı. Stok kalemi: '.$stockItem->product->name,
                     'stock_item_id' => $stockItem->id,
                 ];
             }
@@ -99,7 +99,7 @@ class EditService extends EditRecord
 
             return [
                 'valid' => true,
-                'message' => 'Hizmet numarası doğrulandı. Stok kalemi: ' . $stockItem->product->name,
+                'message' => 'Hizmet numarası doğrulandı. Stok kalemi: '.$stockItem->product->name,
                 'stock_item_id' => $stockItem->id,
             ];
         }
@@ -118,7 +118,7 @@ class EditService extends EditRecord
         $formData = $this->form->getState();
 
         // Hizmet numarası bir stok item'ın barcode'u ise, o stok item'ı servise bağla
-        if (isset($formData['service_no']) && !empty($formData['service_no'])) {
+        if (isset($formData['service_no']) && ! empty($formData['service_no'])) {
             $stockItem = StockItem::where('barcode', $formData['service_no'])->first();
 
             if ($stockItem) {
@@ -129,7 +129,7 @@ class EditService extends EditRecord
                         ->where('stock_item_id', $stockItem->id)
                         ->first();
 
-                    if (!$existingServiceItem) {
+                    if (! $existingServiceItem) {
                         // Eski hizmet numarasına bağlı stok item'ı bul ve kaldır
                         $oldStockItem = StockItem::whereHas('serviceItems', function ($query) use ($service) {
                             $query->where('service_id', $service->id);

@@ -9,4 +9,3 @@ class ViewServiceStatusLog extends ViewRecord
 {
     protected static string $resource = ServiceStatusLogResource::class;
 }
-

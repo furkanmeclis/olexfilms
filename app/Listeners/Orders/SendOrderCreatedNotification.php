@@ -39,10 +39,9 @@ class SendOrderCreatedNotification
                 UserRoleEnum::DEALER_OWNER->value,
                 array_merge($data, [
                     'dealer_id' => $order->dealer_id,
-                    'total_amount' => $order->items->sum(fn ($item) => $item->quantity * ($item->unit_price ?? 0)) . ' TL',
+                    'total_amount' => $order->items->sum(fn ($item) => $item->quantity * ($item->unit_price ?? 0)).' TL',
                 ])
             );
         }
     }
 }
-

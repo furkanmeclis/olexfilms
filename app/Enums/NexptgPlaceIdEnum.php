@@ -24,4 +24,3 @@ enum NexptgPlaceIdEnum: string
         ];
     }
 }
-

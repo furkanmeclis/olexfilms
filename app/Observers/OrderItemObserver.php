@@ -36,4 +36,3 @@ class OrderItemObserver
         event(new OrderItemDeleted($orderItem));
     }
 }
-

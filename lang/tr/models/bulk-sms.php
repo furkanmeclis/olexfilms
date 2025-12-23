@@ -18,4 +18,3 @@ return [
         'completed_at' => 'Tamamlanma Tarihi',
     ],
 ];
-

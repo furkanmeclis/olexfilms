@@ -11,6 +11,3 @@ class WelcomeController extends Controller
         return Inertia::render('Welcome');
     }
 }
-
-
-

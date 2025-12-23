@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Services\VatanSmsService;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -15,21 +14,22 @@ class CustomerController extends Controller
         $customerId = Crypt::decrypt($hash);
         $customer = Customer::find($customerId);
         request()->session()->put('manifest', $customerId);
-        if (!$customer) {
+        if (! $customer) {
             return redirect()->route('home');
         }
         $services = $customer->getServices();
         $products = [];
         foreach ($services as $service) {
-            $products = array_merge($products, collect($service["products"])->map(function ($product) {
+            $products = array_merge($products, collect($service['products'])->map(function ($product) {
                 return $product;
             })->toArray());
         }
+
         return Inertia::render('Customer/NewDesign', [
             'customerB' => $customer,
             'hash' => Crypt::encrypt($customerId),
             'services' => $services,
-            "products" => $products
+            'products' => $products,
         ]);
     }
 
@@ -37,6 +37,7 @@ class CustomerController extends Controller
     {
         $customer = Customer::find($customerId);
         request()->session()->put('manifest', $customerId);
+
         return Inertia::render('Customer/Index', [
             'customerB' => $customer,
             'hash' => Crypt::encrypt($customerId),
@@ -50,10 +51,10 @@ class CustomerController extends Controller
             $customer = Customer::find($customerId);
             if ($customer) {
                 $action = request()->get('action');
-                if ($action == "settings") {
+                if ($action == 'settings') {
                     $default = [
-                        "sms" => false,
-                        "email" => false,
+                        'sms' => false,
+                        'email' => false,
                     ];
                     $notificationSettings = json_decode(request()->get('settings'), true);
                     if ($notificationSettings) {
@@ -84,7 +85,7 @@ class CustomerController extends Controller
     {
         $normalizedPhone = VatanSmsService::formatPhoneNumber(request()->get('phone'));
         if ($normalizedPhone != null) {
-            $customers = Customer::where('id', ">", 0)->get(['id', 'phone', 'name']);
+            $customers = Customer::where('id', '>', 0)->get(['id', 'phone', 'name']);
             $customer = null;
             foreach ($customers as $c) {
                 if (VatanSmsService::formatPhoneNumber($c->phone) == $normalizedPhone) {
@@ -96,12 +97,13 @@ class CustomerController extends Controller
                 return response()->json(['message' => 'Müşteri Bulunamadı', 'status' => false]);
             }
             $otp = rand(100000, 999999);
-            $sms = "Merhaba " . $customer->name . ", Tek Kullanımlık Şifreniz: " . $otp . " Geçerlilik Süresi 5 Dakikadır.";
+            $sms = 'Merhaba '.$customer->name.', Tek Kullanımlık Şifreniz: '.$otp.' Geçerlilik Süresi 5 Dakikadır.';
             VatanSmsService::sendSingleSms($customer->phone, $sms);
-            $otpCacheKey = "otp_" . $customer->id;
+            $otpCacheKey = 'otp_'.$customer->id;
             cache([$otpCacheKey => $otp], now()->addMinutes(5));
+
             return response()->json(['message' => 'Tek Kullanımlık Şifre Gönderildi', 'status' => true,
-                'customer_id' => $customer->id
+                'customer_id' => $customer->id,
             ]);
         } else {
             return response()->json(['message' => 'Sadece Bireysel Telefon Numaraları Desteklenmektedir.', 'status' => false]);
@@ -112,21 +114,21 @@ class CustomerController extends Controller
     {
         $customerId = request()->get('customer_id');
         $otp = request()->get('otp');
-        $otpCacheKey = "otp_" . $customerId;
+        $otpCacheKey = 'otp_'.$customerId;
         $cachedOtp = cache($otpCacheKey);
         if ($cachedOtp == $otp) {
             cache()->forget($otpCacheKey);
+
             return response()->json([
                 'message' => 'Giriş Başarılı',
                 'status' => true,
-                'hash' => Crypt::encrypt($customerId)
+                'hash' => Crypt::encrypt($customerId),
             ]);
         } else {
             return response()->json(['message' => 'Tek Kullanımlık Şifre Hatalı', 'status' => false,
-                "request" => request()->all(),
-                "cache" => cache()->get($otpCacheKey)
+                'request' => request()->all(),
+                'cache' => cache()->get($otpCacheKey),
             ]);
         }
     }
 }
-

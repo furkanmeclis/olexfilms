@@ -18,6 +18,7 @@ class AdminServiceStatsWidget extends StatsOverviewWidget
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::SUPER_ADMIN->value,
             UserRoleEnum::CENTER_STAFF->value,
@@ -75,4 +76,3 @@ class AdminServiceStatsWidget extends StatsOverviewWidget
         });
     }
 }
-

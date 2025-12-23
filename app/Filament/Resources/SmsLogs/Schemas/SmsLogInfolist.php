@@ -77,7 +77,7 @@ class SmsLogInfolist
                             ->label('Geçersiz Telefonlar')
                             ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : '')
                             ->columnSpanFull()
-                            ->visible(fn ($record) => !empty($record->invalid_phones)),
+                            ->visible(fn ($record) => ! empty($record->invalid_phones)),
                     ])
                     ->columns(2)
                     ->visible(fn ($record) => $record->status === 'sent'),

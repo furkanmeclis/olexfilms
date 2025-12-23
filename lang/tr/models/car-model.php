@@ -13,4 +13,3 @@ return [
         'coupe' => 'Gövde Tipi',
     ],
 ];
-

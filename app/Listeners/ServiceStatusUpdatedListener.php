@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Models\Service;
 use App\Models\Warranty;
-use Illuminate\Support\Facades\DB;
 
 class ServiceStatusUpdatedListener
 {
@@ -16,7 +15,7 @@ class ServiceStatusUpdatedListener
     {
         // Her service_item için garanti oluştur
         // Relationship'leri yükle
-        if (!$service->relationLoaded('items')) {
+        if (! $service->relationLoaded('items')) {
             $service->load('items.stockItem.product');
         } else {
             $service->loadMissing(['items.stockItem', 'items.stockItem.product']);
@@ -24,25 +23,25 @@ class ServiceStatusUpdatedListener
 
         // completed_at tarihini kontrol et (Carbon instance olmalı)
         $startDate = $service->completed_at;
-        if (!$startDate) {
+        if (! $startDate) {
             $startDate = now();
         } elseif (is_string($startDate)) {
             // Eğer string ise Carbon'a çevir
             $startDate = \Carbon\Carbon::parse($startDate);
         }
-        
+
         foreach ($service->items as $serviceItem) {
             $stockItem = $serviceItem->stockItem;
 
             // StockItem null ise atla
-            if (!$stockItem) {
+            if (! $stockItem) {
                 continue;
             }
 
             $product = $stockItem->product;
 
             // Product null ise atla
-            if (!$product) {
+            if (! $product) {
                 continue;
             }
 

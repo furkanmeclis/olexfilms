@@ -81,6 +81,7 @@ class NotificationService
                 if (isset($data['dealer_id'])) {
                     return $user->dealer_id === $data['dealer_id'] && $user->canAccess();
                 }
+
                 return $user->canAccess();
             });
         }
@@ -118,7 +119,7 @@ class NotificationService
 
         // Değişkenleri değiştir
         foreach ($data as $key => $value) {
-            $placeholder = '{' . $key . '}';
+            $placeholder = '{'.$key.'}';
             $template = Str::replace($placeholder, (string) $value, $template);
         }
 
@@ -151,4 +152,3 @@ class NotificationService
         return 'Yeni Bildirim';
     }
 }
-

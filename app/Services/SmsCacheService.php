@@ -46,16 +46,13 @@ class SmsCacheService
     public static function getSuccessRate(): float
     {
         $total = SmsLog::whereIn('status', ['sent', 'failed'])->count();
-        
+
         if ($total === 0) {
             return 0.0;
         }
 
         $success = SmsLog::where('status', 'sent')->count();
-        
+
         return round(($success / $total) * 100, 2);
     }
 }
-
-
-

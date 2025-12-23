@@ -15,11 +15,12 @@ class DealerMonthlyTrendsChartWidget extends ChartWidget
 
     protected ?string $heading = 'Aylık Trendler';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public static function canView(): bool
     {
         $user = auth()->user();
+
         return $user?->hasAnyRole([
             UserRoleEnum::DEALER_OWNER->value,
             UserRoleEnum::DEALER_STAFF->value,
@@ -30,7 +31,7 @@ class DealerMonthlyTrendsChartWidget extends ChartWidget
     {
         $dealerId = auth()->user()->dealer_id;
 
-        if (!$dealerId) {
+        if (! $dealerId) {
             return [
                 'datasets' => [],
                 'labels' => [],
@@ -99,4 +100,3 @@ class DealerMonthlyTrendsChartWidget extends ChartWidget
         return 'line';
     }
 }
-

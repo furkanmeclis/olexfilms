@@ -7,7 +7,6 @@ use App\Enums\StockLocationEnum;
 use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
 use App\Events\Orders\OrderStatusChanged;
-use App\Models\StockItem;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -45,7 +44,7 @@ class HandleOrderStatusChanged
                         ->where('description', 'like', "%Sipariş #{$order->id}%")
                         ->first();
 
-                    if (!$existingMovement) {
+                    if (! $existingMovement) {
                         StockMovement::create([
                             'stock_item_id' => $stockItem->id,
                             'user_id' => $user?->id ?? $order->created_by,
@@ -79,7 +78,7 @@ class HandleOrderStatusChanged
                         ->where('description', 'like', "%Sipariş #{$order->id}%")
                         ->first();
 
-                    if (!$existingMovement) {
+                    if (! $existingMovement) {
                         StockMovement::create([
                             'stock_item_id' => $stockItem->id,
                             'user_id' => $user?->id ?? $order->created_by,
@@ -111,4 +110,3 @@ class HandleOrderStatusChanged
         });
     }
 }
-

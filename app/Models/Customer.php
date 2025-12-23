@@ -15,7 +15,7 @@ use Illuminate\Notifications\Notifiable;
 
 class Customer extends Model
 {
-    use HasFactory, SoftDeletes, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'dealer_id',
@@ -87,8 +87,6 @@ class Customer extends Model
 
     /**
      * Get services with formatted data for customer page.
-     * 
-     * @return array
      */
     public function getServices(): array
     {
@@ -107,7 +105,7 @@ class Customer extends Model
                 if ($warranty->stockItem && $warranty->stockItem->product) {
                     $startDate = $warranty->start_date;
                     $endDate = $warranty->end_date;
-                    
+
                     // Calculate warranty rate (progress percentage)
                     $rate = 0;
                     if ($startDate && $endDate) {
@@ -139,7 +137,7 @@ class Customer extends Model
                     'model' => $carModel ? $carModel->name : '',
                     'generation' => $carModel ? $carModel->name : '', // Generation same as model for now
                     'year' => $service->year ?? '',
-                    'plate' => $service->plate ?? '', 
+                    'plate' => $service->plate ?? '',
                     'brand_logo' => $carBrand && $carBrand->logo ? $carBrand->logo_url : 'https://www.carlogos.org/car-logos/bmw-logo-2020-blue-white.png',
                 ],
                 'created_at' => $service->created_at ? $service->created_at->toISOString() : now()->toISOString(),
@@ -151,8 +149,6 @@ class Customer extends Model
 
     /**
      * Get notification settings with default values.
-     * 
-     * @return array
      */
     public function getNotificationSettingsAttribute($value): array
     {
@@ -162,14 +158,15 @@ class Customer extends Model
                 'email' => false,
             ];
         }
-        
+
         // If it's already an array, return it
         if (is_array($value)) {
             return $value;
         }
-        
+
         // If it's a JSON string, decode it
         $decoded = json_decode($value, true);
+
         return is_array($decoded) ? $decoded : [
             'sms' => false,
             'email' => false,

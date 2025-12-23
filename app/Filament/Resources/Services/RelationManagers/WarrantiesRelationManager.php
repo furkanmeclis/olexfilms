@@ -57,7 +57,7 @@ class WarrantiesRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('days_remaining')
                     ->label('Kalan Gün')
-                    ->formatStateUsing(fn ($state) => $state !== null 
+                    ->formatStateUsing(fn ($state) => $state !== null
                         ? ($state > 0 ? "{$state} gün" : 'Süresi dolmuş')
                         : 'Bilinmiyor')
                     ->badge()
@@ -71,11 +71,11 @@ class WarrantiesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('is_active')
                     ->label('Durum')
                     ->badge()
-                    ->formatStateUsing(fn ($state, $record) => $state 
+                    ->formatStateUsing(fn ($state, $record) => $state
                         ? ($record->is_expired ? 'Süresi Dolmuş' : 'Aktif')
                         : 'Pasif')
                     ->color(fn ($state, $record) => match (true) {
-                        !$state => 'gray',
+                        ! $state => 'gray',
                         $record->is_expired => 'danger',
                         default => 'success',
                     }),
@@ -97,4 +97,3 @@ class WarrantiesRelationManager extends RelationManager
             ->defaultSort('end_date', 'asc');
     }
 }
-

@@ -57,7 +57,7 @@ class EditOrder extends EditRecord
 
         // OrderItem'ları güncelle ve stok atamalarını yap
         // Stok yönetimi ve movement logları observer tarafından yapılacak
-        if (!empty($this->stockAssignments)) {
+        if (! empty($this->stockAssignments)) {
             DB::transaction(function () use ($order) {
                 $order->refresh();
                 $existingOrderItemIds = $order->items()->pluck('id')->toArray();
@@ -65,7 +65,7 @@ class EditOrder extends EditRecord
 
                 foreach ($this->stockAssignments as $itemData) {
                     $orderItem = null;
-                    
+
                     // Mevcut OrderItem'ı güncelle veya yeni oluştur
                     if (isset($itemData['id']) && $itemData['id']) {
                         $orderItem = $order->items()->find($itemData['id']);
@@ -78,9 +78,9 @@ class EditOrder extends EditRecord
                             $processedOrderItemIds[] = $orderItem->id;
                         }
                     }
-                    
+
                     // Yeni OrderItem oluştur
-                    if (!$orderItem) {
+                    if (! $orderItem) {
                         $orderItem = OrderItem::create([
                             'order_id' => $order->id,
                             'product_id' => $itemData['product_id'] ?? null,
@@ -91,7 +91,7 @@ class EditOrder extends EditRecord
 
                     // Mevcut stok atamalarını al
                     $currentStockIds = $orderItem->stockItems->pluck('id')->toArray();
-                    
+
                     // Yeni seçilen stokları al
                     $selectedStockIds = array_filter($itemData['stock_items'] ?? []);
 
@@ -100,19 +100,19 @@ class EditOrder extends EditRecord
                     $toRemove = array_diff($currentStockIds, $selectedStockIds);
 
                     // Stokları ekle (observer stok durumunu güncelleyecek)
-                    if (!empty($toAdd)) {
+                    if (! empty($toAdd)) {
                         $orderItem->stockItems()->attach($toAdd);
                     }
 
                     // Stokları kaldır (observer stokları serbest bırakacak)
-                    if (!empty($toRemove)) {
+                    if (! empty($toRemove)) {
                         $orderItem->stockItems()->detach($toRemove);
                     }
                 }
 
                 // Silinen OrderItem'ları kaldır (observer stokları serbest bırakacak)
                 $toDeleteOrderItemIds = array_diff($existingOrderItemIds, $processedOrderItemIds);
-                if (!empty($toDeleteOrderItemIds)) {
+                if (! empty($toDeleteOrderItemIds)) {
                     foreach ($toDeleteOrderItemIds as $orderItemId) {
                         $orderItemToDelete = OrderItem::find($orderItemId);
                         if ($orderItemToDelete) {

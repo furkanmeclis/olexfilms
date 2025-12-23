@@ -11,10 +11,10 @@ use App\Filament\Resources\BulkSms\Tables\BulkSmsTable;
 use App\Models\BulkSms;
 use BackedEnum;
 use Filament\Resources\Resource;
-use UnitEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class BulkSmsResource extends Resource
 {
@@ -68,7 +68,7 @@ class BulkSmsResource extends Resource
         $query = parent::getEloquentQuery();
 
         // Sadece super_admin görebilir
-        if (!auth()->user()?->hasRole('super_admin')) {
+        if (! auth()->user()?->hasRole('super_admin')) {
             $query->whereRaw('1 = 0'); // Hiçbir kayıt gösterme
         }
 

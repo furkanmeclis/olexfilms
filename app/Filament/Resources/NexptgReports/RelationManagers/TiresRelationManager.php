@@ -158,4 +158,3 @@ class TiresRelationManager extends RelationManager
             ->defaultSort('section', 'asc');
     }
 }
-

@@ -8,7 +8,6 @@ use App\Enums\StockMovementActionEnum;
 use App\Enums\StockStatusEnum;
 use App\Events\Orders\OrderItemCreated;
 use App\Events\Orders\OrderItemUpdated;
-use App\Models\StockItem;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -28,15 +27,15 @@ class HandleOrderItemStockAssignment
         // Stoklar zaten attach edilmiş olmalı (form'dan geliyor)
         // Sadece status güncellemesi yap
         $order->loadMissing('items.stockItems');
-        
+
         DB::transaction(function () use ($orderItem, $order, $user) {
             // OrderItem'ı refresh et ki stockItems yüklü olsun
             $orderItem->refresh();
             $stockItems = $orderItem->stockItems;
 
             // Order status'unu kontrol et (enum'a cast edilmiş olmalı)
-            $orderStatus = $order->status instanceof OrderStatusEnum 
-                ? $order->status 
+            $orderStatus = $order->status instanceof OrderStatusEnum
+                ? $order->status
                 : OrderStatusEnum::from($order->status);
 
             // Order status'una göre stok durumunu güncelle
@@ -85,7 +84,7 @@ class HandleOrderItemStockAssignment
                             ->where('description', 'like', "%Sipariş #{$order->id}%")
                             ->first();
 
-                        if (!$existingMovement) {
+                        if (! $existingMovement) {
                             StockMovement::create([
                                 'stock_item_id' => $stockItem->id,
                                 'user_id' => $user?->id ?? $order->created_by,
@@ -113,15 +112,15 @@ class HandleOrderItemStockAssignment
         // Stok atamaları değişmiş olabilir
         // Bu durumda mevcut stokları kontrol et ve güncelle
         $order->loadMissing('items.stockItems');
-        
-        DB::transaction(function () use ($orderItem, $order, $user) {
+
+        DB::transaction(function () use ($orderItem, $order) {
             // OrderItem'ı refresh et ki stockItems yüklü olsun
             $orderItem->refresh();
             $stockItems = $orderItem->stockItems;
 
             // Order status'unu kontrol et (enum'a cast edilmiş olmalı)
-            $orderStatus = $order->status instanceof \App\Enums\OrderStatusEnum 
-                ? $order->status 
+            $orderStatus = $order->status instanceof \App\Enums\OrderStatusEnum
+                ? $order->status
                 : \App\Enums\OrderStatusEnum::from($order->status);
 
             // Order status'una göre stok durumunu güncelle
@@ -160,4 +159,3 @@ class HandleOrderItemStockAssignment
         });
     }
 }
-

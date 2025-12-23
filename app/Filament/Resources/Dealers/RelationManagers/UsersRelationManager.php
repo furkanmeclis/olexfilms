@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Dealers\RelationManagers;
 
+use App\Enums\UserRoleEnum;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
-use App\Enums\UserRoleEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -42,12 +42,14 @@ class UsersRelationManager extends RelationManager
                             return Hidden::make('dealer_id')
                                 ->default(fn () => $this->ownerRecord->id);
                         }
+
                         return $field;
                     })->toArray();
 
                     return $component->schema($sectionComponents);
                 }
             }
+
             return $component;
         })->toArray();
 
@@ -60,10 +62,11 @@ class UsersRelationManager extends RelationManager
                         ->contains(fn ($field) => $field->getName() === 'dealer_id');
                 }
             }
+
             return false;
         });
 
-        if (!$hasDealerId) {
+        if (! $hasDealerId) {
             // İlk section'a dealer_id ekle
             if (isset($components[0]) && $components[0] instanceof \Filament\Schemas\Components\Section) {
                 $firstSectionChildSchema = $components[0]->getChildSchema();
@@ -90,6 +93,7 @@ class UsersRelationManager extends RelationManager
                     ->label('Hızlı Çalışan Ekle')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['dealer_id'] = $this->ownerRecord->id;
+
                         return $data;
                     })
                     ->after(function ($record, array $data) {
