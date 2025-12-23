@@ -2,16 +2,7 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\BulkSms\BulkSmsResource;
-use App\Filament\Resources\CarBrands\CarBrandResource;
-use App\Filament\Resources\CarModels\CarModelResource;
-use App\Filament\Resources\NexptgApiUsers\NexptgApiUserResource;
-use App\Filament\Resources\NotificationSettings\NotificationSettingResource;
-use App\Filament\Resources\ProductCategories\ProductCategoryResource;
-use App\Filament\Resources\ServiceStatusLogs\ServiceStatusLogResource;
-use App\Filament\Resources\StockItems\StockItemResource;
 use App\Http\Middleware\CheckDealerActive;
-use Awcodes\QuickCreate\QuickCreatePlugin;
 use Cmsmaxinc\FilamentErrorPages\FilamentErrorPagesPlugin;
 use Filament\Forms\Components\FileUpload;
 use Filament\Http\Middleware\Authenticate;
@@ -109,19 +100,6 @@ class AdminPanelProvider extends PanelProvider
                     )
                     ->enableBrowserSessions()
                     ->enableTwoFactorAuthentication(),
-                QuickCreatePlugin::make()
-                    ->sortBy('navigation')
-                    ->keyBindings(['command+shift+a', 'ctrl+shift+a'])
-                    ->excludes([
-                        CarBrandResource::class,
-                        NexptgApiUserResource::class,
-                        ProductCategoryResource::class,
-                        BulkSmsResource::class,
-                        CarModelResource::class,
-                        ServiceStatusLogResource::class,
-                        NotificationSettingResource::class,
-                        StockItemResource::class,
-                    ]),
             ]);
     }
 }

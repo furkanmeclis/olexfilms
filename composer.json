@@ -7,7 +7,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "awcodes/filament-quick-create": "^4.0",
         "barryvdh/laravel-dompdf": "^3.1",
         "cmsmaxinc/filament-error-pages": "^2.0",
         "filament/filament": "^4.0",
