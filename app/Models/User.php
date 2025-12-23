@@ -126,19 +126,36 @@ class User extends Authenticatable implements HasAvatar
         return true;
     }
 
-    /**
-     * Get the Filament avatar URL for the user.
-     */
     public function getFilamentAvatarUrl(): ?string
     {
-        $disk = config('filesystems.default');
-        if ($disk !== 's3') {
-            return $this->avatar_url ? Storage::disk($disk)->url($this->avatar_url) : null;
+        // Önce avatar_url'i kontrol et (Breezy için)
+        if ($this->avatar_url) {
+            try {
+                // Temporary URL kullan (1 saat geçerli)
+                return Storage::disk(config('filesystems.default'))->temporaryUrl(
+                    $this->avatar_url,
+                    now()->addHour()
+                );
+            } catch (\Exception $e) {
+                // Eğer temporary URL oluşturulamazsa, normal URL'i dene
+                return Storage::disk(config('filesystems.default'))->url($this->avatar_url);
+            }
         }
-        try {
-            return $this->avatar_url ? Storage::disk($disk)->temporaryUrl($this->avatar_url, now()->addHours(1)) : null;
-        } catch (\Exception $e) {
-            return null;
+
+        // Fallback olarak avatar'ı kullan
+        if ($this->avatar) {
+            try {
+                // Temporary URL kullan (1 saat geçerli)
+                return Storage::disk(config('filesystems.default'))->temporaryUrl(
+                    $this->avatar,
+                    now()->addHour()
+                );
+            } catch (\Exception $e) {
+                // Eğer temporary URL oluşturulamazsa, normal URL'i dene
+                return Storage::disk(config('filesystems.default'))->url($this->avatar);
+            }
         }
+
+        return asset('images/placeholder.png');
     }
 }
