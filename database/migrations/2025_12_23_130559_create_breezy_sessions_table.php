@@ -10,7 +10,9 @@ return new class extends Migration
     {
         Schema::create('breezy_sessions', function (Blueprint $table) {
             $table->id();
-            $table->morphs('authenticatable');
+            $table->string('authenticatable_type', 191);
+            $table->unsignedBigInteger('authenticatable_id');
+            $table->index(['authenticatable_type', 'authenticatable_id'], 'breezy_sessions_authenticatable_index');
             $table->string('panel_id')->nullable();
             $table->string('guard')->nullable();
             $table->string('ip_address', 45)->nullable();
