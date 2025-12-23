@@ -24,7 +24,7 @@ class ServiceStatusLogResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Servis Durum Logları';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static string|UnitEnum|null $navigationGroup = 'Hizmet Yönetimi';
 

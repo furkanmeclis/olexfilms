@@ -21,14 +21,14 @@ class ServiceStatusLogInfolist
                             ->icon('heroicon-o-wrench-screwdriver'),
 
                         TextEntry::make('fromDealer.name')
-                            ->label('Gelen Şube')
+                            ->label('Uygulayan Bayi')
                             ->badge()
                             ->color('info')
                             ->placeholder('Merkez')
                             ->icon('heroicon-o-arrow-left'),
 
                         TextEntry::make('toDealer.name')
-                            ->label('Giden Şube')
+                            ->label('Gidilen Şube')
                             ->badge()
                             ->color('primary')
                             ->placeholder('Merkez')
@@ -53,6 +53,7 @@ class ServiceStatusLogInfolist
                         TextEntry::make('notes')
                             ->label('Log Notları')
                             ->placeholder('Not yok')
+                            ->html()
                             ->columnSpanFull()
                             ->icon('heroicon-o-document-text'),
                     ])

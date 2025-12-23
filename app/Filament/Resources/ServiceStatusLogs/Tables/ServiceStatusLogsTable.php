@@ -19,14 +19,14 @@ class ServiceStatusLogsTable
                     ->icon('heroicon-o-wrench-screwdriver'),
 
                 TextColumn::make('fromDealer.name')
-                    ->label('Gelen Şube')
+                    ->label('Uygulayan Bayi')
                     ->searchable()
                     ->sortable()
                     ->placeholder('Merkez')
                     ->icon('heroicon-o-arrow-left'),
 
                 TextColumn::make('toDealer.name')
-                    ->label('Giden Şube')
+                    ->label('Gidilen Şube')
                     ->searchable()
                     ->sortable()
                     ->placeholder('Merkez')
@@ -40,8 +40,9 @@ class ServiceStatusLogsTable
 
                 TextColumn::make('notes')
                     ->label('Notlar')
+                    ->html()
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->notes)
+                    ->tooltip(fn ($record) => strip_tags($record->notes ?? ''))
                     ->placeholder('Not yok'),
 
                 TextColumn::make('created_at')

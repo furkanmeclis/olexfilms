@@ -3,12 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Enums\UserRoleEnum;
-use App\Models\Dealer;
 use App\Models\Service;
 use App\Models\ServiceStatusLog;
 use BackedEnum;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists;
 use Filament\Notifications\Notification;
@@ -18,7 +16,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -31,13 +29,13 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
     use InteractsWithSchemas;
     use InteractsWithTable;
 
-    protected static ?string $navigationLabel = 'Servis Durum Yönetimi';
+    protected static ?string $navigationLabel = 'Hizmet Arama';
 
-    protected static ?string $title = 'Servis Durum Yönetimi';
+    protected static ?string $title = 'Hizmet Arama';
 
     protected string $view = 'filament.pages.service-status-management';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMagnifyingGlass;
 
     protected static string|UnitEnum|null $navigationGroup = 'Hizmet Yönetimi';
 
@@ -51,8 +49,6 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
     {
         $this->form->fill([
             'service_no' => '',
-            'from_dealer_id' => null,
-            'notes' => '',
         ]);
     }
 
@@ -67,8 +63,6 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
 
     public function form(Schema $schema): Schema
     {
-        $user = auth()->user();
-
         return $schema
             ->components([
                 Section::make('Hizmet Arama')
@@ -80,39 +74,59 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
                             ->placeholder('Hizmet numarasını girin'),
                     ])
                     ->icon('heroicon-o-magnifying-glass'),
-
-                Section::make('Log Ekleme')
-                    ->schema([
-                        Select::make('from_dealer_id')
-                            ->label('Gelen Şube')
-                            ->options(function () {
-                                return Dealer::where('is_active', true)
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->toArray();
-                            })
-                            ->searchable()
-                            ->placeholder('Opsiyonel - Hizmetin geldiği şube')
-                            ->helperText('Eğer hizmet başka bir şubeden geliyorsa seçin'),
-
-                        TextInput::make('to_dealer_display')
-                            ->label('Giden Şube')
-                            ->default(fn () => $user->dealer?->name ?? 'Merkez')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->helperText('Otomatik olarak sizin şubeniz seçilir'),
-
-                        Textarea::make('notes')
-                            ->label('Notlar')
-                            ->rows(3)
-                            ->maxLength(65535)
-                            ->placeholder('Log notlarını girin (opsiyonel)'),
-                    ])
-                    ->columns(2)
-                    ->icon('heroicon-o-plus-circle')
-                    ->visible(fn () => $this->service !== null),
             ])
             ->statePath('data');
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('addServiceStatusLog')
+                ->label('Servis Durum Kaydı Ekle')
+                ->icon('heroicon-o-plus-circle')
+                ->color('success')
+                ->visible(fn () => $this->service !== null)
+                ->modalHeading('Servis Durum Kaydı Ekleme')
+                ->modalSubmitActionLabel('Kaydet')
+                ->modalCancelActionLabel('İptal')
+                ->form([
+                    RichEditor::make('notes')
+                        ->label('Notlar')
+                        ->fileAttachmentsDisk(config('filesystems.default'))
+                        ->fileAttachmentsVisibility('public')
+                        ->placeholder('Servis durum kaydı notlarını girin (opsiyonel)')
+                        ->columnSpanFull(),
+                ])
+                ->action(function (array $data) {
+                    if (!$this->service) {
+                        Notification::make()
+                            ->warning()
+                            ->title('Hizmet Bulunamadı')
+                            ->body('Önce bir hizmet araması yapmalısınız.')
+                            ->send();
+                        return;
+                    }
+
+                    $user = auth()->user();
+
+                    ServiceStatusLog::create([
+                        'service_id' => $this->service->id,
+                        'from_dealer_id' => $this->service->dealer_id, // Servis oluşturan bayi
+                        'to_dealer_id' => $user->dealer_id,
+                        'user_id' => $user->id,
+                        'notes' => $data['notes'] ?? null,
+                    ]);
+
+                    Notification::make()
+                        ->success()
+                        ->title('Servis Durum Kaydı Eklendi')
+                        ->body('Servis durum kaydı başarıyla eklendi.')
+                        ->send();
+
+                    // Tabloyu yenile
+                    $this->resetTable();
+                }),
+        ];
     }
 
     public function searchService(): void
@@ -151,45 +165,6 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
             ->send();
     }
 
-    public function addLog(): void
-    {
-        $data = $this->form->getState();
-
-        if (!$this->service) {
-            Notification::make()
-                ->warning()
-                ->title('Hizmet Bulunamadı')
-                ->body('Önce bir hizmet araması yapmalısınız.')
-                ->send();
-            return;
-        }
-
-        $user = auth()->user();
-
-        ServiceStatusLog::create([
-            'service_id' => $this->service->id,
-            'from_dealer_id' => $data['from_dealer_id'] ?? null,
-            'to_dealer_id' => $user->dealer_id,
-            'user_id' => $user->id,
-            'notes' => $data['notes'] ?? null,
-        ]);
-
-        // Form'u temizle (notes hariç)
-        $this->form->fill([
-            'service_no' => $this->form->getState()['service_no'],
-            'from_dealer_id' => null,
-            'notes' => '',
-        ]);
-
-        Notification::make()
-            ->success()
-            ->title('Log Eklendi')
-            ->body('Servis durum logu başarıyla eklendi.')
-            ->send();
-
-        // Tabloyu yenile
-        $this->resetTable();
-    }
 
     public function table(Table $table): Table
     {
@@ -203,12 +178,12 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
             })
             ->columns([
                 TextColumn::make('fromDealer.name')
-                    ->label('Gelen Şube')
+                    ->label('Uygulayan Bayi')
                     ->placeholder('Merkez')
                     ->icon('heroicon-o-arrow-left'),
 
                 TextColumn::make('toDealer.name')
-                    ->label('Giden Şube')
+                    ->label('Gidilen Şube')
                     ->placeholder('Merkez')
                     ->icon('heroicon-o-arrow-right'),
 
@@ -218,8 +193,9 @@ class ServiceStatusManagement extends Page implements HasSchemas, HasTable
 
                 TextColumn::make('notes')
                     ->label('Notlar')
+                    ->html()
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->notes)
+                    ->tooltip(fn ($record) => strip_tags($record->notes ?? ''))
                     ->placeholder('Not yok'),
 
                 TextColumn::make('created_at')
