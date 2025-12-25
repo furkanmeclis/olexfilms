@@ -255,6 +255,7 @@ class ViewService extends ViewRecord
                     ->required()
                     ->default(ServiceReportMatchTypeEnum::BEFORE->value),
             ])
+
             ->action(function (array $data) use ($record) {
                 $report = NexptgReport::find($data['nexptg_report_id']);
 
@@ -276,7 +277,12 @@ class ViewService extends ViewRecord
                 }
             })
             ->requiresConfirmation();
-
+        $actions[] = Actions\Action::make('viewWarrantyPage')
+            ->label('Garanti Görüntüle')
+            ->icon('heroicon-o-eye')
+            ->color('warning')
+            ->url(fn () => route('warranty.show', ['serviceNo' => $record->service_no]))
+            ->openUrlInNewTab();
         return $actions;
     }
 
