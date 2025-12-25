@@ -47,6 +47,7 @@ return array(
     '6d4419a22bfb72a20b561583f68f48b3' => $vendorDir . '/filament/notifications/src/Testing/helpers.php',
     '89e9938b64b06cc502d7ceca69a380fe' => $vendorDir . '/filament/filament/src/global_helpers.php',
     'ebb446bb6d02e998480945fbbb73dc64' => $vendorDir . '/filament/filament/src/helpers.php',
+    '2cffec82183ee1cea088009cef9a6fc3' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
     'b067bc7112e384b61c701452d53a14a8' => $vendorDir . '/mtdowling/jmespath.php/src/JmesPath.php',
     '8a9dc1de0ca7e01f3e08231539562f61' => $vendorDir . '/aws/aws-sdk-php/src/functions.php',
     '6124b4c8570aa390c21fafd04a26c69f' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
