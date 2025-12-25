@@ -149,7 +149,7 @@ $mappedStockItems = $stockItems
         isScanning: false,
         scanner: null,
         isLoading: false,
-        viewMode: 'grid', // 'grid' | 'list'
+        viewMode: 'list', // 'grid' | 'list'
     
         init() {
             // Livewire state değişikliklerini dinle
@@ -447,7 +447,7 @@ $mappedStockItems = $stockItems
                         <p class="text-xs sm:text-sm text-gray-600 truncate"
                             x-text="'Kategori: ' + getSelectedStockItem()?.category_name">
                         </p>
-                        <div class="mt-2" x-data="{ parts: getFilteredPartsLabels(getSelectedStockItem(), 5) }">
+                        <div class="mt-2 hidden" x-data="{ parts: getFilteredPartsLabels(getSelectedStockItem(), 5) }">
                             <p class="text-xs font-medium text-gray-700 mb-1">Uygulanabilir Alanlar:</p>
                             <div class="flex flex-wrap gap-1">
                                 <template x-for="(part, index) in parts.visible" :key="index">
@@ -589,7 +589,7 @@ $mappedStockItems = $stockItems
                                     x-text="'Kategori: ' + item.category_name"></p>
 
                                 <!-- Uygulanabilir Alanlar -->
-                                <div class="mt-2">
+                                <div class="mt-2 hidden">
                                     <p class="mb-1 text-xs font-medium text-gray-700">Uygulanabilir Alanlar:</p>
                                     <div class="flex flex-wrap gap-1" x-data="{ parts: getFilteredPartsLabels(item, 3) }">
                                         <template x-for="(part, index) in parts.visible"
@@ -644,7 +644,7 @@ $mappedStockItems = $stockItems
                                     </div>
 
                                     <!-- Uygulanabilir Alanlar -->
-                                    <div class="flex flex-wrap gap-1" x-data="{ parts: getFilteredPartsLabels(item, 4) }">
+                                    <div class="flex flex-wrap gap-1 hidden" x-data="{ parts: getFilteredPartsLabels(item, 4) }">
                                         <template x-for="(part, index) in parts.visible"
                                             :key="`list-part-${item.id}-${index}`">
                                             <span
