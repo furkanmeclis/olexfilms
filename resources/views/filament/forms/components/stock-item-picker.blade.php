@@ -45,6 +45,7 @@ if (!$dealerId) {
                 $q->whereNull('dealer_id');
             },
         );
+    /*
     if (!empty($appliedParts) && is_array($appliedParts)) {
         $stockItemsQuery->whereHas('product.category', function ($q) use ($appliedParts) {
             $dbDriver = DB::getDriverName();
@@ -72,6 +73,7 @@ if (!$dealerId) {
         // Eğer applied_parts seçilmemişse boş liste
         $stockItemsQuery->whereRaw('1 = 0');
     }
+    */
     // Debug bilgileri hazırla (query execute edilmeden önce)
     $debugQuery = clone $stockItemsQuery;
     $debugInfo = [
@@ -469,7 +471,7 @@ $mappedStockItems = $stockItems
                 <p class="font-medium">
                     Seçilen uygulama alanlarına uygun stok bulunamadı. Lütfen önce uygulama alanlarını seçin.
                 </p>
-                <details class="text-xs text-amber-700">
+                <details class="text-xs text-amber-700 hidden">
                     <summary class="cursor-pointer font-medium hover:text-amber-800 touch-manipulation">🔍 Debug
                         Bilgileri</summary>
                     <div
