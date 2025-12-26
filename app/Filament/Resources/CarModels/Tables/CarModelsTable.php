@@ -38,7 +38,7 @@ class CarModelsTable
 
         return $table
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('brand.logo')
+                \Filament\Tables\Columns\ImageColumn::make('brand.logo_url')
                     ->label('Marka Logo')
                     ->circular()
                     ->defaultImageUrl(url('/images/placeholder.png')),

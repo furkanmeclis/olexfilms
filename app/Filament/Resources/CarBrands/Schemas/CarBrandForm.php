@@ -31,7 +31,7 @@ class CarBrandForm
                             ->label('Logo')
                             ->image()
                             ->disk(config('filesystems.default'))
-                            ->directory('car-brands/logos')
+                            ->directory('car-brands')
                             ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048)

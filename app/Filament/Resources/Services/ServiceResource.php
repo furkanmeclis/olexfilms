@@ -197,19 +197,14 @@ class ServiceResource extends Resource
                 // Araç Bilgileri
                 Section::make('Araç Bilgileri')
                     ->schema([
-                        Infolists\Components\ImageEntry::make('carBrand.logo')
+                        Infolists\Components\ImageEntry::make('carBrand.logo_url')
                             ->label('Marka Logosu')
                             ->defaultImageUrl(function ($record) {
-                                if ($record->carBrand?->logo) {
-                                    $logoPath = $record->carBrand->logo;
-                                    if (str_starts_with($logoPath, 'storage/')) {
-                                        return asset($logoPath);
-                                    }
-
-                                    return asset('storage/'.$logoPath);
+                                if ($record->carBrand?->logo_url) {
+                                    return $record->carBrand->logo_url;
                                 }
 
-                                return null;
+                                return url('/images/placeholder.png');
                             })
                             ->circular()
                             ->height(100)

@@ -21,7 +21,8 @@ class CarBrandsTable
 
         return $table
             ->columns([
-                \Filament\Tables\Columns\ImageColumn::make('logo')
+                \Filament\Tables\Columns\ImageColumn::make('logo_url')
+
                     ->label('Logo')
                     ->circular()
                     ->defaultImageUrl(url('/images/placeholder.png')),

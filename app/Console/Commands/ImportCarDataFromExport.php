@@ -411,7 +411,7 @@ class ImportCarDataFromExport extends Command
         }
 
         try {
-            $response = Http::timeout(30)->get($logoUrl);
+            $response = Http::withoutVerifying()->timeout(30)->get($logoUrl);
 
             if (! $response->successful()) {
                 // Silently return null to allow trying next extension
