@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Services\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\ServiceStatusEnum;
 use App\Enums\UserRoleEnum;
 use Filament\Actions\Action;
@@ -47,6 +49,11 @@ class ServicesTable
                     ->label('Yıl')
                     ->sortable(),
 
+                TextColumn::make('plate')
+                    ->label('Plaka')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('status')
                     ->label('Durum')
                     ->formatStateUsing(fn ($state) => ServiceStatusEnum::getLabels()[$state->value] ?? $state->value)
@@ -83,6 +90,10 @@ class ServicesTable
                     ->relationship('dealer', 'name')
                     ->searchable()
                     ->preload(),
+            ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -145,6 +156,8 @@ class ServicesTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make(),
                 ]),
             ]);

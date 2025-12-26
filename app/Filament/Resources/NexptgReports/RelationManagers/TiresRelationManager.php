@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NexptgReports\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -144,6 +146,8 @@ class TiresRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
                 CreateAction::make(),
             ])
             ->actions([
@@ -152,6 +156,8 @@ class TiresRelationManager extends RelationManager
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make(),
                 ]),
             ])

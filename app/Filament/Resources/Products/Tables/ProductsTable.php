@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Products\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -62,6 +64,10 @@ class ProductsTable
 
                 TrashedFilter::make(),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
@@ -70,6 +76,8 @@ class ProductsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make()
                         ->label('Sil'),
                     ForceDeleteBulkAction::make()

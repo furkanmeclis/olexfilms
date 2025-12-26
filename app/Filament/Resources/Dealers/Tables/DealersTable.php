@@ -2,13 +2,12 @@
 
 namespace App\Filament\Resources\Dealers\Tables;
 
-use App\Filament\Exports\DealerExporter;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Models\Dealer;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -124,15 +123,13 @@ class DealersTable
                     ->label('Düzenle'),
             ])
             ->headerActions([
-                ExportAction::make()
-                    ->exporter(DealerExporter::class)
+                FilamentExportHeaderAction::make('export')
                     ->label('Dışa Aktar'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
-                        ->exporter(DealerExporter::class)
-                        ->label('Seçilenleri Dışa Aktar'),
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make()
                         ->label('Sil'),
                 ]),

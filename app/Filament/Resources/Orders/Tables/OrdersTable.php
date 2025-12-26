@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\OrderStatusEnum;
 use App\Enums\UserRoleEnum;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -68,6 +71,10 @@ class OrdersTable
                     ->searchable()
                     ->preload(),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
@@ -99,6 +106,12 @@ class OrdersTable
                             ->success()
                             ->send();
                     }),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ]);
     }
 }

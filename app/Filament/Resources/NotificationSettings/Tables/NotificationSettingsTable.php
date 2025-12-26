@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NotificationSettings\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\NotificationEventEnum;
 use App\Enums\NotificationPriorityEnum;
 use App\Enums\NotificationStatusEnum;
@@ -140,6 +142,10 @@ class NotificationSettingsTable
                     ->options(NotificationStatusEnum::getLabels())
                     ->multiple(),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -147,6 +153,8 @@ class NotificationSettingsTable
             ->defaultSort('created_at', 'desc')
             ->bulkActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     BulkAction::make('activate')
                         ->label('Aktif Yap')
                         ->icon('heroicon-o-check-circle')

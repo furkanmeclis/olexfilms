@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\BulkSms\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -95,9 +98,19 @@ class BulkSmsTable
                         'custom' => 'Özel Seçim',
                     ]),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\ProductCategories\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\Products\Schemas\ProductForm;
 use App\Filament\Resources\Products\Tables\ProductsTable;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -68,6 +72,8 @@ class ProductsRelationManager extends RelationManager
         return $configuredTable
             ->recordTitleAttribute('name')
             ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
                 CreateAction::make()
                     ->label('Yeni Ürün'),
             ])
@@ -86,6 +92,14 @@ class ProductsRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->withoutGlobalScopes([
                     SoftDeletingScope::class,
-                ]));
+                ]))
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                    DeleteBulkAction::make()
+                        ->label('Sil'),
+                ]),
+            ]);
     }
 }

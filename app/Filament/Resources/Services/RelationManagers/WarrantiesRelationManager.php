@@ -2,7 +2,10 @@
 
 namespace App\Filament\Resources\Services\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Filament\Resources\Warranties\WarrantyResource;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -84,7 +87,8 @@ class WarrantiesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // Garantiler otomatik oluşturuluyor, create action yok
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
             ])
             ->actions([
                 ViewAction::make()
@@ -92,7 +96,10 @@ class WarrantiesRelationManager extends RelationManager
                     ->url(fn ($record) => WarrantyResource::getUrl('view', ['record' => $record])),
             ])
             ->bulkActions([
-                // Garantiler silinemez
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ])
             ->defaultSort('end_date', 'asc');
     }

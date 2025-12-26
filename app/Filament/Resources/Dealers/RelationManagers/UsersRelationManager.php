@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Dealers\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\UserRoleEnum;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
@@ -89,6 +91,8 @@ class UsersRelationManager extends RelationManager
         return $configuredTable
             ->recordTitleAttribute('name')
             ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
                 CreateAction::make()
                     ->label('Hızlı Çalışan Ekle')
                     ->mutateFormDataUsing(function (array $data): array {
@@ -114,6 +118,8 @@ class UsersRelationManager extends RelationManager
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make()
                         ->label('Sil'),
                 ]),

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\NexptgReports\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\NexptgPartTypeEnum;
 use App\Enums\NexptgPlaceIdEnum;
 use Filament\Actions\BulkActionGroup;
@@ -155,6 +157,8 @@ class MeasurementsRelationManager extends RelationManager
                     ->options(NexptgPartTypeEnum::getLabels()),
             ])
             ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
                 CreateAction::make(),
             ])
             ->actions([
@@ -163,6 +167,8 @@ class MeasurementsRelationManager extends RelationManager
             ])
             ->bulkActions([
                 BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
                     DeleteBulkAction::make(),
                 ]),
             ])

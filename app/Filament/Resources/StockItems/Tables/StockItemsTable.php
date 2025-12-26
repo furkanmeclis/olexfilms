@@ -2,8 +2,11 @@
 
 namespace App\Filament\Resources\StockItems\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\StockLocationEnum;
 use App\Enums\StockStatusEnum;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -81,9 +84,19 @@ class StockItemsTable
                     ->searchable()
                     ->preload(),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ]);
     }
 }

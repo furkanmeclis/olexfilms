@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Services\RelationManagers;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -74,13 +77,17 @@ class ServiceItemsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // Sadece görüntüleme, create/edit form'da yapılacak
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
             ])
             ->actions([
                 // Sadece görüntüleme
             ])
             ->bulkActions([
-                // Sadece görüntüleme
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ]);
     }
 }

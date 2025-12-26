@@ -2,9 +2,12 @@
 
 namespace App\Filament\Resources\Warranties\Tables;
 
+use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
+use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use App\Enums\UserRoleEnum;
 use App\Filament\Resources\Services\ServiceResource;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -92,6 +95,10 @@ class WarrantiesTable
                     ->preload()
                     ->visible(fn () => $isAdmin),
             ])
+            ->headerActions([
+                FilamentExportHeaderAction::make('export')
+                    ->label('Dışa Aktar'),
+            ])
             ->recordActions([
                 ViewAction::make()
                     ->label('Görüntüle'),
@@ -107,6 +114,12 @@ class WarrantiesTable
                     ->color('info')
                     ->url(fn ($record) => ServiceResource::getUrl('view', ['record' => $record->service_id]))
                     ->openUrlInNewTab(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    FilamentExportBulkAction::make('export')
+                        ->label('Dışa Aktar'),
+                ]),
             ])
             ->defaultSort('end_date', 'asc');
     }
