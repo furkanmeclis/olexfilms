@@ -56,7 +56,7 @@ class WarrantiesTable
                 ProgressBarColumn::make('days_remaining')
                     ->label('Kalan Gün')
                     ->maxValue(fn ($record) => $record->total_days ?? 1)
-                    ->lowThreshold(fn ($record) => ($record->total_days ?? 1) * 0.3)
+                    ->lowThreshold(fn ($record) => (int) round(($record->total_days ?? 1) * 0.3))
                     ->dangerColor('rgb(239, 68, 68)')
                     ->warningColor('rgb(245, 158, 11)')
                     ->successColor('rgb(34, 197, 94)')
