@@ -4,10 +4,7 @@
     $isDisabled = $isDisabled();
 @endphp
 
-<x-dynamic-component
-    :component="$getFieldWrapperView()"
-    :field="$field"
->
+<x-dynamic-component :component="$getFieldWrapperView()" :field="$field">
     <div x-data="{
         value: @js($value),
         isDisabled: @js($isDisabled),
@@ -16,8 +13,9 @@
         validationMessage: '',
         isScanning: false,
         scanner: null,
-        
-        
+        isGenerating: false,
+    
+    
         async validate() {
             if (this.isDisabled) return;
             if (!this.value || this.value.trim() === '') {
@@ -26,11 +24,11 @@
                 this.validationMessage = 'Hizmet numarası boş olamaz.';
                 return;
             }
-            
+    
             // Livewire action'ı çağır (sadece UI feedback için, zorunlu değil)
             try {
                 const result = await $wire.validateServiceNumber(this.value.trim());
-                
+    
                 if (result && result.valid) {
                     this.isValid = true;
                     this.isInvalid = false;
@@ -53,29 +51,27 @@
                 $wire.set('{{ $statePath }}', this.value.trim(), false);
             }
         },
-        
+    
         async startQRScan() {
             if (this.isDisabled) return;
             if (!('BarcodeDetector' in window) && typeof Html5Qrcode === 'undefined') {
                 alert('QR kod okutma özelliği bu tarayıcıda desteklenmiyor. Lütfen modern bir tarayıcı kullanın.');
                 return;
             }
-            
+    
             this.isScanning = true;
-            
+    
             try {
                 // Kamera izni al
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: 'environment' } 
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
                 });
-                
+    
                 // QR kod okutma başlat
                 if (typeof Html5Qrcode !== 'undefined') {
                     const qrCodeScanner = new Html5Qrcode('qr-reader');
-                    
-                    await qrCodeScanner.start(
-                        { facingMode: 'environment' },
-                        {
+    
+                    await qrCodeScanner.start({ facingMode: 'environment' }, {
                             fps: 10,
                             qrbox: { width: 250, height: 250 }
                         },
@@ -89,16 +85,16 @@
                             console.log('QR scan error:', errorMessage);
                         }
                     );
-                    
+    
                     this.scanner = qrCodeScanner;
                 } else {
                     // BarcodeDetector API kullan (daha modern)
                     const video = document.createElement('video');
                     video.srcObject = stream;
                     video.play();
-                    
+    
                     const detector = new BarcodeDetector({ formats: ['qr_code'] });
-                    
+    
                     const detectQR = async () => {
                         try {
                             const barcodes = await detector.detect(video);
@@ -111,12 +107,12 @@
                         } catch (e) {
                             console.log('Detection error:', e);
                         }
-                        
+    
                         if (this.isScanning) {
                             requestAnimationFrame(detectQR);
                         }
                     };
-                    
+    
                     detectQR();
                 }
             } catch (error) {
@@ -125,7 +121,7 @@
                 this.isScanning = false;
             }
         },
-        
+    
         stopQRScan() {
             if (this.scanner) {
                 this.scanner.stop();
@@ -133,7 +129,7 @@
             }
             this.isScanning = false;
         },
-        
+    
         handleQRCode(qrText) {
             // QR kod formatı: https://olexfilms.app/warranty/1nrlZmcv
             // URL'den son kısmı (service_no) çıkar
@@ -141,7 +137,7 @@
                 const url = qrText.trim();
                 const parts = url.split('/');
                 const serviceNo = parts[parts.length - 1];
-                
+    
                 if (serviceNo && serviceNo.length > 0) {
                     this.value = serviceNo;
                     // QR kod okutulduktan sonra otomatik doğrula
@@ -157,15 +153,41 @@
                 this.isInvalid = true;
                 this.validationMessage = 'QR kod işlenirken bir hata oluştu.';
             }
+        },
+    
+        async generateCode() {
+            if (this.isDisabled) return;
+    
+            this.isGenerating = true;
+            this.isValid = false;
+            this.isInvalid = false;
+            this.validationMessage = '';
+    
+            try {
+                const result = await $wire.generateServiceNumber();
+    
+                if (result && result.success) {
+                    this.value = result.service_no;
+                    $wire.set('{{ $statePath }}', result.service_no, false);
+                    // Otomatik validate et
+                    await this.validate();
+                } else {
+                    this.isInvalid = true;
+                    this.validationMessage = result?.message || 'Kod üretilemedi.';
+                }
+            } catch (error) {
+                console.error('Generate code error:', error);
+                this.isInvalid = true;
+                this.validationMessage = 'Kod üretilirken bir hata oluştu.';
+            } finally {
+                this.isGenerating = false;
+            }
         }
     }">
         <div class="space-y-2">
-            <div class="flex gap-2">
-                <div class="flex-1">
-                    <input
-                        type="text"
-                        x-model="value"
-                        :disabled="isDisabled"
+            <div class="grid grid-cols-1  gap-2">
+                <div class="col-span-1">
+                    <input type="text" x-model="value" :disabled="isDisabled"
                         @input="isValid = false; isInvalid = false; validationMessage = ''; $wire.set('{{ $statePath }}', $event.target.value, false);"
                         :class="{
                             'border-gray-300': !isValid && !isInvalid,
@@ -174,39 +196,53 @@
                             'opacity-50 cursor-not-allowed': isDisabled
                         }"
                         class="fi-input w-full rounded-lg border shadow-sm focus:border-primary-500 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                        placeholder="Hizmet numarası girin veya QR kod okutun"
-                    >
+                        placeholder="Hizmet numarası girin veya QR kod okutun">
                 </div>
-                <button
-                    type="button"
-                    @click="validate()"
-                    :disabled="isDisabled || !value || value.trim() === ''"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Doğrula
-                </button>
-                <button
-                    type="button"
-                    @click="isScanning ? stopQRScan() : startQRScan()"
-                    :disabled="isDisabled"
-                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2.01M19 8h2M5 20h2m-2-4h2m4-8h2m-2 4h2m-2 4h2"></path>
-                    </svg>
-                    <span x-text="isScanning ? 'Durdur' : 'QR Okut'"></span>
-                </button>
+                <div class="flex gap-2 justify-start lg:justify-end">
+                    <button type="button" @click="generateCode()" x-show="!value || value.trim() === ''"
+                        :disabled="isDisabled || isGenerating"
+                        class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg x-show="!isGenerating" class="h-4 w-4" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <svg x-show="isGenerating" class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        <span x-text="isGenerating ? 'Üretiliyor...' : 'Dijital Kod Üret'"></span>
+                    </button>
+                    <button type="button" @click="validate()"
+                        :disabled="isDisabled || !value || value.trim() === ''"
+                        class="inline-flex items-center gap-2 rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Doğrula
+                    </button>
+                    <button type="button" @click="isScanning ? stopQRScan() : startQRScan()" :disabled="isDisabled"
+                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2.01M19 8h2M5 20h2m-2-4h2m4-8h2m-2 4h2m-2 4h2">
+                            </path>
+                        </svg>
+                        <span x-text="isScanning ? 'Durdur' : 'QR Okut'"></span>
+                    </button>
+                </div>
             </div>
-            
+
             <!-- Validation Message -->
             <div x-show="isValid || isInvalid" class="text-sm">
                 <p x-show="isValid" class="text-green-600" x-text="validationMessage"></p>
                 <p x-show="isInvalid" class="text-red-600" x-text="validationMessage"></p>
             </div>
-            
+
             <!-- QR Scanner -->
             <div x-show="isScanning" x-cloak class="mt-4">
                 <div id="qr-reader" class="w-full max-w-md mx-auto"></div>
@@ -214,8 +250,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Html5Qrcode CDN -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 </x-dynamic-component>
-

@@ -111,6 +111,39 @@ class EditService extends EditRecord
         ];
     }
 
+    public function generateServiceNumber(): array
+    {
+        $maxAttempts = 10;
+        $attempt = 0;
+
+        while ($attempt < $maxAttempts) {
+            // 16 haneli random integer üret
+            $serviceNo = (string) random_int(1000000000000000, 9999999999999999);
+
+            // Service tablosunda kontrol (mevcut kaydı ignore et)
+            $serviceExists = Service::where('service_no', $serviceNo)
+                ->where('id', '!=', $this->record->id)
+                ->exists();
+
+            if (! $serviceExists) {
+                // Unique kod bulundu
+                return [
+                    'success' => true,
+                    'service_no' => $serviceNo,
+                    'message' => 'Dijital kod başarıyla üretildi.',
+                ];
+            }
+
+            $attempt++;
+        }
+
+        // Max deneme sayısı aşıldı
+        return [
+            'success' => false,
+            'message' => 'Benzersiz kod üretilemedi. Lütfen tekrar deneyin.',
+        ];
+    }
+
     protected function afterSave(): void
     {
         $service = $this->record;
