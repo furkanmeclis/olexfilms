@@ -20,7 +20,7 @@ Route::get('/warranty/{serviceNo}', [WarrantyController::class, 'index'])->name(
 Route::get('/warranty/{serviceNo}/pdf', [WarrantyController::class, 'downloadPdf'])->name('warranty.pdf');
 
 // Excel Import routes (only super admin)
-Route::middleware(['auth', EnsureSuperAdmin::class])->group(function () {
+Route::middleware([EnsureSuperAdmin::class])->group(function () {
     Route::get('/excel-import', [ExcelImportController::class, 'index'])->name('excel-import.index');
     Route::post('/excel-import/preview', [ExcelImportController::class, 'preview'])->name('excel-import.preview');
     Route::post('/excel-import/confirm', [ExcelImportController::class, 'confirm'])->name('excel-import.confirm');

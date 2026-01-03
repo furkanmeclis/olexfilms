@@ -16,6 +16,9 @@ class EnsureSuperAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if(!auth()->check()) {
+            return redirect()->route('filament.admin.auth.login');
+        }
         if (! $request->user() || ! $request->user()->hasRole(UserRoleEnum::SUPER_ADMIN->value)) {
             abort(403, 'Bu sayfaya erişim yetkiniz yok.');
         }
