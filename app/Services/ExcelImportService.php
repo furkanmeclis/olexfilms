@@ -591,15 +591,19 @@ class ExcelImportService
 
                 // HandleOrderItemStockAssignment listener otomatik çalışır
                 // Order status DELIVERED olduğu için StockItem'lar dealer'a transfer edilir
-                foreach ($productStockItems as $stockItem) {
-                    $stockItem->transferOwnership(
-                        $dealerId,
-                        $userId,
-                        "Excel import ile dealer'a transfer edildi (Satır {$parsedRow['row_index']})"
-                    );
-                    $stockItem->update([
-                        'status' => StockStatusEnum::AVAILABLE->value,
-                    ]);
+                // StockItem'ları refresh et (attach'ten sonra güncel model gerekli)
+                foreach ($productStockItems as $stockItemModel) {
+                    $stockItem = StockItem::find($stockItemModel->id);
+                    if ($stockItem) {
+                        $stockItem->transferOwnership(
+                            $dealerId,
+                            $userId,
+                            "Excel import ile Sipariş #{$order->id} aracılığıyla dealer'a transfer edildi"
+                        );
+                        $stockItem->update([
+                            'status' => StockStatusEnum::AVAILABLE->value,
+                        ]);
+                    }
                 }
             }
 

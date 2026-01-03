@@ -93,3 +93,4 @@ class DealerRecentActivitiesWidget extends TableWidget
             ->paginated(false);
     }
 }
+
