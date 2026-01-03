@@ -27,7 +27,8 @@ class DealersTable
                 ImageColumn::make('logo_path')
                     ->label('Logo')
                     ->circular()
-                    ->defaultImageUrl(url('/images/placeholder.png')),
+                    ->defaultImageUrl(url('/images/placeholder.png'))
+                    ->default(''),
 
                 TextColumn::make('dealer_code')
                     ->label('Bayi Kodu')
